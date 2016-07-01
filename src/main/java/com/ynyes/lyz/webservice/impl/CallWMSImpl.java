@@ -2748,7 +2748,6 @@ public class CallWMSImpl implements ICallWMS {
 				tbOmD.setcModifiedUserno(cModifiedUserno);
 				tbOmD.setcModifiedDt(DateFromString(cModifiedDt));
 				tbOmD.setcUploadStatus(cUploadStatus);
-				tdTbOmDService.save(tbOmD);
 				TdGoods tdGoods = tdGoodsService.findByCodeAndStatus(cGcode,1l);
 				if (cWaveQty == null)
 				{
@@ -2757,6 +2756,14 @@ public class CallWMSImpl implements ICallWMS {
 				if (tdGoods == null)
 				{
 					return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>商品编码为："+ cGcode +"的商品不存在或者不可用</MESSAGE></STATUS></RESULTS>";
+				}
+				try
+				{
+					tdTbOmDService.save(tbOmD);
+				}
+				catch(Exception e)
+				{
+					return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>"+ e.getMessage() +"</MESSAGE></STATUS></RESULTS>";
 				}
 			}
 
