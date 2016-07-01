@@ -481,11 +481,6 @@ public class TdDeliveryIndexController {
 				for (TdOrder subOrder : orderList) {
 					subOrder.setStatusId(5L);
 					subOrder.setDeliveryTime(new Date());
-					TdCashReciptInf cashReciptInf = tdInterfaceService.initCashReciptByOrder(subOrder);
-					if (cashReciptInf != null)
-					{
-						tdInterfaceService.ebsWithObject(cashReciptInf, INFTYPE.CASHRECEIPTINF);
-					}
 					subOrder = tdOrderService.save(subOrder);
 				}
 			}
@@ -875,43 +870,6 @@ public class TdDeliveryIndexController {
 			}
 		}
 		
-		/*// 所有子单都确认收货
-		if (null != order.getMainOrderNumber()) {
-			List<TdOrder> orderList = tdOrderService.findByMainOrderNumberIgnoreCase(order.getMainOrderNumber());
-
-			if (null != orderList) {
-				for (TdOrder subOrder : orderList) {
-					List<TdOwnMoneyRecord> recList = tdOwnMoneyRecordService
-							.findByOrderNumberIgnoreCase(subOrder.getOrderNumber());
-					TdOwnMoneyRecord rec = new TdOwnMoneyRecord();
-					if (null != recList && recList.size() > 0) {
-						//如果存在修改欠款申请
-						rec=recList.get(0);
-						//continue;
-					}
-					//修改实付款 已经移到同意申请欠款处 
-//					subOrder.setActualPay(subOrder.getActualPay() + payed);
-//					subOrder = tdOrderService.save(subOrder);
-
-					
-					rec.setCreateTime(new Date());
-					rec.setOrderNumber(subOrder.getOrderNumber());
-					rec.setDiyCode(subOrder.getDiySiteCode());
-					rec.setOwned(owned);
-					rec.setPayed(payed);
-					rec.setUsername(subOrder.getUsername());
-					if(owned != null && owned==0){
-						rec.setIsOwn(false);
-					}
-					rec.setIsEnable(false);
-					rec.setIsPayed(false);
-					rec.setSortId(99L);
-
-					rec = tdOwnMoneyRecordService.save(rec);
-				}
-			}
-		}*/
-
 		res.put("code", 0);
 		res.put("owned", owned);
 		return res;
