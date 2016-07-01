@@ -99,6 +99,18 @@ $(function () {
     	});
             $("#sellerdl").css("display","block");
         });
+	    $("input[name='userType']").click(function(){
+	    	var userTypeChecked= $(this).val();
+	    	if(userTypeChecked==5){
+	    		$("input[name='opUser']").attr("datatype","*");
+	    		$("#opUserDl").show();
+	    	}else{
+	    		$("input[name='opUser']").attr("datatype","");
+	    		$("input[name='opUser']").attr("value","");
+	    		$("input[name='opUser']").val("");
+	    		$("#opUserDl").hide();
+	    	}
+        });
 });   
 
  //修改粮草备注
@@ -258,10 +270,10 @@ $(function () {
     <dt>真实姓名</dt>
     <dd><input name="realName" type="text" value="<#if user??>${user.realName!""}</#if>" class="input normal"></dd>
   </dl>
-  <dl>
+  <dl id="opUserDl" <#if user?? && user.userType?? && user.userType==5>style="display:block;"<#else>style="display:none;"</#if>>
     <dt>用户编码</dt>
     <dd>
-    	<input name="opUser" type="text" value="<#if user??>${user.opUser!""}</#if>" class="input normal" datatype="*" ajaxurl="/Verwalter/user/check<#if user??>?id=${user.id?c}</#if>" >
+    	<input name="opUser" type="text" value="<#if user??>${user.opUser!""}</#if>" class="input normal" ajaxurl="/Verwalter/user/check<#if user??>?id=${user.id?c}</#if>" >
     	<span class="Validform_checktip">仅配送员填写</span>
     </dd>
   </dl>

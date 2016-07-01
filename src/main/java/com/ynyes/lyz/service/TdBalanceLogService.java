@@ -118,7 +118,7 @@ public class TdBalanceLogService {
 		if (StringUtils.isNotBlank(endTime)) {
 			c.add(Restrictions.lte("createTime", com.ynyes.lyz.util.StringUtils.stringToDate(endTime, null), true));
 		}
-		c.add(Restrictions.ne("type", 2L, true));
+//		c.add(Restrictions.ne("type", 2L, true));
 		c.add(Restrictions.eq("isSuccess", true, true));
 		c.setOrderByDesc("createTime");
 		return repository.findAll(c,pageRequest);
@@ -161,7 +161,7 @@ public class TdBalanceLogService {
 		if (StringUtils.isNotBlank(endTime)) {
 			c.add(Restrictions.lte("createTime", com.ynyes.lyz.util.StringUtils.stringToDate(endTime, null), true));
 		}
-		c.add(Restrictions.ne("type", 2L, true));
+//		c.add(Restrictions.ne("type", 2L, true));
 		c.add(Restrictions.eq("isSuccess", true, true));
 		c.setOrderByDesc("createTime");
 		return repository.findAll(c);

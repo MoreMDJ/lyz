@@ -147,6 +147,9 @@ function downloaddate()
                 		<#case 1>
                 			提现
                 		<#break>
+                		<#case 2>
+                			管理员修改
+                		<#break>
                 		<#case 3>
                 			消费
                 		<#break>

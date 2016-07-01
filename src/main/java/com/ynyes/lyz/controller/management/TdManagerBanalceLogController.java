@@ -198,6 +198,7 @@ public class TdManagerBanalceLogController extends TdManagerBaseController {
 		Integer i = 0;
 		for (TdBalanceLog log : balanceList) {
 			row = sheet.createRow((int) i + 1);
+			String strfu="";
 			if (null != userMap.get(log.getUsername() + "cityName")) {// 归属城市
 				row.createCell(0).setCellValue(userMap.get(log.getUsername() + "cityName").toString());
 			}
@@ -211,13 +212,16 @@ public class TdManagerBanalceLogController extends TdManagerBaseController {
 				row.createCell(3).setCellValue(userMap.get(log.getUsername() + "name").toString());
 			}
 			if (null != log.getType()) {// 类型
+				if(log.getType()==1L || log.getType()==3L){
+					strfu="-";
+				}
 				row.createCell(4).setCellValue(log.getTypeName());
 			}
 			if (null != log.getBalanceType()) {// 预存款类型
 				row.createCell(5).setCellValue(log.getBalanceTypeName()+"预存款");
 			}
 			if (null != log.getMoney()) {// 变更金额
-				row.createCell(6).setCellValue(log.getMoney());
+				row.createCell(6).setCellValue(strfu+log.getMoney());
 			}
 			if (null != log.getBalance()) {// 变更后余额
 				row.createCell(7).setCellValue(log.getBalance());
