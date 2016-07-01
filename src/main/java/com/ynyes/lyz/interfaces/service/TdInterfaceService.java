@@ -542,38 +542,52 @@ public class TdInterfaceService {
 			{
 				return null;
 			}
-			Double allActualPay = tdOrder.getAllActualPay() == null ? 0.00 : tdOrder.getAllActualPay();
-			Double allTotalPay = tdOrder.getAllTotalPay() == null ? 0.00 : tdOrder.getAllTotalPay();
-			Double totalPrice = tdOrder.getTotalPrice() == null ? 0.00 :tdOrder.getTotalPrice();
+			Double allTotalPay = tdOrder.getAllTotalPay() == null ? 0.00 : tdOrder.getAllTotalPay();	//总单应支付金额
+			if (allTotalPay == 0)
+			{
+				allTotalPay = 1d;
+			}
+			Double totalPrice = tdOrder.getTotalPrice() == null ? 0.00 :tdOrder.getTotalPrice();		//分单应收金额
 			
 			//配送现金
 			if (INFConstants.INF_RECEIPT_TYPE_DELIVER_INT == type && ownMoneyRecord.getMoney() > 0)
 			{
-				
-				Double amount = totalPrice * ownMoneyRecord.getMoney() /(allActualPay + allTotalPay);
+				Double amount = totalPrice * ownMoneyRecord.getMoney() /(allTotalPay);
 				TdCashReciptInf cashReciptInf = this.initCashReceiptInfWithOrderAndReceiptTypeAndMoney(tdOrder, TdCashReciptInf.RECEIPT_TYPE_DELIVER_CASH, amount);
-				ebsWithObject(cashReciptInf, INFTYPE.CASHRECEIPTINF);
+				if (cashReciptInf != null)
+				{
+					ebsWithObject(cashReciptInf, INFTYPE.CASHRECEIPTINF);
+				}
 			}
 			//配送pos
 			if (INFConstants.INF_RECEIPT_TYPE_DELIVER_INT == type && ownMoneyRecord.getPos() > 0)
 			{
-				Double amount = totalPrice * ownMoneyRecord.getPos() /(allActualPay + allTotalPay);
+				Double amount = totalPrice * ownMoneyRecord.getPos() /allTotalPay;
 				TdCashReciptInf cashReciptInf = this.initCashReceiptInfWithOrderAndReceiptTypeAndMoney(tdOrder, TdCashReciptInf.RECEIPT_TYPE_DELIVER_POS, amount);
-				ebsWithObject(cashReciptInf, INFTYPE.CASHRECEIPTINF);
+				if (cashReciptInf != null)
+				{
+					ebsWithObject(cashReciptInf, INFTYPE.CASHRECEIPTINF);
+				}
 			}
 			//门店现金
 			if (INFConstants.INF_RECEIPT_TYPE_DIYSITE_INT == type && ownMoneyRecord.getBackMoney() > 0)
 			{
-				Double amount = totalPrice * ownMoneyRecord.getBackMoney() /(allActualPay + allTotalPay);
+				Double amount = totalPrice * ownMoneyRecord.getBackMoney() /allTotalPay;
 				TdCashReciptInf cashReciptInf = this.initCashReceiptInfWithOrderAndReceiptTypeAndMoney(tdOrder, TdCashReciptInf.RECEIPT_TYPE_DIYSITE_CASH, amount);
-				ebsWithObject(cashReciptInf, INFTYPE.CASHRECEIPTINF);
+				if (cashReciptInf != null)
+				{
+					ebsWithObject(cashReciptInf, INFTYPE.CASHRECEIPTINF);
+				}
 			}
 			//门店pos
 			if (INFConstants.INF_RECEIPT_TYPE_DIYSITE_INT == type && ownMoneyRecord.getBackPos() > 0)
 			{
-				Double amount = totalPrice * ownMoneyRecord.getBackPos() /(allActualPay + allTotalPay);
+				Double amount = totalPrice * ownMoneyRecord.getBackPos() /allTotalPay;
 				TdCashReciptInf cashReciptInf = this.initCashReceiptInfWithOrderAndReceiptTypeAndMoney(tdOrder, TdCashReciptInf.RECEIPT_TYPE_DIYSITE_POS, amount);
-				ebsWithObject(cashReciptInf, INFTYPE.CASHRECEIPTINF);
+				if (cashReciptInf != null)
+				{
+					ebsWithObject(cashReciptInf, INFTYPE.CASHRECEIPTINF);
+				}
 			}
 			
 		}
