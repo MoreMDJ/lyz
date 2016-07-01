@@ -596,7 +596,7 @@ public class TdInterfaceService {
 		}
 		TdCashReciptInf cashReciptInf = new TdCashReciptInf();
 		cashReciptInf.setSobId(SobId);
-		cashReciptInf.setReceiptNumber(tdOrder.getOrderNumber());
+		cashReciptInf.setReceiptNumber(StringTools.getUniqueNoWithHeader("REC"));
 		cashReciptInf.setUserid(tdOrder.getRealUserId());
 		cashReciptInf.setUsername(tdOrder.getRealUserRealName());
 		cashReciptInf.setUserphone(tdOrder.getRealUserUsername());
@@ -1021,6 +1021,7 @@ public class TdInterfaceService {
 		{
 			return "XMLWITHENTITY:null";
 		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");
 		switch (type)
 		{
 		case ORDERINF:
@@ -1101,7 +1102,6 @@ public class TdInterfaceService {
 		case ORDERRECEIVEINF:
 		{
 			TdOrderReceiveInf object = (TdOrderReceiveInf)entity;
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");
 			String receiveDate = sdf.format(object.getReceiveDate());
 			xml =   "<TABLE><SOB_ID>" + object.getSobId() + "</SOB_ID>"
 					+ "<ORDER_HEADER_ID>" + object.getHeaderId() + "</ORDER_HEADER_ID>"
@@ -1189,6 +1189,7 @@ public class TdInterfaceService {
 		case CASHRECEIPTINF:
 		{
 			TdCashReciptInf object = (TdCashReciptInf)entity;
+			String receiveDate = sdf.format(object.getReceiptDate());
 			xml =   "<TABLE><SOB_ID>" + object.getSobId() + "</SOB_ID>"
 					+ "<RECEIPT_ID>" + object.getReceiptId() + "</RECEIPT_ID>"
 					+ "<RECEIPT_NUMBER>" + object.getReceiptNumber() + "</RECEIPT_NUMBER>"
@@ -1201,7 +1202,7 @@ public class TdInterfaceService {
 					+ "<ORDER_NUMBER>" + object.getOrderNumber() + "</ORDER_NUMBER>"
 					+ "<PRODUCT_TYPE>" + object.getProductType() + "</PRODUCT_TYPE>"
 					+ "<RECEIPT_TYPE>" + object.getReceiptType() + "</RECEIPT_TYPE>"
-					+ "<RECEIPT_DATE>" + object.getReceiptDate() + "</RECEIPT_DATE>"
+					+ "<RECEIPT_DATE>" + receiveDate + "</RECEIPT_DATE>"
 					+ "<AMOUNT>" + object.getAmount() + "</AMOUNT>"
 					+ "<ATTRIBUTE1>" + object.getAttribute1() + "</ATTRIBUTE1>"
 					+ "<ATTRIBUTE2>" + object.getAttribute2() + "</ATTRIBUTE2>"

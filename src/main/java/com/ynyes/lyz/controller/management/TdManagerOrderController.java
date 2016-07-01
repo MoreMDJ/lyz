@@ -1329,12 +1329,13 @@ public class TdManagerOrderController {
 		rec.setPayTime(new Date());
 		tdOwnMoneyRecordService.save(rec);
 		
-		//保存订单实付款(有问题)
-//		order.setActualPay(money+pos);
-//		tdOrderService.save(order);
-		// 收款发ebs
-//		recordAndSendToEbsByTdOwnMoneyRecord(own,INFConstants.INF_RECEIPT_TYPE_DIYSITE_INT);
-//		tdInterfaceService.initCashReciptByTdOwnMoneyRecord(own, INFConstants.INF_RECEIPT_TYPE_DIYSITE_INT);
+		//门店收款保存到订单
+		order.setCashPay(money);
+		order.setPosPay(pos);
+		tdOrderService.save(order);
+		
+		// 记录收款并发ebs
+		tdInterfaceService.initCashReciptByTdOwnMoneyRecord(rec, INFConstants.INF_RECEIPT_TYPE_DIYSITE_INT);
 		
 		res.put("code", 0);
 		res.put("message", "已收款");

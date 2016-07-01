@@ -482,7 +482,10 @@ public class TdDeliveryIndexController {
 					subOrder.setStatusId(5L);
 					subOrder.setDeliveryTime(new Date());
 					TdCashReciptInf cashReciptInf = tdInterfaceService.initCashReciptByOrder(subOrder);
-					tdInterfaceService.ebsWithObject(cashReciptInf, INFTYPE.CASHRECEIPTINF);
+					if (cashReciptInf != null)
+					{
+						tdInterfaceService.ebsWithObject(cashReciptInf, INFTYPE.CASHRECEIPTINF);
+					}
 					subOrder = tdOrderService.save(subOrder);
 				}
 			}

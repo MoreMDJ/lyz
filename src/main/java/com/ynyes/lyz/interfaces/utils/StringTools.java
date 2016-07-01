@@ -1,6 +1,9 @@
 package com.ynyes.lyz.interfaces.utils;
 
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -200,6 +203,21 @@ public class StringTools {
 		{
 			return "Y";
 		}
+	}
+	
+	public static String getUniqueNoWithHeader(String headStr)
+	{
+		if (headStr == null)
+		{
+			headStr = "";
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+		Date now = new Date();
+		String sDate = sdf.format(now);
+		Random random = new Random();
+		Integer suiji = random.nextInt(900) + 100;
+		String orderNum = headStr + sDate + suiji;
+		return orderNum;
 	}
 	
 //	/**

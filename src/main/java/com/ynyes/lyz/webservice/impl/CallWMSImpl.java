@@ -43,6 +43,7 @@ import org.xml.sax.SAXException;
 
 import com.ynyes.lyz.entity.TdBackDetail;
 import com.ynyes.lyz.entity.TdBackMain;
+import com.ynyes.lyz.entity.TdCity;
 import com.ynyes.lyz.entity.TdDeliveryInfo;
 import com.ynyes.lyz.entity.TdDeliveryInfoDetail;
 import com.ynyes.lyz.entity.TdDiySiteInventory;
@@ -63,6 +64,7 @@ import com.ynyes.lyz.interfaces.service.TdTbwBackRecDService;
 import com.ynyes.lyz.interfaces.service.TdTbwBackRecMService;
 import com.ynyes.lyz.service.TdBackDetailService;
 import com.ynyes.lyz.service.TdBackMainService;
+import com.ynyes.lyz.service.TdCityService;
 import com.ynyes.lyz.service.TdDeliveryInfoDetailService;
 import com.ynyes.lyz.service.TdDeliveryInfoService;
 import com.ynyes.lyz.service.TdDiySiteInventoryLogService;
@@ -127,6 +129,9 @@ public class CallWMSImpl implements ICallWMS {
 	
 	@Autowired
 	private TdGoodsService tdGoodsService;
+	
+	@Autowired
+	private TdCityService tdCityService;
 
 	public String GetWMSInfo(String STRTABLE, String STRTYPE, String XML)
 	{
@@ -2981,10 +2986,28 @@ public class CallWMSImpl implements ICallWMS {
 				for (TdTbOmD tdTbOmD : tbOmDs)
 				{
 					String cGcode = tdTbOmD.getcGcode();
+					TdGoods tdGoods = tdGoodsService.findByCode(cGcode);
+					if (tdGoods == null)
+					{
+						return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>商品编码为："+ cGcode +"的商品不存在或者不可用</MESSAGE></STATUS></RESULTS>";
+					}
+					TdCity tdCity = tdCityService.findBySobIdCity(cCompanyId);
+					if (tdCity == null)
+					{
+						return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>城市编码为："+ cCompanyId +"的城市不存在</MESSAGE></STATUS></RESULTS>";
+					}
 					TdDiySiteInventory inventory = tdDiySiteInventoryService.findByGoodsCodeAndRegionIdAndDiySiteIdIsNull(cGcode, cCompanyId);
 					if (inventory == null)
 					{
-						return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>城市编码为："+ cCompanyId +"的城市不存在</MESSAGE></STATUS></RESULTS>";
+						inventory = new TdDiySiteInventory();
+						inventory.setGoodsCode(tdGoods.getCode());
+						inventory.setGoodsId(tdGoods.getId());
+						inventory.setCategoryId(tdGoods.getCategoryId());
+						inventory.setCategoryIdTree(tdGoods.getCategoryIdTree());
+						inventory.setCategoryTitle(tdGoods.getCategoryTitle());
+						inventory.setGoodsTitle(tdGoods.getTitle());
+						inventory.setRegionId(cCompanyId);
+						inventory.setRegionName(tdCity.getCityName());
 					}
 
 					Double doubleFromStr = tdTbOmD.getcWaveQty();

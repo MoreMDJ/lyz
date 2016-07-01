@@ -1,5 +1,9 @@
 package com.ynyes.lyz.interfaces.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
+
 public class MainTest {
 	
 //	@Autowired
@@ -8,48 +12,7 @@ public class MainTest {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try {
-			
-			String newStr= XMLEncNA("<ERP>"+
-					"<TABLE>"+
-        "<RT_HEADER_ID>29</RT_HEADER_ID>"+
-        "<LINE_ID>25</LINE_ID>"+
-        "<COUPON_TYPE_ID>1</COUPON_TYPE_ID>"+
-        "<SKU>SCD200-5L</SKU>"+
-        "<QUANTITY>1</QUANTITY>"+
-        "<PRICE>0.0</PRICE>"+
-        "<ATTRIBUTE1></ATTRIBUTE1>"+
-        "<ATTRIBUTE2></ATTRIBUTE2>"+
-        "<ATTRIBUTE3></ATTRIBUTE3>"+
-        "<ATTRIBUTE4></ATTRIBUTE4>"+
-        "<ATTRIBUTE5></ATTRIBUTE5>"+
-    "</TABLE>"+
-    "<TABLE>"+
-    "    <RT_HEADER_ID>29</RT_HEADER_ID>"+
-     "   <LINE_ID>26</LINE_ID>"+
-        "<COUPON_TYPE_ID>1</COUPON_TYPE_ID>"+
-        "<SKU>SCD200-5L</SKU>"+
-        "<QUANTITY>1</QUANTITY>"+
-        "<PRICE>0.0</PRICE>"+
-        "<ATTRIBUTE1></ATTRIBUTE1>"+
-        "<ATTRIBUTE2></ATTRIBUTE2>"+
-        "<ATTRIBUTE3></ATTRIBUTE3>"+
-        "<ATTRIBUTE4></ATTRIBUTE4>"+
-        "<ATTRIBUTE5></ATTRIBUTE5>"+
-    "</TABLE>"+
-    "<TABLE>"+
-        "<RT_HEADER_ID>29</RT_HEADER_ID>"+
-        "<LINE_ID>27</LINE_ID>"+
-        "<COUPON_TYPE_ID>4</COUPON_TYPE_ID>"+
-        "<SKU>SCD200-5L</SKU>"+
-        "<QUANTITY>1</QUANTITY>"+
-        "<PRICE>0.0</PRICE>"+
-        "<ATTRIBUTE1></ATTRIBUTE1>"+
-        "<ATTRIBUTE2></ATTRIBUTE2>"+
-        "<ATTRIBUTE3></ATTRIBUTE3>"+
-        "<ATTRIBUTE4></ATTRIBUTE4>"+
-        "<ATTRIBUTE5></ATTRIBUTE5>"+
-    "</TABLE>"+
-"</ERP>");
+			String newStr = getNumberStr("TTR");
 			System.err.println("test -----:"+newStr);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -93,5 +56,19 @@ public class MainTest {
         } // for
         return s;
     }
+	public static String getNumberStr(String headStr)
+	{
+		if (headStr == null)
+		{
+			headStr = "";
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+		Date now = new Date();
+		String sDate = sdf.format(now);
+		Random random = new Random();
+		Integer suiji = random.nextInt(900) + 100;
+		String orderNum = headStr + sDate + suiji;
+		return orderNum;
+	}
 
 }
