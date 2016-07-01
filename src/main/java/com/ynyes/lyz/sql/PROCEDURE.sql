@@ -97,5 +97,5 @@ left join td_user u1 on u1.op_user=di.driver
 left join td_goods g on g.id=og.goods_id
 left join td_product_category pc on pc.id=g.category_id
 left join td_product_category ppc on ppc.id=pc.parent_id
-where o.main_order_number is not null and order_time>=startTime and order_time<=endTime and o.status_id not in(1,2,3,7,8);
+where o.main_order_number is not null and order_time>=startTime and order_time<=endTime and o.status_id not in(1,2,7,8);
 END;
