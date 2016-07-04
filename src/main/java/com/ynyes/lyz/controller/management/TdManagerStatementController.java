@@ -490,16 +490,16 @@ public class TdManagerStatementController extends TdManagerBaseController {
 				}
 				TdGoodsInOut goodsInOut= goodsInOutList.get(j+i*maxRowNum);
 	        	row = sheet.createRow((int) j + 1);
-	            row.createCell(0).setCellValue(goodsInOut.getDiySiteName());//门店名称
-	            row.createCell(1).setCellValue(goodsInOut.getMainOrderNumber());//主单号
-	            row.createCell(2).setCellValue(goodsInOut.getOrderNumber());//分单号
-	            row.createCell(3).setCellValue(orderStatus(goodsInOut.getStatusId()));//订单状态
-	            row.createCell(4).setCellValue(dateToString(goodsInOut.getOrderTime(), null));//订单日期
-	            row.createCell(5).setCellValue(dateToString(goodsInOut.getSalesTime(), null));//销售日期
-	            row.createCell(6).setCellValue(goodsInOut.getRealName());//客户名称
-	            row.createCell(7).setCellValue(goodsInOut.getUsername());//客户电话
-	            row.createCell(8).setCellValue(goodsInOut.getBrandTitle());//品牌
-	            String brand= goodsInOut.getOrderNumber().substring(0, 2);
+	            row.createCell(0).setCellValue(objToString(goodsInOut.getDiySiteName()));//门店名称
+	            row.createCell(1).setCellValue(objToString(goodsInOut.getMainOrderNumber()));//主单号
+	            row.createCell(2).setCellValue(objToString(goodsInOut.getOrderNumber()));//分单号
+	            row.createCell(3).setCellValue(objToString(orderStatus(goodsInOut.getStatusId())));//订单状态
+	            row.createCell(4).setCellValue(objToString(dateToString(goodsInOut.getOrderTime(), null)));//订单日期
+	            row.createCell(5).setCellValue(objToString(dateToString(goodsInOut.getSalesTime(), null)));//销售日期
+	            row.createCell(6).setCellValue(objToString(goodsInOut.getRealName()));//客户名称
+	            row.createCell(7).setCellValue(objToString(goodsInOut.getUsername()));//客户电话
+	            row.createCell(8).setCellValue(objToString(goodsInOut.getBrandTitle()));//品牌
+	            String brand= objToString(goodsInOut.getOrderNumber()).substring(0, 2);
 	            if(brand.equals("HR")){
 	            	row.createCell(8).setCellValue("华润");
 	            }else if(brand.equals("LY")){
@@ -509,19 +509,19 @@ public class TdManagerStatementController extends TdManagerBaseController {
 	            }else{
 	            	row.createCell(8).setCellValue("其他");
 	            }
-	            row.createCell(9).setCellValue(goodsInOut.getCategoryTitle());//商品类别
-	            row.createCell(10).setCellValue(goodsInOut.getSellerRealName());//导购
-	            row.createCell(11).setCellValue(goodsInOut.getDeliverTypeTitle());//配送方式
-	            row.createCell(12).setCellValue(goodsInOut.getSku());//产品编号
-	            row.createCell(13).setCellValue(goodsInOut.getGoodsTitle());//产品名称
-	            row.createCell(14).setCellValue(goodsInOut.getQuantity());//数量
-	            row.createCell(15).setCellValue(goodsInOut.getPrice());//单价
-	            row.createCell(16).setCellValue(goodsInOut.getTotalPrice());//总价
-	            row.createCell(17).setCellValue(changeName(wareHouseList,goodsInOut.getWhNo()));//中转仓
-	            row.createCell(18).setCellValue(goodsInOut.getDeliverRealName());//配送人员
-	            row.createCell(19).setCellValue(goodsInOut.getDeliverUsername());//配送人员电话
-	            row.createCell(20).setCellValue(goodsInOut.getShippingAddress());//地址
-	            row.createCell(21).setCellValue(goodsInOut.getRemarkInfo());//客户备注
+	            row.createCell(9).setCellValue(objToString(goodsInOut.getCategoryTitle()));//商品类别
+	            row.createCell(10).setCellValue(objToString(goodsInOut.getSellerRealName()));//导购
+	            row.createCell(11).setCellValue(objToString(goodsInOut.getDeliverTypeTitle()));//配送方式
+	            row.createCell(12).setCellValue(objToString(goodsInOut.getSku()));//产品编号
+	            row.createCell(13).setCellValue(objToString(goodsInOut.getGoodsTitle()));//产品名称
+	            row.createCell(14).setCellValue(objToString(goodsInOut.getQuantity()));//数量
+	            row.createCell(15).setCellValue(objToString(goodsInOut.getPrice()));//单价
+	            row.createCell(16).setCellValue(objToString(goodsInOut.getTotalPrice()));//总价
+	            row.createCell(17).setCellValue(objToString(changeName(wareHouseList,goodsInOut.getWhNo())));//中转仓
+	            row.createCell(18).setCellValue(objToString(goodsInOut.getDeliverRealName()));//配送人员
+	            row.createCell(19).setCellValue(objToString(goodsInOut.getDeliverUsername()));//配送人员电话
+	            row.createCell(20).setCellValue(objToString(goodsInOut.getShippingAddress()));//地址
+	            row.createCell(21).setCellValue(objToString(goodsInOut.getRemarkInfo()));//客户备注
 //	            System.out.println("正在生成excel文件的 sheet"+(i+1)+"第"+(j+1)+"行");
 			}
 //			System.out.println("正在生成excel文件的 sheet"+(i+1));
