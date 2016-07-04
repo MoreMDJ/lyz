@@ -19,14 +19,15 @@
 	margin: -141px 0 0 -201px;
 	width: 400px;
 	height:230px;
-	border:1px solid #CCC;
 	line-height: 190px;
 	text-align:center;
 	font-size: 14px;
-	background-color:#F4F4F4;
+	background-color:#FFF;
 	overflow:hidden;
 	border: 1px solid #cccccc;
 	display: none;
+	box-shadow: 10px 10px 5px #888888;
+	color: #333;
 }	
 .dialog_row{
 	width: 100%;
@@ -213,6 +214,6 @@ var theForm = document.forms['form1'];
 	<div class="dialog_tip">此操作可能会运行几分钟.</div>
 	<div class="dialog_tip">运行结果会在几分钟后提示请勿重复操作! </div>
 	<div class="dialog_row">默认初始库存：<input id="defualtInventory" type="number" value="0" /> </div>
-	<div class="dialog_row"><input onclick="sumbitBackMoney()" class="dialog_btn" type="button" value="确定" /><input onclick="hiddenDialog()" class="dialog_btn" type="button" value="取消" /> </div>
+	<div class="dialog_row"><input onclick="sumbitBackMoney()" class="dialog_btn btn" type="button" value="确定" /><input onclick="hiddenDialog()" class="dialog_btn btn" type="button" value="取消" /> </div>
 </div>
  </body></html>
