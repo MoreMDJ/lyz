@@ -7,7 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.ynyes.lyz.entity.TdAd;
 import com.ynyes.lyz.entity.TdReturnReason;
 import com.ynyes.lyz.service.TdManagerLogService;
 import com.ynyes.lyz.service.TdReturnReasonService;

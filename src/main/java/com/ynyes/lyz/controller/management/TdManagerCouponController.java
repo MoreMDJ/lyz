@@ -43,7 +43,6 @@ import com.ynyes.lyz.entity.TdOrder;
 import com.ynyes.lyz.entity.TdUser;
 import com.ynyes.lyz.service.TdBrandService;
 import com.ynyes.lyz.service.TdCityService;
-import com.ynyes.lyz.service.TdCommonService;
 import com.ynyes.lyz.service.TdCouponModuleService;
 import com.ynyes.lyz.service.TdCouponService;
 import com.ynyes.lyz.service.TdCouponTypeService;
@@ -107,9 +106,6 @@ public class TdManagerCouponController extends TdManagerBaseController {
 
 	@Autowired
 	private TdCouponModuleService tdCouponModuleService;
-	
-	@Autowired
-	private TdCommonService tdCommonService;
 	
 	@RequestMapping(value = "/down/order/use")
 	public void couponUseDetail() {

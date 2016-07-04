@@ -1,10 +1,14 @@
 package com.ynyes.lyz.interfaces.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 public class TdCashRefundInf extends TdInfBaseEntity
@@ -61,11 +65,12 @@ public class TdCashRefundInf extends TdInfBaseEntity
 	
 	//退款日期
 	@Column
-	private String refundDate;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date refundDate;
 	
 	//退款金额
 	@Column
-	private String amount;
+	private Double amount;
 	
 	//订单退款，电子券退款，订单收款冲销
 	@Column
@@ -187,19 +192,19 @@ public class TdCashRefundInf extends TdInfBaseEntity
 		this.refundType = refundType;
 	}
 
-	public String getRefundDate() {
+	public Date getRefundDate() {
 		return refundDate;
 	}
 
-	public void setRefundDate(String refundDate) {
+	public void setRefundDate(Date refundDate) {
 		this.refundDate = refundDate;
 	}
 
-	public String getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
 
-	public void setAmount(String amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 

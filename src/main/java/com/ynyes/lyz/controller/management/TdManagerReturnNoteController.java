@@ -61,15 +61,6 @@ public class TdManagerReturnNoteController extends TdManagerBaseController{
 	@Autowired
 	private TdUserService tdUserService;
 
-//	@Autowired
-//	private TdDiySiteService tdDisSiteService;
-//
-//	@Autowired
-//	private TdPayTypeService tdPayTypeService;
-//
-//	@Autowired
-//	private TdUserTurnRecordService tdUserTurnRecordService;
-
 	@Autowired
 	private TdCommonService tdCommonService;
 	
@@ -78,21 +69,12 @@ public class TdManagerReturnNoteController extends TdManagerBaseController{
 	
 	@Autowired
 	private TdManagerRoleService tdManagerRoleService;
-//	
-//	@Autowired
-//	private TdGoodsService tdGoodsService;
-//	
-//	@Autowired
-//	private TdDeliveryInfoDetailService tdDeliveryInfoDetailService;
 	
 	@Autowired
 	private TdCityService tdCityService;
 	
 	@Autowired
 	private TdDiySiteService tdDiySiteService;
-//	
-//	@Autowired
-//	private TdReturnReportService tdReturnReportService;
 	
 	@Autowired
 	private TdPriceCountService tdPriceCountService;

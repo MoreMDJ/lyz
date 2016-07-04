@@ -19,6 +19,7 @@ import org.apache.axis.message.SOAPHeaderElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ynyes.lyz.entity.TdCashReturnNote;
 import com.ynyes.lyz.entity.TdCoupon;
 import com.ynyes.lyz.entity.TdDiySite;
 import com.ynyes.lyz.entity.TdOrder;
@@ -610,7 +611,7 @@ public class TdInterfaceService {
 		}
 		TdCashReciptInf cashReciptInf = new TdCashReciptInf();
 		cashReciptInf.setSobId(SobId);
-		cashReciptInf.setReceiptNumber(StringTools.getUniqueNoWithHeader("REC"));
+		cashReciptInf.setReceiptNumber(StringTools.getUniqueNoWithHeader("RC"));
 		cashReciptInf.setUserid(tdOrder.getRealUserId());
 		cashReciptInf.setUsername(tdOrder.getRealUserRealName());
 		cashReciptInf.setUserphone(tdOrder.getRealUserUsername());
@@ -626,31 +627,47 @@ public class TdInterfaceService {
 	}
 	
 	/**
-	 * 退款
-	 * @param tdOrder
+	 * 订单退款
+	 * @param cashReturnNote
 	 * @return
 	 */
-	public TdCashRefundInf initCashRefundInf(TdOrder tdOrder)
+	public TdCashRefundInf initCashRefundInf(TdCashReturnNote cashReturnNote)
 	{
+		if (cashReturnNote == null)
+		{
+			return null;
+		}
+		TdOrder tdOrder = tdOrderService.findByOrderNumber(cashReturnNote.getOrderNumber());
 		if (tdOrder == null)
 		{
 			return null;
 		}
+		TdOrderInf tdOrderInf = tdOrderInfService.findByOrderNumber(tdOrder.getOrderNumber());
+		if (tdOrderInf == null)
+		{
+			return null;
+		}
+		TdDiySite tdDiySite = tdDiySiteService.findOne(tdOrder.getDiySiteId());
+		if (tdDiySite == null)
+		{
+			return null;
+		}
+		
 		TdCashRefundInf cashRefundInf = new TdCashRefundInf();
-//		cashRefundInf.setSobId();
-//		cashRefundInf.setReceiptId();
-//		cashRefundInf.setReceiptNumber();
-//		cashRefundInf.setUserid();
-//		cashRefundInf.setUsername();
-//		cashRefundInf.setUserphone();
-//		cashRefundInf.setDiySiteCode();
-//		cashRefundInf.setReceiptClass();
-//		cashRefundInf.setOrderHeaderId();
-//		cashRefundInf.setOrderNumber();
-//		cashRefundInf.setProductType();
-//		cashRefundInf.setReceiptType();
-//		cashRefundInf.setReceiptDate();
-//		cashRefundInf.setAmount();
+		cashRefundInf.setSobId(tdDiySite.getRegionId());
+		cashRefundInf.setRefundNumber(StringTools.getUniqueNoWithHeader("RT"));
+		cashRefundInf.setUserid(tdOrder.getRealUserId());
+		cashRefundInf.setUsername(tdOrder.getRealUserRealName());
+		cashRefundInf.setUserphone(tdOrder.getRealUserUsername());
+		cashRefundInf.setDiySiteCode(tdDiySite.getStoreCode());
+		cashRefundInf.setRefundClass("订单");
+		cashRefundInf.setRtHeaderId(tdOrderInf.getHeaderId().toString());
+		cashRefundInf.setReturnNumber(cashReturnNote.getReturnNoteNumber());
+		cashRefundInf.setProductType(StringTools.getProductStrByOrderNumber(tdOrder.getOrderNumber()));
+		cashRefundInf.setRefundType(cashReturnNote.getTypeTitle());
+		cashRefundInf.setRefundDate(new Date());
+		cashRefundInf.setAmount(cashReturnNote.getMoney());
+		cashRefundInf.setDescription("订单退款");
 		return tdCashRefundInfService.save(cashRefundInf);
 		
 	}
