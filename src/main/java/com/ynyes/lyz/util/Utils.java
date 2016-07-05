@@ -1,5 +1,9 @@
 package com.ynyes.lyz.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.ibm.icu.text.DecimalFormat;
 
 public class Utils {
@@ -62,5 +66,21 @@ public class Utils {
 			res=0.0;
 		}
 		return res;
+	}
+	
+	/**
+	 * 获取系统开始时间 2016-01-01
+	 * @return
+	 * @throws ParseException
+	 */
+	public static Date getSysStartDate(){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try {
+			return sdf.parse("2016-01-01 00:00:00");
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return new Date();
+			
+		}
 	}
 }

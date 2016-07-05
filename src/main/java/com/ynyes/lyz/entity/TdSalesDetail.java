@@ -31,21 +31,20 @@ public class TdSalesDetail {
 	//下单时间
 	@Column
 	private Date orderTime;
+	//销售时间
+	private Date saleTime;
 	//订单状态
 	@Column
 	private Long statusId;
-	//会员电话
+	//导购姓名
 	@Column
-	private String username;
+	private String sellerRealName;
 	//客户名称
 	@Column
 	private String realName;
-	//收货人
+	//客户电话
 	@Column
-	private String shippingName;
-	//收货人
-	@Column
-	private String shippingPhone;
+	private String username;
 	//产品编号
 	@Column
 	private String sku;
@@ -61,53 +60,51 @@ public class TdSalesDetail {
 	//总价
 	@Column
 	private Double totalPrice;
-	//使用可提现金额
+	//现金卷
 	@Column
-	private Double cashBalanceUsed;
-	//使用不可体现金额
+	private Double cashCoupon;
+	//品牌类型
 	@Column
-	private Double unCashBalanceUsed;
-	//备注
+	private String brandTitle;
+	//商品父类型
 	@Column
-	private String remark;
+	private String goodsParentTypeTitle;
+	//商品类型
+	@Column
+	private String goodsTypeTitle;
+	//配送方式
+	@Column
+	private String deliverTypeTitle;
 	//中转仓
 	@Column
-	private String whNo;
+	private String whName;
 	//配送人员
 	@Column
 	private String deliverRealName;
 	//配送人员电话
 	@Column
 	private String deliverUsername;
-	//导购姓名
+	//收货人姓名
 	@Column
-	private String sellerRealName;
-	//商品类型
+	private String shippingName;
+	//收货人电话
 	@Column
-	private String title;
-	//配送方式
-	@Column
-	private String deliverTypeTitle;
+	private String shippingPhone;
 	//收货人地址
 	@Column
 	private String shippingAddress;
+	//订单备注
+	@Column
+	private String remark;
 	// 城市
 	@Column
 	private String cityName;
 	// 配送门店id
 	@Column
 	private String diySiteCode;
-	//创建人
-	private String createUsername;
 	//门店id
 	@Column
 	private Long diyId;
-	//一级分类名称
-	@Column
-	private String parentCategoryTitle;
-	//客户备注
-	@Column
-	private String remarkInfo;
 	
 	public Long getId() {
 		return id;
@@ -187,29 +184,11 @@ public class TdSalesDetail {
 	public void setTotalPrice(Double totalPrice) {
 		this.totalPrice = totalPrice;
 	}
-	public Double getCashBalanceUsed() {
-		return cashBalanceUsed;
-	}
-	public void setCashBalanceUsed(Double cashBalanceUsed) {
-		this.cashBalanceUsed = cashBalanceUsed;
-	}
-	public Double getUnCashBalanceUsed() {
-		return unCashBalanceUsed;
-	}
-	public void setUnCashBalanceUsed(Double unCashBalanceUsed) {
-		this.unCashBalanceUsed = unCashBalanceUsed;
-	}
 	public String getRemark() {
 		return remark;
 	}
 	public void setRemark(String remark) {
 		this.remark = remark;
-	}
-	public String getWhNo() {
-		return whNo;
-	}
-	public void setWhNo(String whNo) {
-		this.whNo = whNo;
 	}
 	public String getDeliverRealName() {
 		return deliverRealName;
@@ -228,12 +207,6 @@ public class TdSalesDetail {
 	}
 	public void setSellerRealName(String sellerRealName) {
 		this.sellerRealName = sellerRealName;
-	}
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
 	}
 	public String getDeliverTypeTitle() {
 		return deliverTypeTitle;
@@ -265,12 +238,6 @@ public class TdSalesDetail {
 	public void setCityName(String cityName) {
 		this.cityName = cityName;
 	}
-	public String getCreateUsername() {
-		return createUsername;
-	}
-	public void setCreateUsername(String createUsername) {
-		this.createUsername = createUsername;
-	}
 	public Long getDiyId() {
 		return diyId;
 	}
@@ -283,17 +250,41 @@ public class TdSalesDetail {
 	public void setShippingPhone(String shippingPhone) {
 		this.shippingPhone = shippingPhone;
 	}
-	public String getParentCategoryTitle() {
-		return parentCategoryTitle;
+	public Date getSaleTime() {
+		return saleTime;
 	}
-	public void setParentCategoryTitle(String parentCategoryTitle) {
-		this.parentCategoryTitle = parentCategoryTitle;
+	public void setSaleTime(Date saleTime) {
+		this.saleTime = saleTime;
 	}
-	public String getRemarkInfo() {
-		return remarkInfo;
+	public Double getCashCoupon() {
+		return cashCoupon;
 	}
-	public void setRemarkInfo(String remarkInfo) {
-		this.remarkInfo = remarkInfo;
+	public void setCashCoupon(Double cashCoupon) {
+		this.cashCoupon = cashCoupon;
+	}
+	public String getBrandTitle() {
+		return brandTitle;
+	}
+	public void setBrandTitle(String brandTitle) {
+		this.brandTitle = brandTitle;
+	}
+	public String getGoodsParentTypeTitle() {
+		return goodsParentTypeTitle;
+	}
+	public void setGoodsParentTypeTitle(String goodsParentTypeTitle) {
+		this.goodsParentTypeTitle = goodsParentTypeTitle;
+	}
+	public String getGoodsTypeTitle() {
+		return goodsTypeTitle;
+	}
+	public void setGoodsTypeTitle(String goodsTypeTitle) {
+		this.goodsTypeTitle = goodsTypeTitle;
+	}
+	public String getWhName() {
+		return whName;
+	}
+	public void setWhName(String whName) {
+		this.whName = whName;
 	}
 	
 }

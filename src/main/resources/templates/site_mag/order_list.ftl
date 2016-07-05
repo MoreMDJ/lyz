@@ -196,7 +196,7 @@ function downloaddate(type)
                         <select name="city" id="city" onchange="javascript:setTimeout(__doPostBack('changeCity',''), 0)" >
                         <option value="" >请选择</option>      
                         <#list cityList as city>
-                        	<option value="${city.cityName }" <#if cityname?? && cityname==city.cityName>selected</#if> >${city.cityName }</option>
+                        	<option value="${city.cityName!'' }" <#if cityname?? && cityname==city.cityName!''>selected</#if> >${city.cityName!'' }</option>
                         </#list>
                         </select>
             		</div>
@@ -209,7 +209,7 @@ function downloaddate(type)
                         <select name="diyCode" id="diyCode" onchange="javascript:setTimeout(__doPostBack('changeDiy',''), 0)" >
                         <option value="" >请选择</option>      
                         <#list diySiteList as diySite>
-                        	<option value="${diySite.storeCode }" <#if diyCode?? && diyCode==diySite.storeCode>selected</#if> >${diySite.title }</option>
+                        	<option value="${diySite.storeCode!'' }" <#if diyCode?? && diyCode==diySite.storeCode!''>selected</#if> >${diySite.title!'' }</option>
                         </#list>
                         </select>
             		</div>
