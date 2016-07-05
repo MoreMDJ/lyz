@@ -909,7 +909,7 @@ public class TdManagerStatementController extends TdManagerBaseController {
 	        	}else{
 	        		row.createCell(1).setCellValue(objToString(salesDetail.getMainOrderNumber()));
 	        		row.createCell(2).setCellValue(objToString(salesDetail.getOrderNumber()));
-	        	}
+	        	} 
 	        	//下单时间
 	        	row.createCell(3).setCellValue(objToString(salesDetail.getOrderTime()));
 	        	//订单状态
