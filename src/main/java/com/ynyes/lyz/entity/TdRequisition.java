@@ -119,6 +119,13 @@ public class TdRequisition {
     @Column
     private String sellerRealName;
     
+    // 销顾电话
+    @Column(length = 20)
+    private String sellerTel;
+    
+    // 商品总数
+    @Column
+    private Integer goodsQuantity;
     
 	public String getSellerRealName() {
 		return sellerRealName;
@@ -310,6 +317,35 @@ public class TdRequisition {
 
 	public void setDetailAddress(String detailAddress) {
 		this.detailAddress = detailAddress;
+	}
+
+	public String getSellerTel() {
+		return sellerTel;
+	}
+
+	public void setSellerTel(String sellerTel) {
+		this.sellerTel = sellerTel;
+	}
+
+	public Integer getGoodsQuantity() {
+		return goodsQuantity;
+	}
+
+	public void setGoodsQuantity(Integer goodsQuantity) {
+		this.goodsQuantity = goodsQuantity;
+	}
+
+	@Override
+	public String toString() {
+		return "TdRequisition [id=" + id + ", diySiteTitle=" + diySiteTitle + ", diySiteId=" + diySiteId
+				+ ", customerName=" + customerName + ", customerId=" + customerId + ", orderNumber=" + orderNumber
+				+ ", totalPrice=" + totalPrice + ", leftPrice=" + leftPrice + ", deliveryTime=" + deliveryTime
+				+ ", receiveName=" + receiveName + ", receiveAddress=" + receiveAddress + ", province=" + province
+				+ ", city=" + city + ", disctrict=" + disctrict + ", subdistrict=" + subdistrict + ", detailAddress="
+				+ detailAddress + ", receivePhone=" + receivePhone + ", requisiteGoodsList=" + requisiteGoodsList
+				+ ", orderTime=" + orderTime + ", typeId=" + typeId + ", remarkInfo=" + remarkInfo + ", diySiteTel="
+				+ diySiteTel + ", diyCode=" + diyCode + ", sellerRealName=" + sellerRealName + ", sellerTel="
+				+ sellerTel + ", goodsQuantity=" + goodsQuantity + "]";
 	}
     
 }

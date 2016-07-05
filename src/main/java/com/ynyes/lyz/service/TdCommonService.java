@@ -2360,6 +2360,7 @@ public class TdCommonService {
 			requisition.setDeliveryTime(dayTime);
 
 			requisition.setSellerRealName(order.getSellerRealName());
+			requisition.setSellerTel(order.getSellerUsername());
 
 			List<TdRequisitionGoods> requisitionGoodsList = new ArrayList<>();
 			for (TdOrder tdOrder : orderList) {
@@ -2406,6 +2407,7 @@ public class TdCommonService {
 				}
 			}
 			requisition.setRequisiteGoodsList(requisitionGoodsList);
+			requisition.setGoodsQuantity(requisitionGoodsList.size());
 			requisition = tdRequisitionService.save(requisition);
 		}
 		System.out.println("MDJ:WS:Requisition:" + requisition.getOrderNumber());
@@ -2466,6 +2468,8 @@ public class TdCommonService {
 					+ "</disctrict>" + "<province>" + requisition.getProvince() + "</province>" + "<subdistrict>"
 					+ requisition.getSubdistrict() + "</subdistrict>" + "<order_time>" + requisition.getOrderTime()
 					+ "</order_time>" + "<sub_order_number>" + requisition.getLeftPrice() + "</sub_order_number>"
+					+ "<seller_tel>" + requisition.getSellerTel() + "</seller_tel>"
+					+ "<goods_quantity>" + requisition.getGoodsQuantity() + "</goods_quantity>"
 					+ "</TABLE>" + "</ERP>";
 			xmlStr = xmlStr.replace("null", "");
 
