@@ -927,6 +927,22 @@ public class TdPriceCountService {
 			cal.add(Calendar.YEAR, 1);
 			Date endTime = cal.getTime();
 
+			// 2016-07-05修改：目前的退款全部退还现金
+			// 创建一个打款申请用于存储需要打款的现金，该实体不会进行持久化操作
+			TdCashReturnNote new_return_note = new TdCashReturnNote();
+			new_return_note.setCreateTime(new Date());
+			new_return_note.setMoney(0.00);
+			new_return_note.setTypeId(-1L);
+			new_return_note.setTypeTitle("现金");
+			new_return_note.setOrderNumber(order.getOrderNumber());
+			new_return_note.setMainOrderNumber(order.getMainOrderNumber());
+			new_return_note.setReturnNoteNumber(returnNoteNumber);
+			new_return_note.setUserId(user.getId());
+			new_return_note.setUsername(user.getUsername());
+			new_return_note.setIsOperated(true);
+			new_return_note.setFinishTime(new Date());
+			// 修改结束
+
 			Map<Long, Double> price_difference = new HashMap<>();
 
 			// 2016-06-26修改：需要获取用户使用赠送的产品券和购买的产品券的集合
@@ -1133,7 +1149,7 @@ public class TdPriceCountService {
 										} else {
 											cashPrice = cashTotal;
 										}
-										if(cashPrice > 0){
+										if (cashPrice > 0) {
 											TdCoupon cashCoupon = new TdCoupon();
 											cashCoupon.setTypeId(3L);
 											cashCoupon.setTypeCategoryId(1L);
@@ -1163,7 +1179,7 @@ public class TdPriceCountService {
 											cashCoupon.setOrderNumber(order.getOrderNumber());
 											// add end
 											tdCouponService.save(cashCoupon);
-	
+
 											total -= cashPrice;
 											result.put("cashTotal", cashTotal - cashPrice);
 										}
@@ -1294,7 +1310,12 @@ public class TdPriceCountService {
 											note.setUserId(user.getId());
 											note.setUsername(user.getUsername());
 											note.setIsOperated(false);
-											note = tdCashReturnNoteService.save(note);
+
+											// 2016-07-05修改：以现金的方式退还第三方的钱，不做持久化操作
+											// note =
+											// tdCashReturnNoteService.save(note);
+											new_return_note.setMoney(new_return_note.getMoney() + otherReturn);
+											// 修改结束
 
 											otherPay -= otherReturn;
 										}
@@ -1326,7 +1347,11 @@ public class TdPriceCountService {
 											note.setUserId(user.getId());
 											note.setUsername(user.getUsername());
 											note.setIsOperated(false);
-											note = tdCashReturnNoteService.save(note);
+
+											// 2016-07-05修改：不做持久化操作
+											// note = tdCashReturnNoteService.save(note);
+											new_return_note.setMoney(new_return_note.getMoney() + cashReturn);
+											// 修改结束
 
 											total -= cashReturn;
 											cashPay -= cashReturn;
@@ -1356,7 +1381,10 @@ public class TdPriceCountService {
 												note01.setUserId(user.getId());
 												note01.setUsername(user.getUsername());
 												note01.setIsOperated(false);
-												note01 = tdCashReturnNoteService.save(note01);
+												// 2016-07-05修改：以现金的方式退还POS支付的钱，不做持久化操作
+												// note01 = tdCashReturnNoteService.save(note01);
+												new_return_note.setMoney(new_return_note.getMoney() + posReturn);
+												// 修改结束
 
 												posPay -= posReturn;
 											}
@@ -1415,6 +1443,9 @@ public class TdPriceCountService {
 					}
 				}
 			}
+			// 2016-07-05修改：持久化总的打款记录
+			tdCashReturnNoteService.save(new_return_note);
+			// 修改结束 
 		}
 		tdUserService.save(user);
 	}
@@ -1714,8 +1745,7 @@ public class TdPriceCountService {
 									record = 0.00;
 								}
 								record += sub_coupon_price;
-								if (record > 0)
-								{
+								if (record > 0) {
 									price_difference.put(goods.getCode(), record);
 								}
 								// --------------------修改结束-----------------------

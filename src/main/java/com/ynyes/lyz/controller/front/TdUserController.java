@@ -2626,6 +2626,9 @@ public class TdUserController {
 			if (null == posPay) {
 				posPay = 0.00;
 			}
+			
+			// 2016-07-05修改：以现金的方式归还第三方支付的钱，POS和现金
+			Double all_cash_return = 0.00;
 
 			Map<Long, Double> price_difference = new HashMap<>();
 
@@ -2849,7 +2852,8 @@ public class TdUserController {
 										}
 
 										if (otherReturn > 0.00) {
-											infos.add(otherReturn + "元【" + payTypeTitle + "】");
+											all_cash_return += otherReturn;
+//											infos.add(otherReturn + "元【" + payTypeTitle + "】");
 											otherPay -= otherReturn;
 										}
 										// ----------在此处理退款申请单的一系列操作动作-------------------
@@ -2868,7 +2872,8 @@ public class TdUserController {
 										}
 
 										if (cashReturn > 0.00) {
-											infos.add(cashReturn + "元【现金】");
+											all_cash_return += cashReturn;
+//											infos.add(cashReturn + "元【现金】");
 											total -= cashReturn;
 											cashPay -= cashReturn;
 										}
@@ -2883,7 +2888,8 @@ public class TdUserController {
 											}
 
 											if (posReturn > 0.00) {
-												infos.add(posReturn + "元【POS退还】");
+												all_cash_return += posPay;
+//												infos.add(posReturn + "元【POS退还】");
 												posPay -= posReturn;
 											}
 										}
@@ -2894,6 +2900,7 @@ public class TdUserController {
 					}
 				}
 			}
+			infos.add(all_cash_return + "元【现金】");
 		}
 		res.put("infos", infos);
 		return res;
