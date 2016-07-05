@@ -31,6 +31,7 @@ import com.ynyes.lyz.entity.TdArticle;
 import com.ynyes.lyz.entity.TdArticleCategory;
 import com.ynyes.lyz.entity.TdBalanceLog;
 import com.ynyes.lyz.entity.TdCartGoods;
+import com.ynyes.lyz.entity.TdCashReturnNote;
 import com.ynyes.lyz.entity.TdCity;
 import com.ynyes.lyz.entity.TdCoupon;
 import com.ynyes.lyz.entity.TdDeliveryInfo;
@@ -64,6 +65,7 @@ import com.ynyes.lyz.service.TdArticleCategoryService;
 import com.ynyes.lyz.service.TdArticleService;
 import com.ynyes.lyz.service.TdBalanceLogService;
 import com.ynyes.lyz.service.TdCartGoodsService;
+import com.ynyes.lyz.service.TdCashReturnNoteService;
 import com.ynyes.lyz.service.TdCityService;
 import com.ynyes.lyz.service.TdCommonService;
 import com.ynyes.lyz.service.TdCouponService;
@@ -197,6 +199,9 @@ public class TdUserController {
 
 	@Autowired
 	private TdReturnReasonService tdReturnReasonService;
+	
+	@Autowired
+	private TdCashReturnNoteService tdCashReturnNoteService;
 
 	/**
 	 * 跳转到个人中心的方法（后期会进行修改，根据不同的角色，跳转的页面不同）
@@ -1466,7 +1471,24 @@ public class TdUserController {
 				}
 			}
 		}
-
+		
+		// 获取第三方支付的金额（主单的金额）
+		Double otherPay = order.getOtherPay();
+		// 生成打款通知
+		// 根据退款方式和退货金额生成一个资金退还申请单据
+		TdCashReturnNote note = new TdCashReturnNote();
+		note.setCreateTime(new Date());
+		note.setMoney(otherPay);
+		note.setTypeId(order.getPayTypeId());
+		note.setTypeTitle(order.getPayTypeTitle());
+		note.setOrderNumber(order.getOrderNumber());
+		note.setMainOrderNumber(order.getMainOrderNumber());
+		note.setReturnNoteNumber(null);
+		note.setUserId(user.getId());
+		note.setUsername(user.getUsername());
+		note.setIsOperated(false);
+		tdCashReturnNoteService.save(note);
+		
 		order.setStatusId(7L);
 		order.setCancelTime(new Date());
 		order.setIsRefund(true);
