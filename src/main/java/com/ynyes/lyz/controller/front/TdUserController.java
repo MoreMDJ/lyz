@@ -2926,8 +2926,8 @@ public class TdUserController {
 				}
 			}
 			if (all_cash_return > 0) {
-				if (all_cash_return > (posPay + cashPay)) {
-					all_cash_return = (posPay + cashPay);
+				if (all_cash_return > (order.getPosPay() + order.getCashPay())) {
+					all_cash_return = (order.getPosPay() + order.getCashPay());
 				}
 				BigDecimal bd = new BigDecimal(all_cash_return);
 				all_cash_return = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
