@@ -1548,7 +1548,6 @@ public class TdPriceCountService {
 								coupon.setMobile(user.getUsername());
 								coupon.setSku(module.getSku());
 								coupon.setCityId(city.getId());
-								coupon.setCityName(null);
 								coupon.setCityName(city.getCityName());
 								tdCouponService.save(coupon);
 							}
