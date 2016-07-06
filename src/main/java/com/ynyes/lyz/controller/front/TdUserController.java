@@ -2,6 +2,7 @@ package com.ynyes.lyz.controller.front;
 
 import static org.apache.commons.lang3.StringUtils.leftPad;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -199,7 +200,7 @@ public class TdUserController {
 
 	@Autowired
 	private TdReturnReasonService tdReturnReasonService;
-	
+
 	@Autowired
 	private TdCashReturnNoteService tdCashReturnNoteService;
 
@@ -1471,7 +1472,7 @@ public class TdUserController {
 				}
 			}
 		}
-		
+
 		// 获取第三方支付的金额（主单的金额）
 		Double otherPay = order.getOtherPay();
 		// 生成打款通知
@@ -1488,7 +1489,7 @@ public class TdUserController {
 		note.setUsername(user.getUsername());
 		note.setIsOperated(false);
 		tdCashReturnNoteService.save(note);
-		
+
 		order.setStatusId(7L);
 		order.setCancelTime(new Date());
 		order.setIsRefund(true);
@@ -2648,7 +2649,7 @@ public class TdUserController {
 			if (null == posPay) {
 				posPay = 0.00;
 			}
-			
+
 			// 2016-07-05修改：以现金的方式归还第三方支付的钱，POS和现金
 			Double all_cash_return = 0.00;
 
@@ -2875,7 +2876,8 @@ public class TdUserController {
 
 										if (otherReturn > 0.00) {
 											all_cash_return += otherReturn;
-//											infos.add(otherReturn + "元【" + payTypeTitle + "】");
+											// infos.add(otherReturn + "元【" +
+											// payTypeTitle + "】");
 											otherPay -= otherReturn;
 										}
 										// ----------在此处理退款申请单的一系列操作动作-------------------
@@ -2895,7 +2897,7 @@ public class TdUserController {
 
 										if (cashReturn > 0.00) {
 											all_cash_return += cashReturn;
-//											infos.add(cashReturn + "元【现金】");
+											// infos.add(cashReturn + "元【现金】");
 											total -= cashReturn;
 											cashPay -= cashReturn;
 										}
@@ -2911,7 +2913,8 @@ public class TdUserController {
 
 											if (posReturn > 0.00) {
 												all_cash_return += posPay;
-//												infos.add(posReturn + "元【POS退还】");
+												// infos.add(posReturn +
+												// "元【POS退还】");
 												posPay -= posReturn;
 											}
 										}
@@ -2922,7 +2925,11 @@ public class TdUserController {
 					}
 				}
 			}
-			infos.add(all_cash_return + "元【现金】");
+			if (all_cash_return > 0) {
+				BigDecimal bd = new BigDecimal(all_cash_return);
+				all_cash_return = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+				infos.add(all_cash_return + "元【现金】");
+			}
 		}
 		res.put("infos", infos);
 		return res;
