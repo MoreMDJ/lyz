@@ -193,9 +193,9 @@
                                         ${goods.goodsVersion!""}
                                         ${goods.goodsSaleType!""}
                                     </td>
-                                    <td>${goods.price?string("#.00")}</td>
+                                    <td>${goods.price?string("0.00")}</td>
                                     <td>${goods.quantity!""}</td>
-                                    <td>${(goods.price*goods.quantity)?string("#.00")}</td>
+                                    <td>${(goods.price*goods.quantity)?string("0.00")}</td>
                                 </tr>
                             </#list>
                         </#if>
