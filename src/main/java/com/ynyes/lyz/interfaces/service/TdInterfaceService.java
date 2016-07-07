@@ -1,6 +1,5 @@
 package com.ynyes.lyz.interfaces.service;
 
-import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,6 +15,7 @@ import javax.xml.soap.SOAPFactory;
 import org.apache.axis.client.Call;
 import org.apache.axis.encoding.XMLType;
 import org.apache.axis.message.SOAPHeaderElement;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,9 @@ import com.ynyes.lyz.entity.TdOrder;
 import com.ynyes.lyz.entity.TdOrderGoods;
 import com.ynyes.lyz.entity.TdOwnMoneyRecord;
 import com.ynyes.lyz.entity.TdPayType;
+import com.ynyes.lyz.entity.TdRecharge;
 import com.ynyes.lyz.entity.TdReturnNote;
+import com.ynyes.lyz.entity.TdUser;
 import com.ynyes.lyz.interfaces.entity.TdCashReciptInf;
 import com.ynyes.lyz.interfaces.entity.TdCashRefundInf;
 import com.ynyes.lyz.interfaces.entity.TdOrderCouponInf;
@@ -46,6 +48,7 @@ import com.ynyes.lyz.service.TdDiySiteService;
 import com.ynyes.lyz.service.TdOrderService;
 import com.ynyes.lyz.service.TdPayTypeService;
 import com.ynyes.lyz.service.TdPriceCountService;
+import com.ynyes.lyz.service.TdReChargeService;
 import com.ynyes.lyz.service.TdReturnNoteService;
 
 
@@ -269,28 +272,16 @@ public class TdInterfaceService {
 		if (returnOrderInfXml != null)
 		{
 			Object[] orderInf = { INFConstants.INF_RT_ORDER_STR, "1", returnOrderInfXml};
-			try
+			String result = this.ebsWsInvoke(orderInf);
+			if (StringUtils.isBlank(result))
 			{
-				String object = (String)this.getCall().invoke(orderInf);
-				String resultStr = StringTools.interfaceMessage(object);
-				System.out.println(resultStr);
-				if (resultStr != null)
-				{
-					isSendSuccess = false;
-					returnOrderInf.setSendFlag(0);
-				}
-				else
-				{
-					returnOrderInf.setSendFlag(1);
-					returnOrderInf.setErrorMsg(resultStr);
-				}
-			}
-			catch (RemoteException e)
-			{
-				e.printStackTrace();
 				isSendSuccess = false;
+				returnOrderInf.setSendFlag(0);
+			}
+			else
+			{
 				returnOrderInf.setSendFlag(1);
-				returnOrderInf.setErrorMsg(e.getMessage());
+				returnOrderInf.setErrorMsg(result);
 			}
 			tdReturnOrderInfService.save(returnOrderInf);
 		}
@@ -300,36 +291,17 @@ public class TdInterfaceService {
 		if (returnGoodsInfXml != null && isSendSuccess)
 		{
 			Object[] orderGoodsInf = { INFConstants.INF_RT_ORDER_GOODS_STR, "1", returnGoodsInfXml};
-			try
+			String reuslt = this.ebsWsInvoke(orderGoodsInf);
+			for (int i = 0; i < returnGoodsInfs.size(); i++)
 			{
-				String object = (String)this.getCall().invoke(orderGoodsInf);
-				String resultStr = StringTools.interfaceMessage(object);
-				if (resultStr == null)
+				if (StringUtils.isBlank(reuslt))
 				{
-					for (int i = 0; i < returnGoodsInfs.size(); i++)
-					{
-						TdReturnGoodsInf goodsInf = returnGoodsInfs.get(i);
-						goodsInf.setSendFlag(0);
-					}
+					returnGoodsInfs.get(i).setSendFlag(0);
 				}
 				else
 				{
-					for (int i = 0; i < returnGoodsInfs.size(); i++)
-					{
-						TdReturnGoodsInf goodsInf = returnGoodsInfs.get(i);
-						goodsInf.setSendFlag(1);
-						goodsInf.setErrorMsg(resultStr);
-					}
-				}
-			} 
-			catch (RemoteException e)
-			{
-				e.printStackTrace();
-				for (int i = 0; i < returnGoodsInfs.size(); i++)
-				{
-					TdReturnGoodsInf goodsInf = returnGoodsInfs.get(i);
-					goodsInf.setSendFlag(1);
-					goodsInf.setErrorMsg(e.getMessage());
+					returnGoodsInfs.get(i).setSendFlag(1);
+					returnGoodsInfs.get(i).setErrorMsg(reuslt);
 				}
 			}
 			tdReturnGoodsInfService.save(returnGoodsInfs);
@@ -340,37 +312,17 @@ public class TdInterfaceService {
 		if (returnCouponInfXml != null && isSendSuccess)
 		{
 			Object[] orderInf = { INFConstants.INF_RT_ORDER_COUPONS_STR, "1", returnCouponInfXml};
-			try
+			String reuslt = this.ebsWsInvoke(orderInf);
+			for (int i = 0; i < returnCouponInfs.size(); i++)
 			{
-				String object = (String)this.getCall().invoke(orderInf);
-				String resultStr = StringTools.interfaceMessage(object);
-				if (resultStr == null)
+				if (StringUtils.isBlank(reuslt))
 				{
-					for (int i = 0; i < returnCouponInfs.size(); i++)
-					{
-						TdReturnCouponInf returnCouponInf = (TdReturnCouponInf)returnCouponInfs.get(i);
-						returnCouponInf.setSendFlag(0);
-					}
+					returnCouponInfs.get(i).setSendFlag(0);
 				}
 				else
 				{
-					for (int i = 0; i < returnCouponInfs.size(); i++)
-					{
-						TdReturnCouponInf returnCouponInf = (TdReturnCouponInf)returnCouponInfs.get(i);
-						returnCouponInf.setSendFlag(1);
-						returnCouponInf.setErrorMsg(resultStr);
-					}
-				}
-				System.out.println(resultStr);
-			}
-			catch (RemoteException e)
-			{
-				e.printStackTrace();
-				for (int i = 0; i < returnCouponInfs.size(); i++)
-				{
-					TdReturnCouponInf returnCouponInf = (TdReturnCouponInf)returnCouponInfs.get(i);
-					returnCouponInf.setSendFlag(1);
-					returnCouponInf.setErrorMsg(e.getMessage());
+					returnCouponInfs.get(i).setSendFlag(1);
+					returnCouponInfs.get(i).setErrorMsg(reuslt);
 				}
 			}
 			tdReturnCouponInfService.save(returnCouponInfs);
@@ -637,6 +589,52 @@ public class TdInterfaceService {
 			cashReciptInf.setReceiptType(tdOrder.getPayTypeTitle());
 			cashReciptInf.setReceiptDate(new Date());
 			cashReciptInf.setAmount(tdOrder.getOtherPay());
+			return tdCashReciptInfService.save(cashReciptInf);
+		}
+		return null;
+	}
+	
+	/**
+	 * 订单支付后，支付宝，微信，银联的收款
+	 * @param tdOrder
+	 * @return
+	 */
+	public TdCashReciptInf initCashReciptByReCharge(TdRecharge tdRecharge,TdUser tdUser)
+	{
+		if (tdRecharge == null)
+		{
+			return null;
+		}
+		
+		
+		if (tdRecharge.getTotalPrice() != null && tdRecharge.getTotalPrice() != 0)
+		{
+//			TdOrderInf orderInf = tdOrderInfService.findByOrderNumber(tdOrder.getOrderNumber());
+//			if (orderInf == null) 
+//			{
+//				return null;
+//			}
+			
+			TdDiySite diySite = tdDiySiteService.findByStoreCode(tdUser.getDiyCode());
+			Long SobId = 0L;
+			if (diySite != null)
+			{
+				SobId = diySite.getRegionId();
+			}
+			TdCashReciptInf cashReciptInf = new TdCashReciptInf();
+			cashReciptInf.setSobId(SobId);
+//			cashReciptInf.setReceiptNumber(tdOrder.getOrderNumber());
+			cashReciptInf.setUserid(tdUser.getId());
+			cashReciptInf.setUsername(tdUser.getRealName());
+			cashReciptInf.setUserphone(tdUser.getUsername());
+			cashReciptInf.setDiySiteCode(diySite.getStoreCode());
+			cashReciptInf.setReceiptClass("预收款");
+//			cashReciptInf.setOrderHeaderId(orderInf.getHeaderId());
+//			cashReciptInf.setOrderNumber(tdOrder.getOrderNumber());
+			cashReciptInf.setProductType("PREPAY");
+			cashReciptInf.setReceiptType(tdRecharge.getTypeTitle());
+			cashReciptInf.setReceiptDate(new Date());
+			cashReciptInf.setAmount(tdRecharge.getTotalPrice());
 			return tdCashReciptInfService.save(cashReciptInf);
 		}
 		return null;
@@ -1464,10 +1462,11 @@ public class TdInterfaceService {
 		case RETURNTIMEINF:
 		{
 			TdReturnTimeInf object = (TdReturnTimeInf)entity;
+			String returnDate =sdf.format(object.getReturnDate());
 			xml =   "<TABLE><SOB_ID>" + object.getSobId() + "</SOB_ID>"
 					+ "<RT_HEADER_ID>" + object.getRtHeaderId() + "</RT_HEADER_ID>"
 					+ "<RETURN_NUMBER>" + object.getReturnNumber() + "</RETURN_NUMBER>"
-					+ "<RETURN_DATE>" + object.getReturnDate() + "</RETURN_DATE>"
+					+ "<RETURN_DATE>" + returnDate + "</RETURN_DATE>"
 					+ "<ATTRIBUTE1>" + object.getAttribute1() + "</ATTRIBUTE1>"
 					+ "<ATTRIBUTE2>" + object.getAttribute2() + "</ATTRIBUTE2>"
 					+ "<ATTRIBUTE3>" + object.getAttribute3() + "</ATTRIBUTE3>"
@@ -1572,67 +1571,92 @@ public class TdInterfaceService {
 	 */
 	public String ebsWithObject(Object object, INFTYPE type) 
 	{
+		if (object == null)
+		{
+			return "对象不能为空";
+		}
 		String result = new String();
 		switch (type) 
 		{
 			case ORDERRECEIVEINF:
 			{
+				if (!object.getClass().equals(TdOrderReceiveInf.class))
+				{
+					return "不是TdOrderReceiveInf,发送失败";
+				}
 				TdOrderReceiveInf orderReceiveInf = (TdOrderReceiveInf)object;
 				String orderInfXML = this.XMLWithEntity(orderReceiveInf, INFTYPE.ORDERRECEIVEINF);
 				orderInfXML = "<ERP>" + orderInfXML + "</ERP>";
 				orderInfXML = orderInfXML.replace("null", "");
-				Object[] orderInf = { INFConstants.INF_ORDER_RECEIVE_STR, "1", orderInfXML };
-				try
-				{
-					String resultXml = (String)getCall().invoke(orderInf);
-					result = StringTools.interfaceMessage(resultXml);
-				}
-				catch (Exception e)
-				{
-					result = e.getMessage();
-				}
+				Object[] orderInfParam = { INFConstants.INF_ORDER_RECEIVE_STR, "1", orderInfXML };
+				result = this.ebsWsInvoke(orderInfParam);
 				break;
 			}
 			
 			case CASHRECEIPTINF:
 			{
+				if (!object.getClass().equals(TdCashReciptInf.class))
+				{
+					return "不是TdCashReciptInf,发送失败";
+				}
 				TdCashReciptInf cashReceiveInf = (TdCashReciptInf)object;
 				String cashReceiveInfXML = this.XMLWithEntity(cashReceiveInf, INFTYPE.CASHRECEIPTINF);
 				cashReceiveInfXML = "<ERP>" + cashReceiveInfXML + "</ERP>";
 				cashReceiveInfXML = cashReceiveInfXML.replace("null", "");
 				Object[] orderInf = { INFConstants.INF_CASH_RECEIPTS_STR, "1", cashReceiveInfXML };
-				try
-				{
-					String resultXml = (String)getCall().invoke(orderInf);
-					result = StringTools.interfaceMessage(resultXml);
-				}
-				catch (Exception e)
-				{
-					result = e.getMessage();
-				}
+				result = this.ebsWsInvoke(orderInf);
 				break;
 			}
 			
 			case CASHREFUNDINF:
 			{
+				if (!object.getClass().equals(TdCashRefundInf.class))
+				{
+					return "不是TdCashRefundInf,发送失败";
+				}
 				TdCashRefundInf cashRefundInf = (TdCashRefundInf)object;
 				String cashRefundInfXML = this.XMLWithEntity(cashRefundInf, INFTYPE.CASHREFUNDINF);
 				cashRefundInfXML = "<ERP>" + cashRefundInfXML + "</ERP>";
 				cashRefundInfXML = cashRefundInfXML.replace("null", "");
 				Object[] orderInf = { INFConstants.INF_CASH_REFUND_STR, "1", cashRefundInfXML };
-				try
+				result = this.ebsWsInvoke(orderInf);
+				break;
+			}
+			case RETURNTIMEINF:
+			{
+				if (!object.getClass().equals(TdReturnTimeInf.class))
 				{
-					String resultXml = (String)getCall().invoke(orderInf);
-					result = StringTools.interfaceMessage(resultXml);
+					return "不是TdReturnTimeInf,发送失败";
 				}
-				catch (Exception e)
-				{
-					result = e.getMessage();
-				}
+				String returnTimeXml = this.XMLWithEntity(object, INFTYPE.RETURNTIMEINF);
+				returnTimeXml = "<ERP>" + returnTimeXml + "</ERP>";
+				returnTimeXml = returnTimeXml.replace("null", "");
+				Object[] orderInf = { INFConstants.INF_ORDER_RETMD_STR, "1", returnTimeXml };
+				result = this.ebsWsInvoke(orderInf);
 				break;
 			}
 			default:
 				break;
+		}
+		return result;
+	}
+	
+	/**
+	 * 根据需要传送的数组向ebs的WebService发送数据
+	 * @param params ：[接口表名,1,传送XML]
+	 * @return 发送结果：空代表成功，非空是代表错误信息
+	 */
+	public String ebsWsInvoke(Object[] params)
+	{
+		String result = new String();
+		try
+		{
+			String resultXml = (String)getCall().invoke(params);
+			result = StringTools.interfaceMessage(resultXml);
+		}
+		catch (Exception e)
+		{
+			result = e.getMessage();
 		}
 		return result;
 	}

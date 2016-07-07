@@ -376,6 +376,8 @@ public class TdManagerReturnNoteController extends TdManagerBaseController{
 				}
 				//修改库存
 				tdDiySiteInventoryService.changeGoodsInventory(returnNote,req);
+				TdReturnTimeInf returnTimeInf = tdInterfaceService.initReturnTimeByReturnNote(returnNote);
+				tdInterfaceService.ebsWithObject(returnTimeInf, INFTYPE.RETURNTIMEINF);
 				
 			}
 			// 确认验货
@@ -395,15 +397,19 @@ public class TdManagerReturnNoteController extends TdManagerBaseController{
 					TdOrder order = tdOrderService.findByOrderNumber(returnNote.getOrderNumber());
 					if (order != null && order.getStatusId() != null && order.getStatusId() == 9L)
 					{
-						tdPriceCountService.actAccordingWMS(returnNote, order.getId());
+						List<TdCashReturnNote> cashReturnNotes = tdPriceCountService.actAccordingWMS(returnNote, order.getId());
 						order.setStatusId(12L);
 						returnNote.setReturnTime(new Date());
 						tdOrderService.save(order);
-						TdCashReturnNote cashReturnNote = tdCashReturnNoteService.findByOrderNumber(order.getOrderNumber());
-						TdCashRefundInf cashRefundInf = tdInterfaceService.initCashRefundInf(cashReturnNote);
-						tdInterfaceService.ebsWithObject(cashRefundInf, INFTYPE.CASHREFUNDINF);
+						if (cashReturnNotes != null && cashReturnNotes.size() > 0)
+						{
+							for (TdCashReturnNote tdCashReturnNote : cashReturnNotes)
+							{
+								TdCashRefundInf cashRefundInf = tdInterfaceService.initCashRefundInf(tdCashReturnNote);
+								tdInterfaceService.ebsWithObject(cashRefundInf, INFTYPE.CASHREFUNDINF);
+							}
+						}
 						returnNote.setReturnTime(new Date());
-						TdReturnTimeInf returnTimeInf = tdInterfaceService.initReturnTimeByReturnNote(returnNote);
 						returnNote.setStatusId(5L);// 退货单设置已完成
 					}
 //				}

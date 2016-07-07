@@ -13,6 +13,7 @@ import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -28,6 +29,10 @@ import com.ynyes.lyz.entity.TdCoupon;
 import com.ynyes.lyz.entity.TdOrder;
 import com.ynyes.lyz.entity.TdRecharge;
 import com.ynyes.lyz.entity.TdUser;
+import com.ynyes.lyz.interfaces.entity.TdCashReciptInf;
+import com.ynyes.lyz.interfaces.service.TdCashReciptInfService;
+import com.ynyes.lyz.interfaces.service.TdInterfaceService;
+import com.ynyes.lyz.interfaces.utils.EnumUtils.INFTYPE;
 import com.ynyes.lyz.service.TdBalanceLogService;
 import com.ynyes.lyz.service.TdCommonService;
 import com.ynyes.lyz.service.TdCouponService;
@@ -57,6 +62,12 @@ public class TdPayController {
 
 	@Autowired
 	private TdReChargeService tdRechargeService;
+	
+	@Autowired
+	private TdInterfaceService tdInterfaceService;
+	
+	@Autowired
+	private TdCashReciptInfService tdCashReciptInfService;
 
 	@RequestMapping(value = "/alipay")
 	public String alipay(HttpServletRequest req, ModelMap map, String number, Long type) {
@@ -189,7 +200,8 @@ public class TdPayController {
 						user.setBalance(balance + recharge.getTotalPrice());
 						tdUserService.save(user);
 						tdRechargeService.save(recharge);
-
+						this.saveCashReceiptAndSendToEBS(recharge,user);
+						
 						TdBalanceLog log = new TdBalanceLog();
 						log.setUserId(user.getId());
 						log.setUsername(user.getUsername());
@@ -376,6 +388,7 @@ public class TdPayController {
 						user.setBalance(balance + recharge.getTotalPrice());
 						tdUserService.save(user);
 						tdRechargeService.save(recharge);
+						this.saveCashReceiptAndSendToEBS(recharge,user);
 
 						TdBalanceLog log = new TdBalanceLog();
 						log.setUserId(user.getId());
@@ -603,6 +616,7 @@ public class TdPayController {
 							user.setBalance(balance + recharge.getTotalPrice());
 							tdUserService.save(user);
 							tdRechargeService.save(recharge);
+							this.saveCashReceiptAndSendToEBS(recharge,user);
 
 							TdBalanceLog log = new TdBalanceLog();
 							log.setUserId(user.getId());
@@ -783,4 +797,25 @@ public class TdPayController {
 			System.out.println(out_trade_no);
 		}
 	}
+	
+	private void saveCashReceiptAndSendToEBS(TdRecharge tdRecharge,TdUser tdUser)
+	{
+		if (tdRecharge == null || tdUser == null)
+		{
+			return ;
+		}
+		TdCashReciptInf cashReciptInf = tdInterfaceService.initCashReciptByReCharge(tdRecharge, tdUser);
+		String resultStr = tdInterfaceService.ebsWithObject(cashReciptInf, INFTYPE.CASHRECEIPTINF);
+		if (StringUtils.isBlank(resultStr))
+		{
+			cashReciptInf.setSendFlag(0);
+		}
+		else
+		{
+			cashReciptInf.setSendFlag(1);
+			cashReciptInf.setErrorMsg(resultStr);
+		}
+		tdCashReciptInfService.save(cashReciptInf);
+	}
+	
 }

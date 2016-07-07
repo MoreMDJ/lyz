@@ -10,6 +10,12 @@ import javax.persistence.Id;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+/**
+ * 到店退货单退货时间表
+ * @author mdj
+ *
+ */
+
 @Entity
 public class TdReturnTimeInf extends TdInfBaseEntity{
 	

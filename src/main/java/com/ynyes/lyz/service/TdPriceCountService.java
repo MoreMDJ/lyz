@@ -890,7 +890,8 @@ public class TdPriceCountService {
 	 * @param params的规则为【商品id】-【退货数量】-【退货单价】
 	 * @author DengXiao
 	 */
-	public void returnCashOrCoupon(Long orderId, String params, String returnNoteNumber) {
+	public List<TdCashReturnNote> returnCashOrCoupon(Long orderId, String params, String returnNoteNumber) {
+		List<TdCashReturnNote> tdCashReturnNotes = new ArrayList<>();
 		TdOrder order = tdOrderService.findOne(orderId);
 		Long userId = order.getRealUserId();
 		TdUser user = tdUserService.findOne(userId);
@@ -1449,11 +1450,23 @@ public class TdPriceCountService {
 			if (new_return_note.getMoney() > (order.getPosPay() + order.getCashPay())) {
 				new_return_note.setMoney(order.getPosPay() + order.getCashPay());
 			}
-			// 2016-07-05修改：持久化总的打款记录
-			tdCashReturnNoteService.save(new_return_note);
+			// 2016-07-05修改：持久化总的打款记录，当收款现金为零不持久化
+			if (new_return_note.getMoney() != 0)
+			{
+				tdCashReturnNoteService.save(new_return_note);
+			}
+			if (new_return_note != null)
+			{
+				tdCashReturnNotes.add(new_return_note);
+			}
 			// 修改结束
 		}
 		tdUserService.save(user);
+		if (tdCashReturnNotes != null && tdCashReturnNotes.size() > 0)
+		{
+			return tdCashReturnNotes;
+		}
+		return null;
 	}
 
 	/**
@@ -1461,7 +1474,7 @@ public class TdPriceCountService {
 	 * 
 	 * @author DengXiao
 	 */
-	public void actAccordingWMS(TdReturnNote returnNote, Long orderId) {
+	public List<TdCashReturnNote> actAccordingWMS(TdReturnNote returnNote, Long orderId) {
 		if (null != returnNote) {
 			List<TdOrderGoods> returnGoodsList = returnNote.getReturnGoodsList();
 			if (null != returnGoodsList && returnGoodsList.size() > 0) {
@@ -1472,9 +1485,10 @@ public class TdPriceCountService {
 						params += goods.getGoodsId() + "-" + goods.getQuantity() + "-" + goods.getPrice() + ",";
 					}
 				}
-				this.returnCashOrCoupon(orderId, params, returnNote.getReturnNumber());
+				return this.returnCashOrCoupon(orderId, params, returnNote.getReturnNumber());
 			}
 		}
+		return null;
 	}
 
 	/**
