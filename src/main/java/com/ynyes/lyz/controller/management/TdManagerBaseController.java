@@ -195,6 +195,9 @@ public class TdManagerBaseController {
 	{
 		// 订单状态 1:待审核 2:待付款 3:待出库 4:待签收 5: 待评价 6: 已完成 7: 已取消 8:用户删除 9:退货中 10：退货确认
 		// 11：退货取消 12 : 退货完成
+		if(status==null){
+			return "未知";
+		}
 		Integer integerStatus = status.intValue();
 		switch (integerStatus) {
 			case 1:
@@ -204,7 +207,7 @@ public class TdManagerBaseController {
 			case 3:
 				return "待出库";
 			case 4:
-				return "待签收";
+				return "待收货";
 			case 5:
 				return "待评价";
 			case 6:

@@ -161,26 +161,31 @@ public class TdDiySiteRoleService {
     		if(diySite!=null){
     			roleDiyIds.add(diySite.getId().toString());
     		}
-    		
-    	}
-    	//查询用户管辖门店权限
-    	TdManagerDiySiteRole diySiteRole= this.findByTitle(tdManagerRole.getTitle());
-    	//非超级管理员 添加管辖门店和城市
-    	if(diySiteRole!=null && !diySiteRole.getIsSys()){
-    		//不为空是添加管辖门店
-    		if(StringUtils.isNotBlank(diySiteRole.getDiySiteTree())){
-    			//分割字符串 
-    			String[] diyIds= diySiteRole.getDiySiteTree().replace("[", ",").replace("]", ",").split(",");
-    			//循环添加管辖门店
-    			for (String diyId : diyIds) {
-    				//判断不为空添加管辖门店  (去掉用户可能重复存在的门店编号:roleDiyIds.contains(diyId))
-    				if(StringUtils.isNotBlank(diyId)){
-    					roleDiyIds.add(diyId);
-    				}
-    			}
-    		}
+    		//查询用户管辖门店权限
+        	TdManagerDiySiteRole diySiteRole= this.findByTitle(tdManagerRole.getTitle());
+        	//非超级管理员 添加管辖门店和城市
+        	if(diySiteRole!=null && !diySiteRole.getIsSys()){
+        		//不为空是添加管辖门店
+        		if(StringUtils.isNotBlank(diySiteRole.getDiySiteTree())){
+        			//分割字符串 
+        			String[] diyIds= diySiteRole.getDiySiteTree().replace("[", ",").replace("]", ",").split(",");
+        			//循环添加管辖门店
+        			for (String diyId : diyIds) {
+        				//判断不为空添加管辖门店  (去掉用户可能重复存在的门店编号:roleDiyIds.contains(diyId))
+        				if(StringUtils.isNotBlank(diyId)){
+        					roleDiyIds.add(diyId);
+        				}
+        			}
+        		}
 
+        	}
+    	}else{
+    		List<TdDiySite> diyList= tdDiySiteService.findAll();
+    		for (TdDiySite tdDiySite : diyList) {
+    			roleDiyIds.add(tdDiySite.getId().toString());
+			}
     	}
+    	
     	return roleDiyIds;
 	}
     /**

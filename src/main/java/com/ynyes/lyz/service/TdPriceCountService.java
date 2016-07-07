@@ -1349,7 +1349,8 @@ public class TdPriceCountService {
 											note.setIsOperated(false);
 
 											// 2016-07-05修改：不做持久化操作
-											// note = tdCashReturnNoteService.save(note);
+											// note =
+											// tdCashReturnNoteService.save(note);
 											new_return_note.setMoney(new_return_note.getMoney() + cashReturn);
 											// 修改结束
 
@@ -1382,7 +1383,8 @@ public class TdPriceCountService {
 												note01.setUsername(user.getUsername());
 												note01.setIsOperated(false);
 												// 2016-07-05修改：以现金的方式退还POS支付的钱，不做持久化操作
-												// note01 = tdCashReturnNoteService.save(note01);
+												// note01 =
+												// tdCashReturnNoteService.save(note01);
 												new_return_note.setMoney(new_return_note.getMoney() + posReturn);
 												// 修改结束
 
@@ -1443,9 +1445,13 @@ public class TdPriceCountService {
 					}
 				}
 			}
+
+			if (new_return_note.getMoney() > (order.getPosPay() + order.getCashPay())) {
+				new_return_note.setMoney(order.getPosPay() + order.getCashPay());
+			}
 			// 2016-07-05修改：持久化总的打款记录
 			tdCashReturnNoteService.save(new_return_note);
-			// 修改结束 
+			// 修改结束
 		}
 		tdUserService.save(user);
 	}

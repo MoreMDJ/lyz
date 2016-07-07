@@ -1320,8 +1320,8 @@ public class TdManagerOrderController {
 		rec.setDiyCode(order.getDiySiteCode());
 		rec.setOwned(0.0);
 		rec.setPayed(money+pos);
-		rec.setMoney(money);
-		rec.setPos(pos);
+		rec.setBackMoney(money);
+		rec.setBackPos(pos);
 		rec.setUsername(order.getUsername());
 		rec.setIsOwn(false);
 		rec.setIsEnable(false);

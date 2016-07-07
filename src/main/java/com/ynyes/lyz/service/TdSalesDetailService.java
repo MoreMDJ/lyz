@@ -14,6 +14,7 @@ import com.ynyes.lyz.entity.TdSalesDetail;
 import com.ynyes.lyz.repository.TdSalesDetailRepo;
 import com.ynyes.lyz.util.Criteria;
 import com.ynyes.lyz.util.Restrictions;
+import com.ynyes.lyz.util.Utils;
 
 /**
  * TdSalesDetail 服务类
@@ -29,10 +30,11 @@ public class TdSalesDetailService {
 	TdSalesDetailRepo repository;
 	
 	/**
-	 * 根据时间,城市,门店查询销售明细报表
+	 * 根据时间,城市,门店查询销售明细报表 
 	 * 增加门店id查询
 	 * @return
 	 */
+	@Deprecated
 	public List<TdSalesDetail> searchSalesDetail(Date begin,Date end,String cityName,String diySiteCode,String username,List<String> roleDiyIds){
 		Criteria<TdSalesDetail> c = new Criteria<TdSalesDetail>();
 		if(null!=begin){
@@ -56,10 +58,11 @@ public class TdSalesDetailService {
 		return repository.findAll(c);
 	}
 	/**
-	 * 调用存储过程
+	 * 调用存储过程 
 	 * @return 
 	 * @return
 	 */
+	@Deprecated
 	public void callInsertSalesDetail(Date start,Date end,String username){
 		repository.callInsertSalesDetail(start, end,username);
 	}
@@ -68,6 +71,7 @@ public class TdSalesDetailService {
 	 * 增加门店id查询
 	 * @return
 	 */
+	@Deprecated
 	public Page<TdSalesDetail> searchList(String keywords,Date begin,Date end,String cityName,String diySiteCode,String username,
 			int size,int page,List<String> roleDiyIds){
 		PageRequest pageRequest = new PageRequest(page, size);
@@ -96,4 +100,32 @@ public class TdSalesDetailService {
 		return repository.findAll(c,pageRequest);
 	}
 	
+	/**
+	 * 查询下载的list
+	 * @param begin 开始时间
+	 * @param end 结束时间
+	 * @param cityName 城市
+	 * @param diySiteCode 门店
+	 * @param roleDiyIds 权限门店
+	 * @return
+	 */
+	public List<TdSalesDetail> queryDownList(Date begin,Date end,String cityName,String diySiteCode,List<String> roleDiyIds){
+		//判断空值
+		if(begin==null){
+			begin=Utils.getSysStartDate();
+		}
+		if(end==null){
+			end=new Date();
+		} 
+		if(StringUtils.isBlank(cityName)){
+			cityName="%";
+		}
+		if(StringUtils.isBlank(diySiteCode)){
+			diySiteCode="%";
+		}
+		if(roleDiyIds==null || roleDiyIds.size()==0){
+			roleDiyIds.add("0");
+		}
+		return repository.queryDownList(begin, end, cityName, diySiteCode, roleDiyIds);
+	}
 }
