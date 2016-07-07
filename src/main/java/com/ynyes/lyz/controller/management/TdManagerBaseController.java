@@ -207,7 +207,7 @@ public class TdManagerBaseController {
 			case 3:
 				return "待出库";
 			case 4:
-				return "待签收";
+				return "待收货";
 			case 5:
 				return "待评价";
 			case 6:
