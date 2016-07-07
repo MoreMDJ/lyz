@@ -63,23 +63,17 @@ public class TdDiySiteInventoryLogService {
 	public Boolean saveChangeLog(TdDiySiteInventory diySiteInventory,Long changeValue,String orderNumber,HttpServletRequest req,String changeName)
 	{
 		String username = null;
-		
-		String changeType = "订单修改";
-		if (orderNumber == null && req != null)
+		String changeType = null;
+		//请求不能为空
+		if (req != null)
 		{
-			username = (String) req.getSession().getAttribute("manager");
-			changeType = "管理员修改";
-			if (username == null)
-			{
-				username="看到我就表示被黑了";
-			}
-		}
-		if(orderNumber!=null && req != null){
-			username = (String) req.getSession().getAttribute("username");
-			changeType = "管理员修改后台订单";
-			if (username == null)
-			{
-				username="看到我就表示被黑了";
+			//判断是订单修改还是管理员修改
+			if(orderNumber == null){
+				username = (String) req.getSession().getAttribute("manager");
+				changeType = "管理员修改";
+			}else{
+				username = (String) req.getSession().getAttribute("username");
+				changeType = "订单修改";
 			}
 		}
 		
