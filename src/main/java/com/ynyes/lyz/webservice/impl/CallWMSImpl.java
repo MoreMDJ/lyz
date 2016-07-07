@@ -58,10 +58,12 @@ import com.ynyes.lyz.interfaces.entity.TdTbOmD;
 import com.ynyes.lyz.interfaces.entity.TdTbOmM;
 import com.ynyes.lyz.interfaces.entity.TdTbwBackRecD;
 import com.ynyes.lyz.interfaces.entity.TdTbwBackRecM;
+import com.ynyes.lyz.interfaces.entity.TdTbwWasted;
 import com.ynyes.lyz.interfaces.service.TdTbOmDService;
 import com.ynyes.lyz.interfaces.service.TdTbOmMService;
 import com.ynyes.lyz.interfaces.service.TdTbwBackRecDService;
 import com.ynyes.lyz.interfaces.service.TdTbwBackRecMService;
+import com.ynyes.lyz.interfaces.service.TdTbwWastedService;
 import com.ynyes.lyz.service.TdBackDetailService;
 import com.ynyes.lyz.service.TdBackMainService;
 import com.ynyes.lyz.service.TdCityService;
@@ -132,6 +134,9 @@ public class CallWMSImpl implements ICallWMS {
 	
 	@Autowired
 	private TdCityService tdCityService;
+	
+	@Autowired
+	private TdTbwWastedService tdTbwWastedService;
 
 	public String GetWMSInfo(String STRTABLE, String STRTYPE, String XML)
 	{
@@ -3033,17 +3038,370 @@ public class CallWMSImpl implements ICallWMS {
 					{
 						inventory.setInventory(inventory.getInventory() +cRecQty);
 						tdDiySiteInventoryService.save(inventory);
-						tdDiySiteInventoryLogService.saveChangeLog(inventory, cRecQty, null, null,TdDiySiteInventoryLog.CHANGETYPE_CITY_DO_ADD);
+						tdDiySiteInventoryLogService.saveChangeLog(inventory, cRecQty, null, null,TdDiySiteInventoryLog.CHANGETYPE_CITY_YC_ADD);
 					}
 					else if (cUploadStatus.equalsIgnoreCase("out"))
 					{
 						inventory.setInventory(inventory.getInventory() - cRecQty);
 						tdDiySiteInventoryService.save(inventory);
-						tdDiySiteInventoryLogService.saveChangeLog(inventory, -cRecQty, null, null,TdDiySiteInventoryLog.CHANGETYPE_CITY_DO_SUB);
+						tdDiySiteInventoryLogService.saveChangeLog(inventory, -cRecQty, null, null,TdDiySiteInventoryLog.CHANGETYPE_CITY_BS_SUB);
 					}
 				}
 			}
 			
+			return "<RESULTS><STATUS><CODE>0</CODE><MESSAGE></MESSAGE></STATUS></RESULTS>";
+		}
+		else if (STRTABLE.equalsIgnoreCase("tbw_waste_d"))//报损报溢
+		{
+			for (int i = 0; i < nodeList.getLength(); i++)
+			{
+				String cWhNo = null;//单号
+				String cOwnerNo = null;//委托业主
+				String cWasteNo = null;//损溢单号
+				Long cWasteId = null;//损溢ID
+				String cWasteType = null;//损溢单类型(一般报损、一般报溢)
+				String cGcode = null;//商品
+				String cOwnerGcode = null;//委托业主商品
+				String cLocationNo = null;//储位编号
+				Long cStockattrId = null;//商品属性ID
+				Long cPackQty = null;//包装数量
+				Double cQty = null;//数量
+				String cLotNo = null;//批号
+				String cSpec = null;//规格
+				String cProduceDt = null;//产的日期
+				String cExpireDt = null;//到期日
+				Double cWaveQty = null;//定位量
+				String cItemType = null;//品质(良品、不良品、赠品)
+				Double cAckQty = null;//实际报损数量
+				Double cPrice = null;//商品单价
+				Double cTaxRate = null;//税率
+				String cOpStatus = null;//作业状态(初始，定位，发单，完成)
+				String cReserved1 = null;//预留1
+				String cReserved2 = null;//预留2
+				String cReserved3 = null;//预留3
+				String cReserved4 = null;//预留4
+				String cReserved5 = null;//预留5
+				String cNote = null;//备注
+				String cMkUserno = null;//建立人员
+				String cMkDt = null;//建立时间
+				String cModifiedUserno = null;//修改人员
+				String cModifiedDt = null;//修改时间
+				String cUploadStatus = null;//上传状态
+				Long cCompanyId = null;//公司id
+				Node node = nodeList.item(i);
+				NodeList childNodeList = node.getChildNodes();
+				// 遍历所有TABLE中的字段
+				for (int idx = 0; idx < childNodeList.getLength(); idx++)
+				{
+					Node childNode = childNodeList.item(idx);
+					if (childNode.getNodeName().equalsIgnoreCase("c_wh_no"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cWhNo = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_owner_no"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cOwnerNo = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_waste_no"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cWasteNo = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_waste_id"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cWasteId = Long.parseLong(childNode.getChildNodes().item(0).getNodeValue());
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_waste_type"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cWasteType = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_gcode"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cGcode = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_owner_gcode"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cOwnerGcode = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_location_no"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cLocationNo = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_stockattr_id"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cStockattrId = Long.parseLong(childNode.getChildNodes().item(0).getNodeValue());
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_pack_qty"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cPackQty = Long.parseLong(childNode.getChildNodes().item(0).getNodeValue());
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_qty"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cQty = Double.parseDouble(childNode.getChildNodes().item(0).getNodeValue());
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_lot_no"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cLotNo = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_spec"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cSpec = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_produce_dt"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cProduceDt = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_expire_dt"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cExpireDt = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_wave_qty"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cWaveQty = Double.parseDouble(childNode.getChildNodes().item(0).getNodeValue());
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_item_type"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cItemType = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_ack_qty"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cAckQty = Double.parseDouble(childNode.getChildNodes().item(0).getNodeValue());
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_price"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cPrice = Double.parseDouble(childNode.getChildNodes().item(0).getNodeValue());
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_tax_rate"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cTaxRate = Double.parseDouble(childNode.getChildNodes().item(0).getNodeValue());
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_op_status"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cOpStatus = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_reserved1"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cReserved1 = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_reserved2"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cReserved2 = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_reserved3"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cReserved3 = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_reserved4"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cReserved4 = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_reserved5"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cReserved5 = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_note"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cNote = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_mk_userno"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cMkUserno = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_mk_dt"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cMkDt = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_modified_userno"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cModifiedUserno = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_modified_dt"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cModifiedDt = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("c_upload_status"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cUploadStatus = childNode.getChildNodes().item(0).getNodeValue();
+					    }
+					}
+					else if (childNode.getNodeName().equalsIgnoreCase("C_COMPANY_ID"))
+					{
+					    if (null != childNode.getChildNodes().item(0))
+					    {
+					        cCompanyId = Long.parseLong(childNode.getChildNodes().item(0).getNodeValue());
+					    }
+					}
+				}
+				TdTbwWasted tbwWasted = new TdTbwWasted();
+				tbwWasted.setcWhNo(cWhNo);
+				tbwWasted.setcOwnerNo(cOwnerNo);
+				tbwWasted.setcWasteNo(cWasteNo);
+				tbwWasted.setcWasteId(cWasteId);
+				tbwWasted.setcWasteType(cWasteType);
+				tbwWasted.setcGcode(cGcode);
+				tbwWasted.setcOwnerGcode(cOwnerGcode);
+				tbwWasted.setcLocationNo(cLocationNo);
+				tbwWasted.setcStockattrId(cStockattrId);
+				tbwWasted.setcPackQty(cPackQty);
+				tbwWasted.setcQty(cQty);
+				tbwWasted.setcLotNo(cLotNo);
+				tbwWasted.setcSpec(cSpec);
+				tbwWasted.setcProduceDt(DateFromString(cProduceDt));
+				tbwWasted.setcExpireDt(DateFromString(cExpireDt));
+				tbwWasted.setcWaveQty(cWaveQty);
+				tbwWasted.setcItemType(cItemType);
+				tbwWasted.setcAckQty(cAckQty);
+				tbwWasted.setcPrice(cPrice);
+				tbwWasted.setcTaxRate(cTaxRate);
+				tbwWasted.setcOpStatus(cOpStatus);
+				tbwWasted.setcReserved1(cReserved1);
+				tbwWasted.setcReserved2(cReserved2);
+				tbwWasted.setcReserved3(cReserved3);
+				tbwWasted.setcReserved4(cReserved4);
+				tbwWasted.setcReserved5(cReserved5);
+				tbwWasted.setcNote(cNote);
+				tbwWasted.setcMkUserno(cMkUserno);
+				tbwWasted.setcMkDt(DateFromString(cMkDt));
+				tbwWasted.setcModifiedUserno(cModifiedUserno);
+				tbwWasted.setcModifiedDt(DateFromString(cModifiedDt));
+				tbwWasted.setcUploadStatus(cUploadStatus);
+				tbwWasted.setcCompanyId(cCompanyId);
+				tdTbwWastedService.save(tbwWasted);
+				TdGoods tdGoods = tdGoodsService.findByCode(cGcode);
+				if (tdGoods == null)
+				{
+					return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>商品编码为："+ cGcode +"的商品不存在或者不可用</MESSAGE></STATUS></RESULTS>";
+				}
+				TdCity tdCity = tdCityService.findBySobIdCity(cCompanyId);
+				if (tdCity == null)
+				{
+					return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>城市编码为："+ cCompanyId +"的城市不存在</MESSAGE></STATUS></RESULTS>";
+				}
+				TdDiySiteInventory inventory = tdDiySiteInventoryService.findByGoodsCodeAndRegionIdAndDiySiteIdIsNull(cGcode, cCompanyId);
+				if (inventory == null)
+				{
+					inventory = new TdDiySiteInventory();
+					inventory.setGoodsCode(tdGoods.getCode());
+					inventory.setGoodsId(tdGoods.getId());
+					inventory.setCategoryId(tdGoods.getCategoryId());
+					inventory.setCategoryIdTree(tdGoods.getCategoryIdTree());
+					inventory.setCategoryTitle(tdGoods.getCategoryTitle());
+					inventory.setGoodsTitle(tdGoods.getTitle());
+					inventory.setRegionId(cCompanyId);
+					inventory.setRegionName(tdCity.getCityName());
+				}
+				Double doubleFromStr = tbwWasted.getcQty();
+				doubleFromStr = doubleFromStr * 100;
+				Long cRecQty = doubleFromStr.longValue();
+				cRecQty = cRecQty / 100;
+				if (cWasteType.contains("溢出"))
+				{
+					inventory.setInventory(inventory.getInventory() +cRecQty);
+					tdDiySiteInventoryService.save(inventory);
+					tdDiySiteInventoryLogService.saveChangeLog(inventory, cRecQty, null, null,TdDiySiteInventoryLog.CHANGETYPE_CITY_DO_ADD);
+				}
+				else
+				{
+					inventory.setInventory(inventory.getInventory() - cRecQty);
+					tdDiySiteInventoryService.save(inventory);
+					tdDiySiteInventoryLogService.saveChangeLog(inventory, -cRecQty, null, null,TdDiySiteInventoryLog.CHANGETYPE_CITY_DO_SUB);
+				}
+			}
+
 			return "<RESULTS><STATUS><CODE>0</CODE><MESSAGE></MESSAGE></STATUS></RESULTS>";
 		}
 		return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>不支持该表数据传输："+ STRTABLE +"</MESSAGE></STATUS></RESULTS>";

@@ -34,6 +34,8 @@ public class SiteMagConstant {
 			imagePath = "/mnt/root/images/goods";
 			alipayReturnUrl = "http://101.200.128.65:8080/pay/alipay/return";
 			alipayReturnUrlAsnyc = "http://101.200.128.65:8080/pay/alipay/return/async";
+//			alipayReturnUrl = "http://123.57.32.143:8080/pay/alipay/return";
+//			alipayReturnUrlAsnyc = "http://123.57.32.143:8080/pay/alipay/return/async";
 		} else {
 			backupPath = "src/main/resources/backup/";
 			imagePath = "src/main/resources/static/images";

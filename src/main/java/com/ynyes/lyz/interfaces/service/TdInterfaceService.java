@@ -48,7 +48,6 @@ import com.ynyes.lyz.service.TdDiySiteService;
 import com.ynyes.lyz.service.TdOrderService;
 import com.ynyes.lyz.service.TdPayTypeService;
 import com.ynyes.lyz.service.TdPriceCountService;
-import com.ynyes.lyz.service.TdReChargeService;
 import com.ynyes.lyz.service.TdReturnNoteService;
 
 
@@ -609,28 +608,22 @@ public class TdInterfaceService {
 		
 		if (tdRecharge.getTotalPrice() != null && tdRecharge.getTotalPrice() != 0)
 		{
-//			TdOrderInf orderInf = tdOrderInfService.findByOrderNumber(tdOrder.getOrderNumber());
-//			if (orderInf == null) 
-//			{
-//				return null;
-//			}
-			
-			TdDiySite diySite = tdDiySiteService.findByStoreCode(tdUser.getDiyCode());
+			TdDiySite diySite = tdDiySiteService.findOne(tdUser.getUpperDiySiteId());
 			Long SobId = 0L;
+			String storeCode = null;
 			if (diySite != null)
 			{
 				SobId = diySite.getRegionId();
+				storeCode = diySite.getStoreCode();
 			}
 			TdCashReciptInf cashReciptInf = new TdCashReciptInf();
 			cashReciptInf.setSobId(SobId);
-//			cashReciptInf.setReceiptNumber(tdOrder.getOrderNumber());
 			cashReciptInf.setUserid(tdUser.getId());
 			cashReciptInf.setUsername(tdUser.getRealName());
 			cashReciptInf.setUserphone(tdUser.getUsername());
-			cashReciptInf.setDiySiteCode(diySite.getStoreCode());
+			cashReciptInf.setReceiptNumber(StringTools.getUniqueNoWithHeader("RC"));
+			cashReciptInf.setDiySiteCode(storeCode);
 			cashReciptInf.setReceiptClass("预收款");
-//			cashReciptInf.setOrderHeaderId(orderInf.getHeaderId());
-//			cashReciptInf.setOrderNumber(tdOrder.getOrderNumber());
 			cashReciptInf.setProductType("PREPAY");
 			cashReciptInf.setReceiptType(tdRecharge.getTypeTitle());
 			cashReciptInf.setReceiptDate(new Date());
