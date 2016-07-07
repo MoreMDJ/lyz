@@ -372,7 +372,7 @@ function payedChange(){
     			<#if ownrecord.isEnable?? && ownrecord.isEnable == true>
     				<#if ownrecord.ispassed?? && ownrecord.ispassed == true>
     					<a class="btn-submit-save bgc-ff8e08" href="javascript:;" style="background:#999">审核通过</a>
-    					<a class="btn-submit-save bgc-ff8e08" href="javascript:;" onclick="javascript:win_yes('请确认代收款和货物是否正确？','submitDelivery(${td_order.id?c});')">确认送达</a>
+    					<a class="btn-submit-save bgc-ff8e08" href="javascript:;" onclick="javascript:win_yes('是否确认送达？','submitDelivery(${td_order.id?c});')">确认送达</a>
     				<#else>
     					<a class="btn-submit-save bgc-ff8e08" href="javascript:;" style="background:#999">未通过审核</a>
     					<a class="btn-submit-save bgc-ff8e08" onclick="pupopen(1)">申请欠款</a>
@@ -380,7 +380,7 @@ function payedChange(){
     				</#if>
     			<#else>
     				<#if ownrecord.isOwn?? && ownrecord.isOwn==false>
-    				    <a class="btn-submit-save bgc-ff8e08" href="javascript:;" onclick="javascript:win_yes('请确认代收款和货物是否正确？','submitDelivery(${td_order.id?c});')">确认送达</a>
+    				    <a class="btn-submit-save bgc-ff8e08" href="javascript:;" onclick="javascript:win_yes('是否确认送达？','submitDelivery(${td_order.id?c});')">确认送达</a>
     				<#else>	
     					<a class="btn-submit-save bgc-ff8e08" href="javascript:;" style="background:#999">等待审核</a>
     				</#if>
@@ -390,7 +390,7 @@ function payedChange(){
     			<#if td_order.allTotalPay?? && td_order.allTotalPay!=0 && isOnlinePay?? && isOnlinePay==false>
     			<a class="btn-submit-save bgc-ff8e08" onclick="pupopen()">填写代收金额</a>
     			<#else>
-    			<a class="btn-submit-save bgc-ff8e08" href="javascript:;" onclick="javascript:win_yes('请确认代收款和货物是否正确？','submitDelivery(${td_order.id?c});')">确认送达</a>
+    			<a class="btn-submit-save bgc-ff8e08" href="javascript:;" onclick="javascript:win_yes('是否确认送达？','submitDelivery(${td_order.id?c});')">确认送达</a>
     			</#if>
     			
     		</#if>
