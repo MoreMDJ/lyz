@@ -91,6 +91,14 @@ public class TdDiySiteInventoryService {
 	// return repository.findBygoodsCodeAndDiySiteIdNull(goodsCode);
 	// }
 
+	
+	/**
+	 * 查找所有的库存
+	 * @param keywords 关键字
+	 * @param page
+	 * @param size
+	 * @return
+	 */
 	public Page<TdDiySiteInventory> findAll(String keywords, int page, int size) {
 		PageRequest pageRequest = new PageRequest(page, size);
 		if (StringUtils.isNotBlank(keywords))
@@ -99,12 +107,27 @@ public class TdDiySiteInventoryService {
 		return repository.findAll(pageRequest);
 	}
 
+	/**
+	 * 根据关键字查找
+	 * @param keywords
+	 * @param page
+	 * @param size
+	 * @return
+	 */
 	public Page<TdDiySiteInventory> findByGoodsCodeContainingOrGoodsTitleContainingOrderByIdAsc(String keywords,
 			int page, int size) {
 		PageRequest pageRequest = new PageRequest(page, size);
 		return repository.findByGoodsCodeContainingOrGoodsTitleContainingOrderByIdAsc(keywords, keywords, pageRequest);
 	}
 
+	/**
+	 * 根据城市查找库存
+	 * @param regionId
+	 * @param keywords 关键字
+	 * @param page
+	 * @param size
+	 * @return
+	 */
 	public Page<TdDiySiteInventory> findByRegionIdAndGoodsCodeContainingOrRegionIdAndGoodsTitleContainingOrderByIdAsc(
 			Long regionId, String keywords, int page, int size) {
 		PageRequest pageRequest = new PageRequest(page, size);
@@ -114,6 +137,14 @@ public class TdDiySiteInventoryService {
 				keywords, regionId, keywords, pageRequest);
 	}
 
+	/**
+	 * 门店库存
+	 * @param siteId
+	 * @param keywords
+	 * @param page
+	 * @param size
+	 * @return
+	 */
 	public Page<TdDiySiteInventory> findBySiteIdAndKeywords(Long siteId, String keywords, int page, int size) {
 		PageRequest pageable = new PageRequest(page, size);
 		if (StringUtils.isBlank(keywords))
@@ -122,6 +153,14 @@ public class TdDiySiteInventoryService {
 				keywords, siteId, keywords, pageable);
 	}
 
+	/**
+	 * 根据城市查找库存
+	 * @param regionId
+	 * @param keywords 关键字
+	 * @param page
+	 * @param size
+	 * @return
+	 */
 	public Page<TdDiySiteInventory> findByRegionIdAndKeywords(Long regionId, String keywords, int page, int size) {
 		PageRequest pageable = new PageRequest(page, size);
 		if (StringUtils.isBlank(keywords))
@@ -129,7 +168,25 @@ public class TdDiySiteInventoryService {
 		return repository.findByRegionIdAndGoodsCodeContainingOrRegionIdAndGoodsTitleContainingOrderByIdAsc(regionId,
 				keywords, regionId, keywords, pageable);
 	}
+	
+	public Page<TdDiySiteInventory> findCityInventoryAndKeywords(String keywords, int page, int size)
+	{
+		PageRequest pageable = new PageRequest(page, size);
+		if (StringUtils.isBlank(keywords))
+		{
+			return repository.findByDiySiteIdIsNull(pageable);
+		}
+		return repository.findByDiySiteIdIsNullAndGoodsCodeContainingOrDiySiteIdIsNullAndGoodsTitleContainingOrderByIdAsc(keywords, keywords, pageable);
+	}
 
+	/**
+	 * 根据城市查找城市库存
+	 * @param regionId
+	 * @param keywords
+	 * @param page
+	 * @param size
+	 * @return
+	 */
 	public Page<TdDiySiteInventory> findByRegionIdOnlyAndKeywords(Long regionId, String keywords, int page, int size) {
 		PageRequest pageable = new PageRequest(page, size);
 		if (StringUtils.isBlank(keywords))
@@ -139,10 +196,21 @@ public class TdDiySiteInventoryService {
 						regionId, keywords, regionId, keywords, pageable);
 	}
 
+	/**
+	 * 根据门店查找库存
+	 * @param code
+	 * @return
+	 */
 	public List<TdDiySiteInventory> findByDiySiteId(Long code) {
 		return repository.findByDiySiteId(code);
 	}
 
+	/**
+	 * 根据商品编码和城市id查找库存
+	 * @param goodsCode
+	 * @param regionId
+	 * @return
+	 */
 	public TdDiySiteInventory findByGoodsCodeAndRegionIdAndDiySiteIdIsNull(String goodsCode, Long regionId) {
 		if (StringUtils.isBlank(goodsCode) || regionId == null)
 			return null;
@@ -153,6 +221,8 @@ public class TdDiySiteInventoryService {
 	{
 		return repository.findGoodsIdByRegionIdAndDiySiteIdIsNull(regionId);
 	}
+	
+	
 
 	/**
 	 * 根据订单增减库存

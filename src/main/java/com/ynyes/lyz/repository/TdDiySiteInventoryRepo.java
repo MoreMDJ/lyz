@@ -37,6 +37,10 @@ public interface TdDiySiteInventoryRepo extends PagingAndSortingRepository<TdDiy
 	
 	TdDiySiteInventory findByGoodsCodeAndRegionIdAndDiySiteIdIsNull(String goodsCode,Long regionId);
 	
+	Page<TdDiySiteInventory> findByDiySiteIdIsNullAndGoodsCodeContainingOrDiySiteIdIsNullAndGoodsTitleContainingOrderByIdAsc(String code,String title,Pageable pageable);
+	
+	Page<TdDiySiteInventory> findByDiySiteIdIsNull(Pageable pageable);
+	
 	@Query("select t.goodsId from TdDiySiteInventory t where t.regionId = ?1 and t.diySiteId is null")
 	List<Long> findGoodsIdByRegionIdAndDiySiteIdIsNull(Long regionId);
 }

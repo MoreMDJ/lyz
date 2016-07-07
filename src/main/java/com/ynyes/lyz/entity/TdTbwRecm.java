@@ -13,7 +13,7 @@ import javax.persistence.TemporalType;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * wms入库的主档
+ * wms采购入库的主档
  * 
  * @author Sharon
  *

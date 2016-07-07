@@ -933,7 +933,7 @@ public class TdPriceCountService {
 			new_return_note.setCreateTime(new Date());
 			new_return_note.setMoney(0.00);
 			new_return_note.setTypeId(-1L);
-			new_return_note.setTypeTitle("现金");
+			new_return_note.setTypeTitle("门店现金");
 			new_return_note.setOrderNumber(order.getOrderNumber());
 			new_return_note.setMainOrderNumber(order.getMainOrderNumber());
 			new_return_note.setReturnNoteNumber(returnNoteNumber);

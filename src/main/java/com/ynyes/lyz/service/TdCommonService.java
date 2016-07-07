@@ -2025,20 +2025,16 @@ public class TdCommonService {
 	// 传 order 给 EBS
 	private void sendOrderToEBS(List<TdOrder> orderList) {
 		for (TdOrder tdOrder : orderList) {
-			// if (tdOrder != null && tdOrder.getOrderNumber() != null &&
-			// tdOrder.getOrderNumber().contains("HR"))
-			// {
-			// continue;
-			// }
-			TdOrderInf orderInf = tdInterfaceService.initOrderInf(tdOrder);
 			
+			//单头是否传成功：默认失败
 			Boolean isOrderInfSucceed = false;
 			// 单头
-			String orderInfXML = tdInterfaceService.XmlByOrder(tdOrder, INFTYPE.ORDERINF);
+			TdOrderInf orderInf = tdInterfaceService.initOrderInf(tdOrder);
+			String orderInfXML = tdInterfaceService.XmlWithObject(orderInf, INFTYPE.ORDERINF);
 			Object[] orderInfObject = { INFConstants.INF_ORDER_STR, "1", orderInfXML };
-			try {
+			try
+			{
 				String object = (String) tdInterfaceService.getCall().invoke(orderInfObject);
-				System.out.println(object);
 				String resultStr = StringTools.interfaceMessage(object);
 				if (org.apache.commons.lang3.StringUtils.isBlank(resultStr))
 				{
@@ -2050,19 +2046,22 @@ public class TdCommonService {
 					orderInf.setSendFlag(1);
 					orderInf.setErrorMsg(resultStr);
 				}
-				tdOrderInfService.save(orderInf);
 				
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				e.printStackTrace();
 				orderInf.setSendFlag(1);
 				orderInf.setErrorMsg(e.getMessage());
 			}
+			tdOrderInfService.save(orderInf);
 			// 商品
 			List<TdOrderGoodsInf> goodsInfs = tdOrderGoodsInfService.findByOrderHeaderId(orderInf.getHeaderId());
-			String orderGoodsInfXML = tdInterfaceService.XmlByOrder(tdOrder, INFTYPE.ORDERGOODSINF);
+			String orderGoodsInfXML = tdInterfaceService.XmlWithObject(goodsInfs, INFTYPE.ORDERGOODSINF);
 			if (org.apache.commons.lang3.StringUtils.isNotBlank(orderGoodsInfXML) && isOrderInfSucceed) {
 				Object[] orderGoodsInf = { INFConstants.INF_ORDER_GOODS_STR, "1", orderGoodsInfXML };
-				try {
+				try
+				{
 					String object = (String)tdInterfaceService.getCall().invoke(orderGoodsInf);
 					String resultStr = StringTools.interfaceMessage(object);
 					for (int i = 0; i < goodsInfs.size(); i++)
@@ -2078,25 +2077,30 @@ public class TdCommonService {
 						}
 					}
 					
-				} catch (Exception e) {
+				}
+				catch (Exception e)
+				{
 					e.printStackTrace();
 					for (int i = 0; i < goodsInfs.size(); i++)
 					{
 						goodsInfs.get(i).setSendFlag(1);
 						goodsInfs.get(i).setErrorMsg(e.getMessage());
 					}
-					tdOrderGoodsInfService.save(goodsInfs);
 				}
+				tdOrderGoodsInfService.save(goodsInfs);
 			}
 			// 券
-			String orderCouponInfXML = tdInterfaceService.XmlByOrder(tdOrder, INFTYPE.ORDERCOUPONINF);
 			List<TdOrderCouponInf> couponInfs = tdOrderCouponInfService.findByorderHeaderId(orderInf.getHeaderId());
-			if (org.apache.commons.lang3.StringUtils.isNotBlank(orderCouponInfXML) && isOrderInfSucceed) {
+			String orderCouponInfXML = tdInterfaceService.XmlWithObject(couponInfs, INFTYPE.ORDERCOUPONINF);
+			if (org.apache.commons.lang3.StringUtils.isNotBlank(orderCouponInfXML) && isOrderInfSucceed)
+			{
 				Object[] orderCouponInf = { INFConstants.INF_ORDER_COUPON_STR, "1", orderCouponInfXML };
-				try {
+				try
+				{
 					String object = (String)tdInterfaceService.getCall().invoke(orderCouponInf);
 					String resultStr = StringTools.interfaceMessage(object);
-					for (int i = 0; i < couponInfs.size(); i++) {
+					for (int i = 0; i < couponInfs.size(); i++)
+					{
 						if (org.apache.commons.lang3.StringUtils.isBlank(resultStr))
 						{
 							couponInfs.get(i).setSendFlag(0);
@@ -2108,7 +2112,8 @@ public class TdCommonService {
 						}
 					}
 					
-				} catch (Exception e)
+				}
+				catch (Exception e)
 				{
 					e.printStackTrace();
 					for (int i = 0; i < couponInfs.size(); i++)
@@ -2116,15 +2121,17 @@ public class TdCommonService {
 						couponInfs.get(i).setSendFlag(1);
 						couponInfs.get(i).setErrorMsg(e.getMessage());
 					}
-					tdOrderCouponInfService.save(couponInfs);
 				}
+				tdOrderCouponInfService.save(couponInfs);
 			}
 			// 收款
-			String cashreciptInfXML = tdInterfaceService.XmlByOrder(tdOrder, INFTYPE.CASHRECEIPTINF);
 			List<TdCashReciptInf> cashReciptInfs = tdCashReciptInfService.findByOrderHeaderId(orderInf.getHeaderId());
-			if (org.apache.commons.lang3.StringUtils.isNotBlank(cashreciptInfXML) && isOrderInfSucceed) {
+			String cashreciptInfXML = tdInterfaceService.XmlWithObject(cashReciptInfs, INFTYPE.CASHRECEIPTINF);
+			if (org.apache.commons.lang3.StringUtils.isNotBlank(cashreciptInfXML) && isOrderInfSucceed)
+			{
 				Object[] cashreciptInf = { INFConstants.INF_CASH_RECEIPTS_STR, "1", cashreciptInfXML };
-				try {
+				try
+				{
 					String object = (String)tdInterfaceService.getCall().invoke(cashreciptInf);
 					String resultStr = StringTools.interfaceMessage(object);
 					for (int i = 0; i < cashReciptInfs.size(); i++)
@@ -2139,7 +2146,9 @@ public class TdCommonService {
 							cashReciptInfs.get(i).setErrorMsg(resultStr);
 						}
 					}
-				} catch (Exception e) {
+				}
+				catch (Exception e)
+				{
 					e.printStackTrace();
 					for (int i = 0; i < cashReciptInfs.size(); i++)
 					{
@@ -2212,9 +2221,9 @@ public class TdCommonService {
 				for (TdOrder subOrder : orderList) {
 					if (null != subOrder) {
 						subOrder.setRemarkInfo("物流已受理");
-						tdOrderService.save(subOrder);
 					}
 				}
+				tdOrderService.save(orderList);
 			}
 		}
 	}

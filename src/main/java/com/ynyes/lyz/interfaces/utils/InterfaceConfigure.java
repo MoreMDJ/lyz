@@ -13,7 +13,7 @@ public class InterfaceConfigure
 	/*-----测试环境 start----*/
 	
 	
-	/*
+	/**
 	 * 在测试服务器抛给WMS的WEBSERVICE接口地址
 	 */
 	static String WMS_WS_URL = "http://182.92.160.220:8199/WmsInterServer.asmx?wsdl";
@@ -23,7 +23,6 @@ public class InterfaceConfigure
 	 */
 	static String EBS_WS_URL = "http://erptest.zghuarun.com:8030/webservices/SOAProvider/plsql/cux_app_webservice_pkg/?wsdl";
 	
-	/*-----测试环境 end----*/
 	
 	/*-----正式环境 start----*/
 	
@@ -31,9 +30,8 @@ public class InterfaceConfigure
 //	static String WMS_WS_URL = "http://101.200.75.73:8999/WmsInterServer.asmx?wsdl";
 	
 	// 在正式服务器抛给EBS的WEBSERVICE接口地址
-//	static String EBS_WS_URL = "http://erpap.zghuarun.com:8008/webservices/SOAProvider/plsql/cux_app_webservice_pkg?wsdl";
-	
-	/*-----正式环境 end----*/
+//	static String EBS_WS_URL = "http://erpap.zghuarun.com:8008/webservices/SOAProvider/plsql/cux_app_webservice_pkg/?wsdl";
+
 
 	/**
 	 * 抛给WMS的WEBSERVICE接口地址

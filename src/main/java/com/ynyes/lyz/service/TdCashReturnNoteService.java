@@ -120,4 +120,13 @@ public class TdCashReturnNoteService {
 		PageRequest pageRequest = new PageRequest(page, size);
 		return repository.findByUsernameAndIsOperatedOrderByCreateTimeDesc(username, isOperated, pageRequest);
 	}
+	
+	public TdCashReturnNote findByOrderNumber(String orderNumber)
+	{
+		if (orderNumber == null)
+		{
+			return null;
+		}
+		return repository.findByOrderNumber(orderNumber);
+	}
 }

@@ -1947,7 +1947,15 @@ public class CallWMSImpl implements ICallWMS {
 				recm.setcCompanyId(cCompanyId);
 				recm.setInitTime(new Date());
 				tdTbwRecmService.save(recm);
+				if (cCompanyId == null)
+				{
+					return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>城市编码不存在</MESSAGE></STATUS></RESULTS>";
+				}
 				List<TdTbwRecd> tbwRecds = tdTbwRecdService.findByRecNo(cRecNo);
+				if (tbwRecds == null || tbwRecds.size() < 1)
+				{
+					return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>"+cRecNo +"：未找到明细</MESSAGE></STATUS></RESULTS>";
+				}
 				for (TdTbwRecd tdTbwRecd : tbwRecds)
 				{
 					String gcode = tdTbwRecd.getGcode();

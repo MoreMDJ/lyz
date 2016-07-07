@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ynyes.lyz.entity.TdCashReturnNote;
 import com.ynyes.lyz.entity.TdCity;
 import com.ynyes.lyz.entity.TdDiySite;
 import com.ynyes.lyz.entity.TdManager;
@@ -29,8 +30,11 @@ import com.ynyes.lyz.entity.TdManagerRole;
 import com.ynyes.lyz.entity.TdOrder;
 import com.ynyes.lyz.entity.TdReturnNote;
 import com.ynyes.lyz.entity.TdUser;
+import com.ynyes.lyz.interfaces.entity.TdCashRefundInf;
 import com.ynyes.lyz.interfaces.entity.TdReturnTimeInf;
 import com.ynyes.lyz.interfaces.service.TdInterfaceService;
+import com.ynyes.lyz.interfaces.utils.EnumUtils.INFTYPE;
+import com.ynyes.lyz.service.TdCashReturnNoteService;
 import com.ynyes.lyz.service.TdCityService;
 import com.ynyes.lyz.service.TdCommonService;
 import com.ynyes.lyz.service.TdDiySiteInventoryService;
@@ -87,6 +91,9 @@ public class TdManagerReturnNoteController extends TdManagerBaseController{
 	
 	@Autowired
 	private TdDiySiteInventoryService tdDiySiteInventoryService;
+	
+	@Autowired
+	private TdCashReturnNoteService tdCashReturnNoteService;
 	
 	// 列表
 	@RequestMapping(value = "/{type}/list")
@@ -392,11 +399,13 @@ public class TdManagerReturnNoteController extends TdManagerBaseController{
 						order.setStatusId(12L);
 						returnNote.setReturnTime(new Date());
 						tdOrderService.save(order);
-						
+						TdCashReturnNote cashReturnNote = tdCashReturnNoteService.findByOrderNumber(order.getOrderNumber());
+						TdCashRefundInf cashRefundInf = tdInterfaceService.initCashRefundInf(cashReturnNote);
+						tdInterfaceService.ebsWithObject(cashRefundInf, INFTYPE.CASHREFUNDINF);
+						returnNote.setReturnTime(new Date());
+						TdReturnTimeInf returnTimeInf = tdInterfaceService.initReturnTimeByReturnNote(returnNote);
+						returnNote.setStatusId(5L);// 退货单设置已完成
 					}
-					returnNote.setReturnTime(new Date());
-					TdReturnTimeInf returnTimeInf = tdInterfaceService.initReturnTimeByReturnNote(returnNote);
-					returnNote.setStatusId(5L);// 退货单设置已完成
 //				}
 			}
 

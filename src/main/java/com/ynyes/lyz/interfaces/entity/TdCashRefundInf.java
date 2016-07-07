@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
@@ -53,6 +54,11 @@ public class TdCashRefundInf extends TdInfBaseEntity
 	//销售订单号
 	@Column
 	private String returnNumber;
+	
+	//原销售订单头ID
+	@Column
+	@Indexed
+	private Long orderHeaderId;
 	
 	//1.电子券类型,订单产品类型 HR华润,LYZ乐易装,YR莹润,
 	//2.PREPAY预收款
@@ -176,6 +182,14 @@ public class TdCashRefundInf extends TdInfBaseEntity
 		this.returnNumber = returnNumber;
 	}
 
+	public Long getOrderHeaderId() {
+		return orderHeaderId;
+	}
+
+	public void setOrderHeaderId(Long orderHeaderId) {
+		this.orderHeaderId = orderHeaderId;
+	}
+
 	public String getProductType() {
 		return productType;
 	}
@@ -261,10 +275,10 @@ public class TdCashRefundInf extends TdInfBaseEntity
 		return "TdCashRefundInf [sobId=" + sobId + ", refundId=" + refundId + ", refundNumber=" + refundNumber
 				+ ", userid=" + userid + ", username=" + username + ", userphone=" + userphone + ", diySiteCode="
 				+ diySiteCode + ", refundClass=" + refundClass + ", rtHeaderId=" + rtHeaderId + ", returnNumber="
-				+ returnNumber + ", productType=" + productType + ", refundType=" + refundType + ", refundDate="
-				+ refundDate + ", amount=" + amount + ", description=" + description + ", attribute1=" + attribute1
-				+ ", attribute2=" + attribute2 + ", attribute3=" + attribute3 + ", attribute4=" + attribute4
-				+ ", attribute5=" + attribute5 + "]";
+				+ returnNumber + ", orderHeaderId=" + orderHeaderId + ", productType=" + productType + ", refundType="
+				+ refundType + ", refundDate=" + refundDate + ", amount=" + amount + ", description=" + description
+				+ ", attribute1=" + attribute1 + ", attribute2=" + attribute2 + ", attribute3=" + attribute3
+				+ ", attribute4=" + attribute4 + ", attribute5=" + attribute5 + "]";
 	}
 	
 }

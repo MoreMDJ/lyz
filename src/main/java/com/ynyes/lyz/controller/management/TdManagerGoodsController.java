@@ -1122,7 +1122,12 @@ public class TdManagerGoodsController {
 		}
 		else
 		{
-			map.addAttribute("inventory_page", tdDiySiteInventoryService.findAll(keywords, page,size));
+			if (siteId != null && siteId == -1)
+			{
+				map.addAttribute("inventory_page", tdDiySiteInventoryService.findCityInventoryAndKeywords(keywords, page,size));
+			}
+			else
+				map.addAttribute("inventory_page", tdDiySiteInventoryService.findAll(keywords, page,size));
 		}
 		
 		map.addAttribute("site_list", diysite_list);

@@ -46,6 +46,8 @@ public class INFConstants
 	 * 收款表
 	 */
 	public static final String	INF_CASH_RECEIPTS_STR		= "TD_CASH_RECEIPTS";
+	
+	public static final String INF_CASH_REFUND_STR		= "TD_CASH_REFUND";
 
 
 	/**

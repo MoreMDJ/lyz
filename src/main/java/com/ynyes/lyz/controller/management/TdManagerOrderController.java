@@ -1090,7 +1090,8 @@ public class TdManagerOrderController {
 					if (order.getDeliverTypeTitle().equalsIgnoreCase("门店自提")) {
 						// add send receive time to ebs
 						TdOrderReceiveInf orderReceiveInf = tdInterfaceService.initOrderReceiveByOrder(order);
-						if (orderReceiveInf != null) {
+						if (orderReceiveInf != null)
+						{
 							tdInterfaceService.ebsWithObject(orderReceiveInf, INFTYPE.ORDERRECEIVEINF);
 						}
 					}

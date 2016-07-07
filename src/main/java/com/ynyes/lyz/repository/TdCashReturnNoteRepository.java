@@ -46,4 +46,6 @@ public interface TdCashReturnNoteRepository
 	 * @version 版本：2016年6月16日下午12:53:42
 	 */
 	Page<TdCashReturnNote> findByUsernameAndIsOperatedOrderByCreateTimeDesc(String username,Boolean isOperated,Pageable page);
+	
+	TdCashReturnNote findByOrderNumber(String orderNumber);
 }
