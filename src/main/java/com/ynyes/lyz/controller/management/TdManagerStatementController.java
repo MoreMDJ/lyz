@@ -463,9 +463,9 @@ public class TdManagerStatementController extends TdManagerBaseController {
 	        HSSFSheet sheet = wb.createSheet("第"+(i+1)+"页");  
 	        // 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制short  
 	        //列宽
-	        int[] widths={13,25,25,18,13,18,18,13,13,18,
-	        		9,9,9,9,9,13,13,13,18,13,
-	        		13,13,13,20,20};
+	        int[] widths={13,25,25,18,18,13,18,18,13,13,
+	        		18,9,9,9,9,9,13,13,13,18,
+	        		13,13,13,13,20,20};
 	        sheetColumnWidth(sheet,widths);
 	        
 	        // 第四步，创建单元格，并设置值表头 设置表头居中  
@@ -477,9 +477,9 @@ public class TdManagerStatementController extends TdManagerBaseController {
 	       	//设置标题
 	        HSSFRow row = sheet.createRow((int) 0); 
 	        
-	        String[] cellValues={"门店名称","主单号","分单号","下单时间","订单状态","导购","客户名称","客户电话","产品编号","产品名称",
-	        		"数量","单价","总价","现金卷","品牌","商品父分类","商品子分类","配送方式","中转仓","配送人员",
-	        		"配送人员电话","收货人姓名","收货人电话","收货人地址","订单备注"};
+	        String[] cellValues={"门店名称","主单号","分单号","下单日期","确认日期","订单状态","导购","客户名称","客户电话","产品编号",
+	        		"产品名称","数量","单价","总价","现金卷","品牌","商品父分类","商品子分类","配送方式","中转仓",
+	        		"配送人员","配送人员电话","收货人姓名","收货人电话","收货人地址","订单备注"};
 			cellDates(cellValues, style, row);
 			
 			for(int j=0;j<maxRowNum;j++)
@@ -500,55 +500,51 @@ public class TdManagerStatementController extends TdManagerBaseController {
 	        		row.createCell(2).setCellValue(objToString(goodsInOut.getOrderNumber()));
 	        	} 
 	        	//下单时间
-	        	row.createCell(3).setCellValue(objToString(goodsInOut.getSalesTime()));
+	        	row.createCell(3).setCellValue(objToString(goodsInOut.getOrderTime()));
+	        	//确认时间
+	        	row.createCell(4).setCellValue(objToString(goodsInOut.getSalesTime()));
 	        	//订单状态
-	        	row.createCell(4).setCellValue(orderStatus(goodsInOut.getStatusId()));
+	        	row.createCell(5).setCellValue(orderStatus(goodsInOut.getStatusId()));
 	        	//导购
-				row.createCell(5).setCellValue(objToString(goodsInOut.getSellerRealName()));
+				row.createCell(6).setCellValue(objToString(goodsInOut.getSellerRealName()));
 				//客户名称
-				row.createCell(6).setCellValue(objToString(goodsInOut.getRealName()));
+				row.createCell(7).setCellValue(objToString(goodsInOut.getRealName()));
 				//客户电话
-				row.createCell(7).setCellValue(objToString(goodsInOut.getUsername()));
+				row.createCell(8).setCellValue(objToString(goodsInOut.getUsername()));
 				//产品编号
-				row.createCell(8).setCellValue(objToString(goodsInOut.getSku()));
+				row.createCell(9).setCellValue(objToString(goodsInOut.getSku()));
 				//产品名称
-				row.createCell(9).setCellValue(objToString(goodsInOut.getGoodsTitle()));
+				row.createCell(10).setCellValue(objToString(goodsInOut.getGoodsTitle()));
 				//产品数量
-				row.createCell(10).setCellValue(objToString(goodsInOut.getQuantity()));
+				row.createCell(11).setCellValue(objToString(goodsInOut.getQuantity()));
 				//产品价格
-				row.createCell(11).setCellValue(objToString(goodsInOut.getPrice()));
+				row.createCell(12).setCellValue(objToString(goodsInOut.getPrice()));
 				//产品总价
-				row.createCell(12).setCellValue((goodsInOut.getTotalPrice()*100)/100);
+				row.createCell(13).setCellValue((goodsInOut.getTotalPrice()*100)/100);
 	        	//现金卷
-	            row.createCell(13).setCellValue(objToString(goodsInOut.getCashCoupon()));
+	            row.createCell(14).setCellValue(objToString(goodsInOut.getCashCoupon()));
 	          	//品牌
-				row.createCell(14).setCellValue(objToString(goodsInOut.getBrandTitle()));
+				row.createCell(15).setCellValue(objToString(goodsInOut.getBrandTitle()));
 	    		//商品父分类
-				row.createCell(15).setCellValue(objToString(goodsInOut.getGoodsParentTypeTitle()));
+				row.createCell(16).setCellValue(objToString(goodsInOut.getGoodsParentTypeTitle()));
 				//商品子分类
-	        	row.createCell(16).setCellValue(objToString(goodsInOut.getGoodsTypeTitle()));
+	        	row.createCell(17).setCellValue(objToString(goodsInOut.getGoodsTypeTitle()));
 				//配送方式
-	        	row.createCell(17).setCellValue(objToString(goodsInOut.getDeliverRealName()));
+	        	row.createCell(18).setCellValue(objToString(goodsInOut.getDeliverTypeTitle()));
 				//中转仓
-	            row.createCell(18).setCellValue(objToString(goodsInOut.getWhName()));
+	            row.createCell(19).setCellValue(objToString(goodsInOut.getWhName()));
 	    		//配送人员
-	        	row.createCell(19).setCellValue(objToString(goodsInOut.getDeliverRealName()));
+	        	row.createCell(20).setCellValue(objToString(goodsInOut.getDeliverRealName()));
 	        	//配送人员电话
-	        	row.createCell(20).setCellValue(objToString(goodsInOut.getDeliverUsername()));
-	        	//收货人姓名
+	        	row.createCell(21).setCellValue(objToString(goodsInOut.getDeliverUsername()));
+	        	//收货人姓名 收货人电话 收货人地址
 	        	if(!"门店自提".equals(goodsInOut.getDeliverTypeTitle())){
-	        		row.createCell(21).setCellValue(objToString(goodsInOut.getShippingName()));
-	        	}
-	        	//收货人电话
-	        	if(!"门店自提".equals(goodsInOut.getDeliverTypeTitle())){
-	        		row.createCell(22).setCellValue(objToString(goodsInOut.getShippingPhone()));
-	        	}
-	        	//收货人地址
-	        	if(!"门店自提".equals(goodsInOut.getDeliverTypeTitle())){
-	        		row.createCell(23).setCellValue(objToString(goodsInOut.getShippingAddress()));
+	        		row.createCell(22).setCellValue(objToString(goodsInOut.getShippingName()));
+	        		row.createCell(23).setCellValue(objToString(goodsInOut.getShippingPhone()));
+	        		row.createCell(24).setCellValue(objToString(goodsInOut.getShippingAddress()));
 	        	}
 	        	//订单备注
-	        	row.createCell(24).setCellValue(objToString(goodsInOut.getRemark()));
+	        	row.createCell(25).setCellValue(objToString(goodsInOut.getRemark()));
 //	            System.out.println("正在生成excel文件的 sheet"+(i+1)+"第"+(j+1)+"行");
 			}
 //			System.out.println("正在生成excel文件的 sheet"+(i+1));
@@ -916,7 +912,7 @@ public class TdManagerStatementController extends TdManagerBaseController {
 	       	//设置标题
 	        HSSFRow row = sheet.createRow((int) 0); 
 	        
-	        String[] cellValues={"门店名称","主单号","分单号","下单时间","订单状态","导购","客户名称","客户电话","产品编号","产品名称",
+	        String[] cellValues={"门店名称","主单号","分单号","下单日期","订单状态","导购","客户名称","客户电话","产品编号","产品名称",
 	        		"数量","单价","总价","现金卷","品牌","商品父分类","商品子分类","配送方式","中转仓","配送人员",
 	        		"配送人员电话","收货人姓名","收货人电话","收货人地址","订单备注"};
 			cellDates(cellValues, style, row);

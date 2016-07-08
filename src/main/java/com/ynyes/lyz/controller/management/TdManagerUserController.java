@@ -639,6 +639,15 @@ public class TdManagerUserController {
 				item.setUsername(newUsername);
 				tdOrderService.save(item);
 			}
+			//修改真实用户的订单
+			List<TdOrder> tdRealOrder = tdOrderService.findByRealUserUsernameOrderByIdDesc(oldUsername);
+			for (TdOrder item : tdRealOrder) {
+				item.setRealUserUsername(newUsername);
+				item.setRealUserId(tdUser.getId());
+				item.setRealUserRealName(tdUser.getRealName());
+				tdOrderService.save(item);
+			}
+			
 
 			List<TdUserCollect> tdUserCollect = tdUserCollectService.findByUsername(oldUsername);
 			for (TdUserCollect item : tdUserCollect) {

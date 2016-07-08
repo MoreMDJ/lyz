@@ -32,7 +32,7 @@ public class TdSalesDetail {
 	@Column
 	private Date orderTime;
 	//销售时间
-	private Date saleTime;
+	private Date salesTime;
 	//订单状态
 	@Column
 	private Long statusId;
@@ -250,11 +250,11 @@ public class TdSalesDetail {
 	public void setShippingPhone(String shippingPhone) {
 		this.shippingPhone = shippingPhone;
 	}
-	public Date getSaleTime() {
-		return saleTime;
+	public Date getSalesTime() {
+		return salesTime;
 	}
-	public void setSaleTime(Date saleTime) {
-		this.saleTime = saleTime;
+	public void setSalesTime(Date salesTime) {
+		this.salesTime = salesTime;
 	}
 	public Double getCashCoupon() {
 		return cashCoupon;
