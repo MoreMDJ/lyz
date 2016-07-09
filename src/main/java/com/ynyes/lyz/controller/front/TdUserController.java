@@ -2803,6 +2803,8 @@ public class TdUserController {
 										}
 
 										if (cashPrice > 0) {
+											BigDecimal bd = new BigDecimal(cashPrice);
+											cashPrice = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 											infos.add(cashPrice + "元【通用现金券】*1");
 										}
 										total -= cashPrice;
@@ -2827,6 +2829,8 @@ public class TdUserController {
 										uncashBalance = unCashBalanceUsed;
 									}
 									if (uncashBalance > 0) {
+										BigDecimal bd = new BigDecimal(uncashBalance);
+										uncashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 										infos.add(Math.round(uncashBalance*100)/100 + "元【不可提现预存款】");
 									}
 									// // 开始退还不可提现余额
@@ -2849,6 +2853,8 @@ public class TdUserController {
 										cashBalance = cashBalanceUsed;
 									}
 									if (cashBalance > 0) {
+										BigDecimal bd = new BigDecimal(cashBalance);
+										cashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 										infos.add(Math.round(cashBalance*100)/100 + "元【可提现预存款】");
 									}
 									total -= cashBalance;

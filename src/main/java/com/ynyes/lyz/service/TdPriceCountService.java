@@ -1,5 +1,6 @@
 package com.ynyes.lyz.service;
 
+import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
@@ -1160,6 +1161,8 @@ public class TdPriceCountService {
 											}
 											cashCoupon.setPicUri(goods.getCoverImageUri());
 											cashCoupon.setGoodsName(goods.getTitle());
+											BigDecimal bd = new BigDecimal(cashPrice);
+											cashPrice = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 											cashCoupon.setPrice(cashPrice);
 											cashCoupon.setTypeTitle("退货返还的优惠券");
 											cashCoupon.setGetNumber(1L);
@@ -1210,6 +1213,8 @@ public class TdPriceCountService {
 										TdBalanceLog balanceLog = new TdBalanceLog();
 										balanceLog.setUserId(user.getId());
 										balanceLog.setUsername(user.getUsername());
+										BigDecimal bd = new BigDecimal(uncashBalance);
+										uncashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 										balanceLog.setMoney(uncashBalance);
 										balanceLog.setType(4L);
 										balanceLog.setCreateTime(new Date());
@@ -1257,6 +1262,8 @@ public class TdPriceCountService {
 										TdBalanceLog balanceLog = new TdBalanceLog();
 										balanceLog.setUserId(user.getId());
 										balanceLog.setUsername(user.getUsername());
+										BigDecimal bd = new BigDecimal(cashBalance);
+										cashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 										balanceLog.setMoney(cashBalance);
 										balanceLog.setType(4L);
 										balanceLog.setCreateTime(new Date());
