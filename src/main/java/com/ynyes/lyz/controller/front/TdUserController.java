@@ -2827,7 +2827,7 @@ public class TdUserController {
 										uncashBalance = unCashBalanceUsed;
 									}
 									if (uncashBalance > 0) {
-										infos.add(uncashBalance + "元【不可提现预存款】");
+										infos.add(Math.round(uncashBalance*100)/100 + "元【不可提现预存款】");
 									}
 									// // 开始退还不可提现余额
 									// 判断是否剩余部分金额需要退还
@@ -2849,7 +2849,7 @@ public class TdUserController {
 										cashBalance = cashBalanceUsed;
 									}
 									if (cashBalance > 0) {
-										infos.add(cashBalance + "元【可提现预存款】");
+										infos.add(Math.round(cashBalance*100)/100 + "元【可提现预存款】");
 									}
 									total -= cashBalance;
 									cashBalanceUsed -= cashBalance;

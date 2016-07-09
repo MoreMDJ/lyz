@@ -271,7 +271,7 @@ public class TdOrderService {
 			return null;
 		}
 		return repository.findByUsernameOrderByIdDesc(username);
-	};
+	}
 
 	// zhangji
 	public Page<TdOrder> findByUsernameAndSearchAndStatusIdOrUsernameAndSearchAndStatusIdOrUsernameAndSearchAndStatusId(
@@ -785,5 +785,13 @@ public class TdOrderService {
 		}
 		
 		return 0L;
+	}
+	
+	// 根据用户名查找所有的订单（不分页）
+	public List<TdOrder> findByRealUserUsernameOrderByIdDesc(String username) {
+		if (null == username) {
+			return null;
+		}
+		return repository.findByRealUserUsernameOrderByIdDesc(username);
 	}
 }

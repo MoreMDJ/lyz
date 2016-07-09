@@ -278,4 +278,7 @@ public interface TdOrderRepo extends PagingAndSortingRepository<TdOrder, Long>, 
 			+ "o.statusId in ?1 and d.driver = ?3 and d.orderNumber = o.mainOrderNumber and o.shippingAddress like %?2% "
 			+ "group by o.mainOrderNumber order by o.orderTime desc")
 	Integer queryCountDeliverysearch(List<Long> statusIds,String keyword,String opUser);
+	
+	//根据真实用户名查找所有的订单
+	List<TdOrder> findByRealUserUsernameOrderByIdDesc(String username);
 }
