@@ -53,7 +53,6 @@ import com.ynyes.lyz.entity.TdOrder;
 import com.ynyes.lyz.entity.TdReturnNote;
 import com.ynyes.lyz.entity.TdTbwRecd;
 import com.ynyes.lyz.entity.TdTbwRecm;
-import com.ynyes.lyz.entity.TdUser;
 import com.ynyes.lyz.interfaces.entity.TdTbOmD;
 import com.ynyes.lyz.interfaces.entity.TdTbOmM;
 import com.ynyes.lyz.interfaces.entity.TdTbwBackRecD;
@@ -76,7 +75,6 @@ import com.ynyes.lyz.service.TdOrderService;
 import com.ynyes.lyz.service.TdReturnNoteService;
 import com.ynyes.lyz.service.TdTbwRecdService;
 import com.ynyes.lyz.service.TdTbwRecmService;
-import com.ynyes.lyz.service.TdUserService;
 import com.ynyes.lyz.webservice.ICallWMS;
 
 
@@ -98,9 +96,6 @@ public class CallWMSImpl implements ICallWMS {
 	
 	@Autowired
 	private TdBackDetailService tdBackDetailService;
-	
-	@Autowired
-	private TdUserService tdUserService;
 	
 	@Autowired
 	private TdReturnNoteService tdReturnNoteService;
@@ -219,6 +214,8 @@ public class CallWMSImpl implements ICallWMS {
 				String c_owner_no = null;//委托业主
 				String c_reserved1 = null;//分单号
 				String c_Driver = null;//送货员
+				Long cCompanyId = null;//公司id
+				String cTaskType = null;//任务类型
 				
 				Node node = nodeList.item(i);
 				NodeList childNodeList = node.getChildNodes();
@@ -306,16 +303,30 @@ public class CallWMSImpl implements ICallWMS {
 								c_Driver = childNode.getChildNodes().item(0).getNodeValue();
 							}
 						}
-						
+						else if (childNode.getNodeName().equalsIgnoreCase("c_company_id"))
+						{
+						    if (null != childNode.getChildNodes().item(0))
+						    {
+						    	cCompanyId = Long.parseLong(childNode.getChildNodes().item(0).getNodeValue());
+						    }
+						}
+						else if (childNode.getNodeName().equalsIgnoreCase("c_task_type"))
+						{
+						    if (null != childNode.getChildNodes().item(0))
+						    {
+						    	cTaskType = childNode.getChildNodes().item(0).getNodeValue();
+						    }
+						}
 					}
 				}
 				
 				//保存 修改
 				TdDeliveryInfo tdDeliveryInfo = tdDeliveryInfoService.findByTaskNo(c_task_no);
-				if (tdDeliveryInfo == null)
+				if (tdDeliveryInfo != null)
 				{
-					tdDeliveryInfo = new TdDeliveryInfo();
+					return "<RESULTS><STATUS><CODE>1</CODE>编号:" + c_task_no + " 已存在<MESSAGE></MESSAGE></STATUS></RESULTS>";
 				}
+				tdDeliveryInfo = new TdDeliveryInfo();
 				tdDeliveryInfo.setTaskNo(c_task_no);
 				tdDeliveryInfo.setWhNo(c_wh_no);
 				tdDeliveryInfo.setDriver(c_Driver);
@@ -351,6 +362,51 @@ public class CallWMSImpl implements ICallWMS {
 				tdDeliveryInfo.setOpUser(c_op_user);
 				tdDeliveryInfo.setModifiedUserno(c_modified_userno);
 				tdDeliveryInfo.setOwnerNo(c_owner_no);
+				tdDeliveryInfo.setcCompanyId(cCompanyId);
+				tdDeliveryInfo.setcTaskType(cTaskType);
+				if (cTaskType != null && cTaskType.contains("退货"))
+				{
+					if (cCompanyId == null)
+					{
+						return "<RESULTS><STATUS><CODE>1</CODE>采购退货城市id不能为空<MESSAGE></MESSAGE></STATUS></RESULTS>";
+					}
+					TdCity tdCity = tdCityService.findBySobIdCity(cCompanyId);
+					if (tdCity == null)
+					{
+						return "<RESULTS><STATUS><CODE>1</CODE>app不存在城市id为:" + cCompanyId + "的城市<MESSAGE></MESSAGE></STATUS></RESULTS>";
+					}
+					List<TdDeliveryInfoDetail> infoDetails = tdDeliveryInfoDetailService.findByTaskNo(c_task_no);
+					if (infoDetails == null || infoDetails.size() < 1)
+					{
+						return "<RESULTS><STATUS><CODE>1</CODE>未找到任务编号为" + c_task_no + " 的明细，请先传明细，在主档<MESSAGE></MESSAGE></STATUS></RESULTS>";
+					}
+					for (TdDeliveryInfoDetail infoDetail : infoDetails)
+					{
+						String cGcode = infoDetail.getgCode();
+						TdGoods tdGoods = tdGoodsService.findByCode(cGcode);
+						TdDiySiteInventory inventory = tdDiySiteInventoryService.findByGoodsCodeAndRegionIdAndDiySiteIdIsNull(cGcode, cCompanyId);
+						if (inventory == null)
+						{
+							inventory = new TdDiySiteInventory();
+							inventory.setGoodsCode(tdGoods.getCode());
+							inventory.setGoodsId(tdGoods.getId());
+							inventory.setCategoryId(tdGoods.getCategoryId());
+							inventory.setCategoryIdTree(tdGoods.getCategoryIdTree());
+							inventory.setCategoryTitle(tdGoods.getCategoryTitle());
+							inventory.setGoodsTitle(tdGoods.getTitle());
+							inventory.setRegionId(cCompanyId);
+							inventory.setRegionName(tdCity.getCityName());
+						}
+						Double doubleFromStr = infoDetail.getBackNumber();
+						doubleFromStr = doubleFromStr * 100;
+						Long cRecQty = doubleFromStr.longValue();
+						cRecQty = cRecQty / 100;
+						inventory.setInventory(inventory.getInventory() - cRecQty);
+						tdDiySiteInventoryService.save(inventory);
+						tdDiySiteInventoryLogService.saveChangeLog(inventory, -cRecQty, null, null,TdDiySiteInventoryLog.CHANGETYPE_CITY_CG_SUB);
+					}
+				}
+
 				tdDeliveryInfoService.save(tdDeliveryInfo);
 			}
 			return "<RESULTS><STATUS><CODE>0</CODE><MESSAGE></MESSAGE></STATUS></RESULTS>";
@@ -663,14 +719,12 @@ public class CallWMSImpl implements ICallWMS {
 				infoDetail.setRequstNumber(c_d_request_qty);
 				infoDetail.setBackNumber(c_d_ack_qty);
 				infoDetail.setSubOrderNumber(c_reserved1);
+				TdGoods tdGoods = tdGoodsService.findByCode(c_gcode);
+				if (tdGoods == null)
+				{
+					return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>编码为" + c_gcode + "的商品不存在</MESSAGE></STATUS></RESULTS>";
+				}
 				tdDeliveryInfoDetailService.save(infoDetail);
-//				String siteCode = null;
-//				Long diySiteId = null;
-				Long userId= null;
-//				Boolean isSendOrder = true; // 是否是物流送货
-				TdUser tdUser = null;
-//				Long sobId = null;
-//				String orderNumber = null;
 				if (c_reserved1 != null)
 				{
 					TdOrder tdOrder = tdOrderService.findByOrderNumber(c_reserved1);
@@ -678,66 +732,9 @@ public class CallWMSImpl implements ICallWMS {
 					{
 						tdOrder.setStatusId(4L);
 						tdOrder.setSendTime(new Date());
-						userId = tdOrder.getRealUserId();
-						if (tdOrder.getDeliverTypeTitle().equalsIgnoreCase("门店自提")) 
-						{
-//							isSendOrder = false;
-						}
-//						siteCode = tdOrder.getDiySiteCode();
-//						diySiteId = tdOrder.getDiySiteId();
 						tdOrderService.save(tdOrder);
 					}
 				}
-				if (userId != null)
-				{
-					tdUser = tdUserService.findOne(userId);
-				}
-				if (tdUser != null)
-				{
-//					sobId = tdUser.getCityId();
-				}
-//				String gCode = infoDetail.getgCode();
-//				Long backquantity = Math.round(infoDetail.getBackNumber() == null ? 0 : infoDetail.getBackNumber());
-//				if (isSendOrder) 
-//				{
-//					TdDiySiteInventory inventory = tdDiySiteInventoryService.findByGoodsCodeAndRegionIdAndDiySiteIdIsNull(gCode, sobId);
-//					if (inventory != null && inventory.getInventory() != null)
-//					{
-//						inventory.setInventory(inventory.getInventory() - backquantity);
-//						tdDiySiteInventoryLogService.saveChangeLog(inventory, 0 - backquantity, orderNumber, null);
-//					}
-//				}
-//				else
-//				{
-//					TdDiySiteInventory inventory = tdDiySiteInventoryService.findByGoodsCodeAndDiySiteId(gCode, diySiteId);
-//					if (inventory != null && inventory.getInventory() != null)
-//					{
-//						inventory.setInventory(inventory.getInventory() - backquantity);
-//						tdDiySiteInventoryLogService.saveChangeLog(inventory, 0 - backquantity, orderNumber, null);
-//					}
-//				}
-				
-//				TdGoods tdGoods = tdGoodsService.findByCode(infoDetail.getgCode());
-//				List<TdDiySiteInventory> inventoryList = tdGoods.getInventoryList();
-//				if (tdGoods != null && tdGoods.getLeftNumber() != null)
-//				{
-//					tdGoods.setLeftNumber(tdGoods.getLeftNumber() - backquantity >= 0 ? tdGoods.getLeftNumber() - backquantity : 0);
-//				}
-//				if (tdGoods != null && siteCode != null && inventoryList !=null && inventoryList.size() >= 1)
-//				{
-//					for (int inventoryIndex = 0; inventoryIndex < inventoryList.size(); inventoryIndex++) 
-//					{
-//						TdDiySiteInventory siteInventory = inventoryList.get(inventoryIndex);
-//						if (siteInventory.getDiyCode().equals(siteCode)) 
-//						{
-//							siteInventory.setInventory(siteInventory.getInventory() - backquantity);
-//							tdDiySiteInventoryService.save(siteInventory);
-//							break;
-//						}
-//					}
-//				}
-//				tdGoodsService.save(tdGoods, "WMS:goods");
-
 			}
 			return "<RESULTS><STATUS><CODE>0</CODE><MESSAGE></MESSAGE></STATUS></RESULTS>";
 		}
@@ -3051,7 +3048,7 @@ public class CallWMSImpl implements ICallWMS {
 			
 			return "<RESULTS><STATUS><CODE>0</CODE><MESSAGE></MESSAGE></STATUS></RESULTS>";
 		}
-		else if (STRTABLE.equalsIgnoreCase("tbw_waste_d"))//报损报溢
+		else if (STRTABLE.equalsIgnoreCase("tbw_waste_view"))//报损报溢
 		{
 			for (int i = 0; i < nodeList.getLength(); i++)
 			{
@@ -3326,7 +3323,21 @@ public class CallWMSImpl implements ICallWMS {
 					    }
 					}
 				}
-				TdTbwWasted tbwWasted = new TdTbwWasted();
+				if (cWasteNo == null)
+				{
+					return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>损溢单号不能为空</MESSAGE></STATUS></RESULTS>";
+				}
+				if (cWasteId == null)
+				{
+					return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>损溢单号id不能为空</MESSAGE></STATUS></RESULTS>";
+				}
+				
+				TdTbwWasted tbwWasted = tdTbwWastedService.findByCWasteNoAndCWasteId(cWasteNo,cWasteId);
+				if (tbwWasted != null)
+				{
+					return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>损溢单号："+ cWasteNo +" 已存在</MESSAGE></STATUS></RESULTS>";
+				}
+				tbwWasted = new TdTbwWasted();
 				tbwWasted.setcWhNo(cWhNo);
 				tbwWasted.setcOwnerNo(cOwnerNo);
 				tbwWasted.setcWasteNo(cWasteNo);
@@ -3388,17 +3399,17 @@ public class CallWMSImpl implements ICallWMS {
 				doubleFromStr = doubleFromStr * 100;
 				Long cRecQty = doubleFromStr.longValue();
 				cRecQty = cRecQty / 100;
-				if (cWasteType.contains("溢出"))
+				if (cWasteType.contains("报溢"))
 				{
 					inventory.setInventory(inventory.getInventory() +cRecQty);
 					tdDiySiteInventoryService.save(inventory);
-					tdDiySiteInventoryLogService.saveChangeLog(inventory, cRecQty, null, null,TdDiySiteInventoryLog.CHANGETYPE_CITY_DO_ADD);
+					tdDiySiteInventoryLogService.saveChangeLog(inventory, cRecQty, null, null,TdDiySiteInventoryLog.CHANGETYPE_CITY_YC_ADD);
 				}
 				else
 				{
 					inventory.setInventory(inventory.getInventory() - cRecQty);
 					tdDiySiteInventoryService.save(inventory);
-					tdDiySiteInventoryLogService.saveChangeLog(inventory, -cRecQty, null, null,TdDiySiteInventoryLog.CHANGETYPE_CITY_DO_SUB);
+					tdDiySiteInventoryLogService.saveChangeLog(inventory, -cRecQty, null, null,TdDiySiteInventoryLog.CHANGETYPE_CITY_BS_SUB);
 				}
 			}
 

@@ -177,6 +177,13 @@ $(function () {
         </dd>
     </dl>
     <dl>
+        <dt>接口通知电话</dt>
+        <dd>
+            <input name="infPhone" type="text" value="<#if setting??>${setting.infPhone!""}</#if>" class="input normal" datatype="m" sucmsg=" "</input>
+            <span class="Validform_chektip"></span>
+        </dd>
+    </dl>
+    <dl>
         <dt>客服电话</dt>
         <dd>
             <input name="telephone" type="text" value="<#if setting??>${setting.telephone!""}</#if>" class="input normal" datatype="*0-100" sucmsg=" ">

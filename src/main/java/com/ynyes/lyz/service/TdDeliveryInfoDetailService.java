@@ -102,6 +102,15 @@ public class TdDeliveryInfoDetailService {
 		}
 		return repository.findDistinctSubOrderNumberByTaskNoIn(taskNoList);
 	}
+	
+	public List<TdDeliveryInfoDetail> findByTaskNo(String taskNo)
+	{
+		if (taskNo == null)
+		{
+			return null;
+		}
+		return repository.findByTaskNo(taskNo);
+	}
 
 	/**
 	 * 保存

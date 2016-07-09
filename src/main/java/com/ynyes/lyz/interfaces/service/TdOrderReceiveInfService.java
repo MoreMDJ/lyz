@@ -75,6 +75,15 @@ public class TdOrderReceiveInfService {
         return repository.findOne(id);
     }
     
+    public List<TdOrderReceiveInf> findByOrderNumber(String orderNumber)
+    {
+    	if (orderNumber == null)
+    	{
+			return null;
+		}
+    	return repository.findByOrderNumber(orderNumber);
+    }
+    
     /**
      * 查找
      * 

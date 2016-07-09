@@ -141,6 +141,10 @@ public class TdSetting {
     //收货地址最大限制 zp
     @Column
     private Long maxShipping;
+    
+    //WebService 接口错误是发送的手机号
+    @Column(length = 20)
+    private String infPhone;
 
     public Long getId() {
         return id;
@@ -397,6 +401,28 @@ public class TdSetting {
 	public void setMaxShipping(Long maxShipping) {
 		this.maxShipping = maxShipping;
 	}
-	
+
+	public String getInfPhone() {
+		return infPhone;
+	}
+
+	public void setInfPhone(String infPhone) {
+		this.infPhone = infPhone;
+	}
+
+	@Override
+	public String toString() {
+		return "TdSetting [id=" + id + ", title=" + title + ", domainName=" + domainName + ", logoUri=" + logoUri
+				+ ", company=" + company + ", address=" + address + ", telephone=" + telephone + ", fax=" + fax
+				+ ", qq=" + qq + ", adminEmail=" + adminEmail + ", icpNumber=" + icpNumber + ", seoTitle=" + seoTitle
+				+ ", seoKeywords=" + seoKeywords + ", seoDescription=" + seoDescription + ", copyright=" + copyright
+				+ ", isTouchEnable=" + isTouchEnable + ", touchUri=" + touchUri + ", isCommentVerify=" + isCommentVerify
+				+ ", isEnableLog=" + isEnableLog + ", registerNego=" + registerNego + ", cashCouponGuide="
+				+ cashCouponGuide + ", goodsCouponGuide=" + goodsCouponGuide + ", registerSuccessPoints="
+				+ registerSuccessPoints + ", registerSharePoints=" + registerSharePoints + ", goodsSharePoints="
+				+ goodsSharePoints + ", goodsShareLimits=" + goodsShareLimits + ", returnRation=" + returnRation
+				+ ", wxQrCode=" + wxQrCode + ", iOsQrCode=" + iOsQrCode + ", androidQrCode=" + androidQrCode
+				+ ", cancelTime=" + cancelTime + ", maxShipping=" + maxShipping + ", infPhone=" + infPhone + "]";
+	}
     
 }

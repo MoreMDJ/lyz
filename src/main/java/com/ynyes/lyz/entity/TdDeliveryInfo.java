@@ -68,6 +68,14 @@ public class TdDeliveryInfo {
 	// 送货员
 	@Column
 	private String driver;
+	
+	// 城市id
+	@Column
+	private Long cCompanyId;
+	
+	// 任务类型
+	@Column(length = 20)
+	private String cTaskType;
 
 	public String getDriver() {
 		return driver;
@@ -156,4 +164,29 @@ public class TdDeliveryInfo {
 	public void setOwnerNo(String ownerNo) {
 		this.ownerNo = ownerNo;
 	}
+
+	public Long getcCompanyId() {
+		return cCompanyId;
+	}
+
+	public void setcCompanyId(Long cCompanyId) {
+		this.cCompanyId = cCompanyId;
+	}
+
+	public String getcTaskType() {
+		return cTaskType;
+	}
+
+	public void setcTaskType(String cTaskType) {
+		this.cTaskType = cTaskType;
+	}
+
+	@Override
+	public String toString() {
+		return "TdDeliveryInfo [id=" + id + ", taskNo=" + taskNo + ", whNo=" + whNo + ", beginDt=" + beginDt
+				+ ", endDt=" + endDt + ", opStatus=" + opStatus + ", opUser=" + opUser + ", modifiedUserno="
+				+ modifiedUserno + ", ownerNo=" + ownerNo + ", orderNumber=" + orderNumber + ", driver=" + driver
+				+ ", cCompanyId=" + cCompanyId + ", cTaskType=" + cTaskType + "]";
+	}
+	
 }

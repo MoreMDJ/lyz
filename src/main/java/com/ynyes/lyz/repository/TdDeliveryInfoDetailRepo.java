@@ -10,11 +10,12 @@ import com.ynyes.lyz.entity.TdDeliveryInfoDetail;
 public interface TdDeliveryInfoDetailRepo
 		extends PagingAndSortingRepository<TdDeliveryInfoDetail, Long>, JpaSpecificationExecutor<TdDeliveryInfoDetail> {
 	
-	TdDeliveryInfoDetail findByTaskNo(String taskNo);
+	List<TdDeliveryInfoDetail> findByTaskNo(String taskNo);
 	
 	List<TdDeliveryInfoDetail> findByOpUser(String opUser);
 	
 	List<TdDeliveryInfoDetail> findDistinctSubOrderNumberByTaskNoIn(List<String> taskNoList);
 	
 	List<TdDeliveryInfoDetail> findBySubOrderNumber(String subOrderNumber);
+	
 }

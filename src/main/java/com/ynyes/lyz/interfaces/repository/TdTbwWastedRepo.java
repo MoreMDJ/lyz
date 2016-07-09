@@ -7,4 +7,7 @@ import com.ynyes.lyz.interfaces.entity.TdTbwWasted;
 
 public interface TdTbwWastedRepo extends PagingAndSortingRepository<TdTbwWasted, Long> ,JpaSpecificationExecutor<TdTbwWasted>
 {
+	TdTbwWasted findByCWasteNo(String cWasteNo);
+	
+	TdTbwWasted findByCWasteNoAndCWasteId(String cWasteNo,Long cWasteId);
 }

@@ -95,6 +95,15 @@ public class TdReturnTimeInfService {
 //    	return repository.findByOrderNumber(orderNumber);
 //    }
     
+    public List<TdReturnTimeInf> findByReturnNumber(String returnNumber)
+    {
+    	if (returnNumber == null)
+    	{
+			return null;
+		}
+    	return repository.findByReturnNumber(returnNumber);
+    }
+    
     /**
      * 保存
      * 

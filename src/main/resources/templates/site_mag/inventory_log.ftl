@@ -80,7 +80,7 @@ var theForm = document.forms['form1'];
                     <input type="hidden" name="listId" id="listId" value="${item.id?c}">
                 </td>
                 <td align="left">${item.manager!""}</td>
-                <td align="left"><#if item.description??>${item.changeType!""}<#else>无</#if></td>
+                <td align="left"><#if item.changeType??>${item.changeType!""}<#else>无</#if></td>
                 <td align="left"><#if item.regionName??>${item.regionName!'无'}<#else>${item.diySiteTitle!'无'}</#if></td>
                 <td align="left">${item.goodsSku!""}</td>
                 <td align="left">${item.goodsTitle!""}</td>

@@ -83,6 +83,24 @@ public class TdTbwWastedService
         return (List<TdTbwWasted>) repository.findAll();
     }
     
+    public TdTbwWasted findByCWasteNo(String cWasteNo)
+    {
+    	if (cWasteNo == null )
+    	{
+			return null;
+		}
+    	return repository.findByCWasteNo(cWasteNo);
+    }
+    
+    public TdTbwWasted findByCWasteNoAndCWasteId(String cWasteNo,Long cWasteId)
+    {
+    	if (cWasteId == null || cWasteNo == null)
+    	{
+			return null;
+		}
+    	return repository.findByCWasteNoAndCWasteId(cWasteNo, cWasteId);
+    }
+    
     /**
      * 保存
      * 

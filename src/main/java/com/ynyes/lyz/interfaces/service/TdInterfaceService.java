@@ -1,5 +1,12 @@
 package com.ynyes.lyz.interfaces.service;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,6 +35,7 @@ import com.ynyes.lyz.entity.TdOwnMoneyRecord;
 import com.ynyes.lyz.entity.TdPayType;
 import com.ynyes.lyz.entity.TdRecharge;
 import com.ynyes.lyz.entity.TdReturnNote;
+import com.ynyes.lyz.entity.TdSetting;
 import com.ynyes.lyz.entity.TdUser;
 import com.ynyes.lyz.interfaces.entity.TdCashReciptInf;
 import com.ynyes.lyz.interfaces.entity.TdCashRefundInf;
@@ -49,6 +57,7 @@ import com.ynyes.lyz.service.TdOrderService;
 import com.ynyes.lyz.service.TdPayTypeService;
 import com.ynyes.lyz.service.TdPriceCountService;
 import com.ynyes.lyz.service.TdReturnNoteService;
+import com.ynyes.lyz.service.TdSettingService;
 
 
 @Service
@@ -102,6 +111,9 @@ public class TdInterfaceService {
 	
 	@Autowired
 	private TdPriceCountService tdPriceCountService;
+	
+	@Autowired
+	private TdSettingService tdSettingService;
 	
 	private Call call;
 	
@@ -265,7 +277,7 @@ public class TdInterfaceService {
 		{
 			return ;
 		}
-		Boolean isSendSuccess = true;
+		Boolean isSendSuccess = false;
 		//退单头
 		String returnOrderInfXml = this.XmlWithObject(returnOrderInf, INFTYPE.RETURNORDERINF);
 		if (returnOrderInfXml != null)
@@ -274,7 +286,7 @@ public class TdInterfaceService {
 			String result = this.ebsWsInvoke(orderInf);
 			if (StringUtils.isBlank(result))
 			{
-				isSendSuccess = false;
+				isSendSuccess = true;
 				returnOrderInf.setSendFlag(0);
 			}
 			else
@@ -750,34 +762,30 @@ public class TdInterfaceService {
 		{
 			return null;
 		}
-		TdOrder tdOrder = tdOrderService.findByOrderNumber(cashReturnNote.getOrderNumber());
-		if (tdOrder == null)
-		{
-			return null;
-		}
-		TdOrderInf tdOrderInf = tdOrderInfService.findByOrderNumber(tdOrder.getOrderNumber());
+		TdOrderInf tdOrderInf = tdOrderInfService.findByOrderNumber(cashReturnNote.getOrderNumber());
 		if (tdOrderInf == null)
 		{
 			return null;
 		}
-		TdDiySite tdDiySite = tdDiySiteService.findOne(tdOrder.getDiySiteId());
-		if (tdDiySite == null)
+		
+		TdReturnOrderInf returnOrderInf = tdReturnOrderInfService.findByOrderNumber(cashReturnNote.getOrderNumber());
+		if (returnOrderInf == null)
 		{
 			return null;
 		}
 		
 		TdCashRefundInf cashRefundInf = new TdCashRefundInf();
-		cashRefundInf.setSobId(tdDiySite.getRegionId());
+		cashRefundInf.setSobId(tdOrderInf.getSobId());
 		cashRefundInf.setRefundNumber(StringTools.getUniqueNoWithHeader("RT"));
-		cashRefundInf.setUserid(tdOrder.getRealUserId());
-		cashRefundInf.setUsername(tdOrder.getRealUserRealName());
-		cashRefundInf.setUserphone(tdOrder.getRealUserUsername());
-		cashRefundInf.setDiySiteCode(tdDiySite.getStoreCode());
+		cashRefundInf.setUserid(tdOrderInf.getUserid());
+		cashRefundInf.setUsername(tdOrderInf.getUsername());
+		cashRefundInf.setUserphone(tdOrderInf.getUserphone());
+		cashRefundInf.setDiySiteCode(tdOrderInf.getDiySiteCode());
 		cashRefundInf.setRefundClass("订单");
-		cashRefundInf.setRtHeaderId(tdOrderInf.getHeaderId().toString());
+		cashRefundInf.setRtHeaderId(returnOrderInf.getRtHeaderId());
 		cashRefundInf.setReturnNumber(cashReturnNote.getReturnNoteNumber());
 		cashRefundInf.setOrderHeaderId(tdOrderInf.getHeaderId());
-		cashRefundInf.setProductType(StringTools.getProductStrByOrderNumber(tdOrder.getOrderNumber()));
+		cashRefundInf.setProductType(StringTools.getProductStrByOrderNumber(tdOrderInf.getOrderNumber()));
 		cashRefundInf.setRefundType(cashReturnNote.getTypeTitle());
 		cashRefundInf.setRefundDate(new Date());
 		cashRefundInf.setAmount(cashReturnNote.getMoney());
@@ -832,7 +840,6 @@ public class TdInterfaceService {
 		if(diySite!=null){
 			returnOrderInf.setSobId(diySite.getRegionId());
 		}
-//		returnOrderInf.setRtHeaderId(returnNote);
 		
 		returnOrderInf.setReturnNumber(returnNote.getReturnNumber());
 		returnOrderInf.setReturnDate(returnNote.getOrderTime());
@@ -1650,6 +1657,11 @@ public class TdInterfaceService {
 		catch (Exception e)
 		{
 			result = e.getMessage();
+			this.smsSend(INFTYPE.EBSWEBSERVICE);
+		}
+		if (result != null)
+		{
+			this.smsSend(INFTYPE.EBSWEBSERVICE);
 		}
 		return result;
 	}
@@ -1668,6 +1680,93 @@ public class TdInterfaceService {
 		}
 		default:
 			break;
+		}
+	}
+	
+	/**        ----------------- 短信接口 --------------------      **/
+	/**        ----------------- 接口传输错误时发送 --------------------      **/
+	public void smsSend(INFTYPE infType)
+	{
+		String errorService = "";
+		String phone = "qwe";
+		switch (infType) {
+		case WMSWEBSERVICE:
+			errorService = "WMS:";
+			break;
+		case EBSWEBSERVICE:
+			errorService = "EBS:";
+			break;
+
+		default:
+			break;
+		}
+		String info = errorService + "接口数据传输失败，请查看";
+		String content = null;
+		try
+		{
+			content = URLEncoder.encode(info, "GB2312");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		TdSetting tdSetting = tdSettingService.findTopBy();
+		if (tdSetting == null || tdSetting.getInfPhone() == null || "".equalsIgnoreCase(tdSetting.getInfPhone()))
+		{
+			return ;
+		}
+		phone = tdSetting.getInfPhone();
+		//成都账号
+		String enCode	= "C11535";
+		String enPass	= "2XiQj1";
+		String userName	= "cd001";
+		
+		String url = "http://www.mob800.com/interface/Send.aspx?enCode=" + enCode + "&enPass="
+				+ enPass + "&userName=" + userName + "&mob=" + phone + "&msg=" + content;
+		
+		try {
+			URL u = new URL(url);
+			URLConnection connection = u.openConnection();
+			HttpURLConnection httpConn = (HttpURLConnection) connection;
+			httpConn.setRequestProperty("Content-type", "text/html");
+			httpConn.setRequestProperty("Accept-Charset", "utf-8");
+			httpConn.setRequestProperty("contentType", "utf-8");
+			InputStream inputStream = null;
+			InputStreamReader inputStreamReader = null;
+			BufferedReader reader = null;
+			StringBuffer resultBuffer = new StringBuffer();
+			String tempLine = null;
+
+			try {
+				inputStream = httpConn.getInputStream();
+				inputStreamReader = new InputStreamReader(inputStream);
+				reader = new BufferedReader(inputStreamReader);
+
+				while ((tempLine = reader.readLine()) != null)
+				{
+					resultBuffer.append(tempLine);
+				}
+
+			}
+			finally
+			{
+				if (reader != null)
+				{
+					reader.close();
+				}
+				if (inputStreamReader != null)
+				{
+					inputStreamReader.close();
+				}
+				if (inputStream != null)
+				{
+					inputStream.close();
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 	

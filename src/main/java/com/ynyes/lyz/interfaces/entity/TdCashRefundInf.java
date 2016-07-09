@@ -49,7 +49,7 @@ public class TdCashRefundInf extends TdInfBaseEntity
 	
 	//销售单头ID (代收款对应拆分后的订单ID)
 	@Column
-	private String rtHeaderId;
+	private Long rtHeaderId;
 	
 	//销售订单号
 	@Column
@@ -166,11 +166,11 @@ public class TdCashRefundInf extends TdInfBaseEntity
 		this.refundClass = refundClass;
 	}
 
-	public String getRtHeaderId() {
+	public Long getRtHeaderId() {
 		return rtHeaderId;
 	}
 
-	public void setRtHeaderId(String rtHeaderId) {
+	public void setRtHeaderId(Long rtHeaderId) {
 		this.rtHeaderId = rtHeaderId;
 	}
 

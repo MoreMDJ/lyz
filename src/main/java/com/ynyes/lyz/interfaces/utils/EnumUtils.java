@@ -52,6 +52,16 @@ public class EnumUtils {
 		/**
 		 * 退款表
 		 */
-		CASHREFUNDINF
+		CASHREFUNDINF,
+		
+		/**
+		 * WMS
+		 */
+		WMSWEBSERVICE,
+		
+		/**
+		 * EBS
+		 */
+		EBSWEBSERVICE
 	}
 }

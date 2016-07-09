@@ -90,10 +90,14 @@ public class TdCashRefundInfService {
     {
         return (List<TdCashRefundInf>) repository.findAll();
     }
-//    public TdReturnOrderInf findByOrderNumber(String orderNumber)
-//    {
-//    	return repository.findByOrderNumber(orderNumber);
-//    }
+    public List<TdCashRefundInf> findByOrderHeaderId(Long orderHeaderId)
+    {
+    	if (orderHeaderId == null)
+    	{
+			return null;
+		}
+    	return repository.findByOrderHeaderId(orderHeaderId);
+    }
     
     /**
      * 保存

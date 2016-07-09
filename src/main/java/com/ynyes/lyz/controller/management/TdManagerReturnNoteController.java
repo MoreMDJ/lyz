@@ -34,7 +34,6 @@ import com.ynyes.lyz.interfaces.entity.TdCashRefundInf;
 import com.ynyes.lyz.interfaces.entity.TdReturnTimeInf;
 import com.ynyes.lyz.interfaces.service.TdInterfaceService;
 import com.ynyes.lyz.interfaces.utils.EnumUtils.INFTYPE;
-import com.ynyes.lyz.service.TdCashReturnNoteService;
 import com.ynyes.lyz.service.TdCityService;
 import com.ynyes.lyz.service.TdCommonService;
 import com.ynyes.lyz.service.TdDiySiteInventoryService;
@@ -91,9 +90,6 @@ public class TdManagerReturnNoteController extends TdManagerBaseController{
 	
 	@Autowired
 	private TdDiySiteInventoryService tdDiySiteInventoryService;
-	
-	@Autowired
-	private TdCashReturnNoteService tdCashReturnNoteService;
 	
 	// 列表
 	@RequestMapping(value = "/{type}/list")

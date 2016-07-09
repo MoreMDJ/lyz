@@ -36,6 +36,7 @@ import com.ynyes.lyz.entity.TdBalanceLog;
 import com.ynyes.lyz.entity.TdBrand;
 import com.ynyes.lyz.entity.TdCartColorPackage;
 import com.ynyes.lyz.entity.TdCartGoods;
+import com.ynyes.lyz.entity.TdCashReturnNote;
 import com.ynyes.lyz.entity.TdCategoryLimit;
 import com.ynyes.lyz.entity.TdCity;
 import com.ynyes.lyz.entity.TdCoupon;
@@ -171,6 +172,9 @@ public class TdCommonService {
 	
 	@Autowired
 	private TdOrderInfService tdOrderInfService;
+	
+	@Autowired
+	private TdCashReturnNoteService tdCashReturnNoteService;
 
 	/**
 	 * 根据仓库编号获取仓库名
@@ -356,6 +360,25 @@ public class TdCommonService {
 				// 更新订单商品信息是否退货状态
 				tdOrderGoodsService.save(oGoods);
 			}
+		}
+		Double otherPay = order.getOtherPay();
+		if (otherPay != null && otherPay > 0)
+		{
+			// 生成打款通知
+			// 根据退款方式和退货金额生成一个资金退还申请单据
+			TdCashReturnNote note = new TdCashReturnNote();
+			note.setCreateTime(new Date());
+			note.setMoney(otherPay);
+			note.setTypeId(order.getPayTypeId());
+			note.setTypeTitle(order.getPayTypeTitle());
+			note.setOrderNumber(order.getOrderNumber());
+			note.setMainOrderNumber(order.getMainOrderNumber());
+			note.setReturnNoteNumber(null);
+			note.setUserId(order.getRealUserId());
+			note.setUsername(order.getUsername());
+			note.setIsOperated(false);
+			note.setReturnNoteNumber(returnNote.getReturnNumber());
+			tdCashReturnNoteService.save(note);
 		}
 
 		returnNote.setReturnGoodsList(orderGoodsList);
@@ -2159,6 +2182,7 @@ public class TdCommonService {
 				String errorMsg = chectResult1(result);
 				if (errorMsg != null) {
 					writeErrorLog(mainOrderNumber, requisitionGoods.getSubOrderNumber(), errorMsg);
+					tdInterfaceService.smsSend(INFTYPE.WMSWEBSERVICE);
 				}
 			}
 			String xmlEncode = XMLMakeAndEncode(requisition, 1);
@@ -2168,6 +2192,7 @@ public class TdCommonService {
 			} catch (Exception e) {
 				e.printStackTrace();
 				writeErrorLog(mainOrderNumber, "无", e.getMessage());
+				tdInterfaceService.smsSend(INFTYPE.WMSWEBSERVICE);
 				// return "发送异常";
 			}
 			String result = null;
@@ -2179,6 +2204,7 @@ public class TdCommonService {
 			String errorMsg = chectResult1(result);
 			if (errorMsg != null) {
 				writeErrorLog(mainOrderNumber, "无", errorMsg);
+				tdInterfaceService.smsSend(INFTYPE.WMSWEBSERVICE);
 			} else {
 				// 根据乐易装的要求，当成功将信息发送至WMS时，保留提示信息
 				for (TdOrder subOrder : orderList) {
@@ -2191,6 +2217,11 @@ public class TdCommonService {
 		}
 	}
 
+	/**
+	 * 要货单重传
+	 * @param requisition
+	 * @return
+	 */
 	public Map<String, String> sendWmsMst(TdRequisition requisition) {
 		String mainOrderNumber = null;
 		Boolean isSuccess = true;
@@ -2212,6 +2243,7 @@ public class TdCommonService {
 					System.out.println("MDJWMS: " + mainOrderNumber + " 发送失败");
 					map.put(requisitionGoods.getGoodsCode(),
 							requisitionGoods.getOrderNumber() + requisitionGoods.getSubOrderNumber() + "失败");
+					tdInterfaceService.smsSend(INFTYPE.WMSWEBSERVICE);
 				}
 				String result = "";
 				if (objects != null) {
@@ -2224,6 +2256,7 @@ public class TdCommonService {
 					isSuccess = false;
 					map.put(requisitionGoods.getGoodsCode(), requisitionGoods.getOrderNumber()
 							+ requisitionGoods.getSubOrderNumber() + "失败-code:" + errorMsg);
+					tdInterfaceService.smsSend(INFTYPE.WMSWEBSERVICE);
 				} else {
 					map.put(requisitionGoods.getGoodsCode(),
 							requisitionGoods.getOrderNumber() + requisitionGoods.getSubOrderNumber() + "成功");
@@ -2237,6 +2270,7 @@ public class TdCommonService {
 				e.printStackTrace();
 				isSuccess = false;
 				map.put(requisition.getOrderNumber(), "失败");
+				tdInterfaceService.smsSend(INFTYPE.WMSWEBSERVICE);
 			}
 			String result = null;
 			if (objects != null) {
@@ -2248,6 +2282,7 @@ public class TdCommonService {
 			if (errorMsg != null) {
 				isSuccess = false;
 				map.put(requisition.getOrderNumber(), "失败:" + errorMsg);
+				tdInterfaceService.smsSend(INFTYPE.WMSWEBSERVICE);
 			} else {
 				map.put(requisition.getOrderNumber(), "成功");
 			}
@@ -2328,8 +2363,11 @@ public class TdCommonService {
 			requisition.setTotalPrice(order.getAllTotalPay());
 			requisition.setTypeId(1L);
 			String dayTime = order.getDeliveryDate();
-			dayTime = dayTime + " " + order.getDeliveryDetailId() + ":30";
-			requisition.setDeliveryTime(dayTime);
+			if (org.apache.commons.lang3.StringUtils.isNotBlank(dayTime) && order.getDeliveryDetailId() != null)
+			{
+				dayTime = dayTime + " " + order.getDeliveryDetailId() + ":30";
+				requisition.setDeliveryTime(dayTime);
+			}
 
 			requisition.setSellerRealName(order.getSellerRealName());
 			requisition.setSellerTel(order.getSellerUsername());
@@ -2475,54 +2513,6 @@ public class TdCommonService {
 
 		else if (type == 3) {
 			TdReturnNote returnNote = (TdReturnNote) object;
-			// String xmlStr = "<ERP>"
-			// + "<TABLE>"
-			// + "<id>" + returnNote.getId() + "</id>"
-			// + "<cancel_time>" + returnNote.getCancelTime()==null ? "" :
-			// returnNote.getCancelTime() + "</cancel_time>"
-			// + "<check_time>" + returnNote.getCheckTime() == null ? "" :
-			// returnNote.getCheckTime() + "</check_time>"
-			// + "<diy_site_address>" + returnNote.getDiySiteAddress() == null ?
-			// "" : returnNote.getDiySiteAddress() + "</diy_site_address>"
-			// + "<diy_site_id>" + returnNote.getDiySiteId() == null ? "" :
-			// returnNote.getDiySiteId() + "</diy_site_id>"
-			// + "<diy_site_tel>" + returnNote.getDiySiteTel() == null ? "" :
-			// returnNote.getDiySiteTel() + "</diy_site_tel>"
-			// + "<diy_site_title>" + returnNote.getDiySiteTitle() == null ? ""
-			// : returnNote.getDiySiteTitle() + "</diy_site_title>"
-			// + "<manager_remark_info>" + returnNote.getManagerRemarkInfo() ==
-			// null ? "" : returnNote.getManagerRemarkInfo() +
-			// "</manager_remark_info>"
-			// + "<order_number>" + returnNote.getOrderNumber() == null ? "" :
-			// returnNote.getOrderNumber() + "</order_number>"
-			// + "<order_time>" + returnNote.getOrderTime() == null ? "" :
-			// returnNote.getOrderTime() + "</order_time>"
-			// + "<pay_type_id>" + returnNote.getPayTypeId() == null ? "" :
-			// returnNote.getPayTypeId() + "</pay_type_id>"
-			// + "<pay_type_title>" + returnNote.getPayTypeTitle() == null ? ""
-			// : returnNote.getPayTypeTitle() + "</pay_type_title>"
-			// + "<remark_info>" + returnNote.getRemarkInfo() == null ? "" :
-			// returnNote.getRemarkInfo() + "</remark_info>"
-			// + "<return_number>" + returnNote.getReturnNumber() == null ? "" :
-			// returnNote.getReturnNumber() + "</return_number>"
-			// + "<return_time>" + returnNote.getReturnTime() == null ? "" :
-			// returnNote.getReturnTime() + "</return_time>"
-			// + "<sort_id>" + returnNote.getSortId() == null ? "" :
-			// returnNote.getSortId() + "</sort_id>"
-			// + "<status_id>" + returnNote.getStatusId() == null ? "" :
-			// returnNote.getStatusId() + "</status_id>"
-			// + "<username>" + returnNote.getUsername() == null ? "" :
-			// returnNote.getUsername() + "</username>"
-			// + "<deliver_type_title>" + returnNote.getDeliverTypeTitle() ==
-			// null ? "" : returnNote.getDeliverTypeTitle() +
-			// "</deliver_type_title>"
-			// + "<turn_price>" + returnNote.getTurnPrice() == null ? "" :
-			// returnNote.getTurnPrice() + "</turn_price>"
-			// + "<turn_type>" + returnNote.getTurnType() == null ? "" :
-			// returnNote.getTurnType() + "</turn_type>"
-			// + "</TABLE>"
-			// + "</ERP>";
-
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");
 			String orderDate = sdf.format(returnNote.getOrderTime());
 			String returnDate = null;
@@ -2569,43 +2559,6 @@ public class TdCommonService {
 
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");
 			String date = sdf.format(returnNote.getOrderTime());
-			// String xmlStr = "<ERP>"
-			// + "<TABLE>"
-			// + "<id>" + returnNote.getId() + "</id>"
-			// + "<cancel_time>" + returnNote.getCancelTime() + "</cancel_time>"
-			// + "<check_time>" + returnNote.getCheckTime() + "</check_time>"
-			// + "<diy_site_address>" + returnNote.getDiySiteAddress() +
-			// "</diy_site_address>"
-			// + "<diy_site_id>" + returnNote.getDiySiteId() + "</diy_site_id>"
-			// + "<diy_site_tel>" + returnNote.getDiySiteTel() +
-			// "</diy_site_tel>"
-			// + "<diy_site_title>" + returnNote.getDiySiteTitle() +
-			// "</diy_site_title>"
-			// + "<manager_remark_info>" + returnNote.getManagerRemarkInfo() +
-			// "</manager_remark_info>"
-			// + "<order_number>" + returnNote.getOrderNumber() +
-			// "</order_number>"
-			// + "<order_time>" + date + "</order_time>"
-			// + "<pay_type_id>" + returnNote.getPayTypeId() + "</pay_type_id>"
-			// + "<pay_type_title>" + returnNote.getPayTypeTitle() +
-			// "</pay_type_title>"
-			// + "<remark_info>" + returnNote.getRemarkInfo() + "</remark_info>"
-			// + "<return_number>" + returnNote.getReturnNumber() +
-			// "</return_number>"
-			// + "<return_time>" + returnNote.getReturnTime() + "</return_time>"
-			// + "<sort_id>" + returnNote.getSortId() + "</sort_id>"
-			// + "<status_id>" + returnNote.getStatusId() + "</status_id>"
-			// + "<username>" + returnNote.getUsername() + "</username>"
-			// + "<deliver_type_title>" + returnNote.getDeliverTypeTitle() +
-			// "</deliver_type_title>"
-			// + "<turn_price>" + returnNote.getTurnPrice() + "</turn_price>"
-			// + "<turn_type>" + returnNote.getTurnType() + "</turn_type>"
-			// + "<shopping_address>" + returnNote.getShoppingAddress() +
-			// "</shopping_address>"
-			// + "<seller_real_name>" + returnNote.getSellerRealName() +
-			// "</seller_real_name>"
-			// + "</TABLE>"
-			// + "</ERP>";
 			String xmlStr = "<ERP>" + "<TABLE>" + "<id>" + returnNote.getId() + "</id>" + "<cancel_time>"
 					+ returnNote.getCancelTime() + "</cancel_time>" + "<check_time>" + returnNote.getCheckTime()
 					+ "</check_time>" + "<diy_site_address>" + returnNote.getDiySiteAddress() + "</diy_site_address>"
@@ -2729,6 +2682,7 @@ public class TdCommonService {
 		}
 	}
 
+	
 	public void sendBackToWMS(TdReturnNote note) {
 		if (null == note) {
 			return;
@@ -2745,6 +2699,7 @@ public class TdCommonService {
 				} catch (Exception e) {
 					e.printStackTrace();
 					writeErrorLog(note.getReturnNumber() + ":" + orderGoods.getSku(), "退货单", e.getMessage());
+					tdInterfaceService.smsSend(INFTYPE.WMSWEBSERVICE);
 				}
 				String result = "";
 				if (objects != null) {
@@ -2756,6 +2711,7 @@ public class TdCommonService {
 
 				if (errorMsg != null) {
 					writeErrorLog(note.getReturnNumber() + ":" + orderGoods.getSku(), "退货单", errorMsg);
+					tdInterfaceService.smsSend(INFTYPE.WMSWEBSERVICE);
 				}
 			}
 			String xmlReturnEncode = XMLMakeAndEncode(note, 4);
@@ -2764,6 +2720,7 @@ public class TdCommonService {
 			} catch (Exception e) {
 				e.printStackTrace();
 				writeErrorLog(note.getReturnNumber(), "退货单", e.getMessage());
+				tdInterfaceService.smsSend(INFTYPE.WMSWEBSERVICE);
 			}
 			String result = "";
 			if (objects != null) {
@@ -2775,10 +2732,16 @@ public class TdCommonService {
 
 			if (errorMsg != null) {
 				writeErrorLog(note.getOrderNumber(), "退货单", errorMsg);
+				tdInterfaceService.smsSend(INFTYPE.WMSWEBSERVICE);
 			}
 		}
 	}
 
+	/**
+	 * 退货单重传
+	 * @param note
+	 * @return
+	 */
 	public Map<String, String> testSendBackMsgToWMS(TdReturnNote note) {
 		Map<String, String> map = new HashMap<>();
 		map.put("result", "失败");
