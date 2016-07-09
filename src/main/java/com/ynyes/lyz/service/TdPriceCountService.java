@@ -1910,11 +1910,10 @@ public class TdPriceCountService {
 										// 如果需要退还的金额大于等于用户使用的不可提现余额，则只能够退还用户使用的不可提现余额
 										uncashBalance = unCashBalanceUsed;
 									}
-									// 开始退还不可提现余额
-									user.setUnCashBalance(user.getUnCashBalance() + uncashBalance);
-									user.setBalance(user.getBalance() + uncashBalance);
 
 									// 判断是否剩余部分金额需要退还
+									BigDecimal bd = new BigDecimal(uncashBalance);
+									uncashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 									returnBalance += uncashBalance;
 									total -= uncashBalance;
 									unCashBalanceUsed -= uncashBalance;
@@ -1935,8 +1934,8 @@ public class TdPriceCountService {
 									}
 
 									// 开始退还余额
-									user.setCashBalance(user.getCashBalance() + cashBalance);
-									user.setBalance(user.getBalance() + cashBalance);
+									BigDecimal bd = new BigDecimal(cashBalance);
+									cashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 									returnBalance += cashBalance;
 									total -= cashBalance;
 									cashBalanceUsed -= cashBalance;
@@ -1959,6 +1958,8 @@ public class TdPriceCountService {
 
 										if (otherReturn > 0.00) {
 											// 根据退款方式和退货金额生成一个资金退还申请单据
+											BigDecimal bd = new BigDecimal(otherReturn);
+											otherReturn = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 											TdCashReturnNote note = new TdCashReturnNote();
 											note.setCreateTime(new Date());
 											note.setMoney(otherReturn);
@@ -1994,6 +1995,8 @@ public class TdPriceCountService {
 
 										if (cashReturn > 0.00) {
 											// 根据退款方式和退货金额生成一个资金退还申请单据
+											BigDecimal bd = new BigDecimal(cashReturn);
+											cashReturn = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 											TdCashReturnNote note = new TdCashReturnNote();
 											note.setCreateTime(new Date());
 											note.setMoney(cashReturn);
@@ -2023,6 +2026,8 @@ public class TdPriceCountService {
 
 											if (posReturn > 0.00) {
 												// 根据退款方式和退货金额生成一个资金退还申请单据
+												BigDecimal bd = new BigDecimal(posReturn);
+												posReturn = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 												TdCashReturnNote note01 = new TdCashReturnNote();
 												note01.setCreateTime(new Date());
 												note01.setMoney(posReturn);
