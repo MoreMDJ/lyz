@@ -1454,8 +1454,8 @@ public class TdPriceCountService {
 				}
 			}
 
-			if (new_return_note.getMoney() > (order.getPosPay() + order.getCashPay())) {
-				new_return_note.setMoney(order.getPosPay() + order.getCashPay());
+			if (new_return_note.getMoney() > (posPay + cashPay)) {
+				new_return_note.setMoney(posPay + cashPay);
 			}
 			// 2016-07-05修改：持久化总的打款记录，当收款现金为零不持久化
 			if (new_return_note.getMoney() != 0)

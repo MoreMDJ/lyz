@@ -87,7 +87,7 @@ public class TdEbsResendController
 			for (int i = 0; i < cashReciptInfs.size(); i++)
 			{
 				TdCashReciptInf cashReciptInf = cashReciptInfs.get(i);
-				if (cashReciptInf.getSendFlag() == 0)
+				if (cashReciptInf.getSendFlag() != null && cashReciptInf.getSendFlag() == 0)
 				{
 					continue;
 				}
@@ -125,7 +125,7 @@ public class TdEbsResendController
 			for (int i = 0; i < cashRefundInfs.size(); i++)
 			{
 				TdCashRefundInf cashRefundInf = cashRefundInfs.get(i);
-				if (cashRefundInf.getSendFlag() == 0)
+				if (cashRefundInf.getSendFlag() != null && cashRefundInf.getSendFlag() == 0)
 				{
 					continue;
 				}
@@ -152,7 +152,7 @@ public class TdEbsResendController
 	public void resendOrder(String orderNumber)
 	{
 		TdOrderInf orderInf = tdOrderInfService.findByOrderNumber(orderNumber);
-		if (orderInf == null || orderInf.getSendFlag() == null || orderInf.getSendFlag() == 0)
+		if (orderInf == null || (orderInf.getSendFlag() != null && orderInf.getSendFlag() == 0))
 		{
 			return ;
 		}
@@ -325,7 +325,7 @@ public class TdEbsResendController
 	public void resendReturnOrder(String returnNumber)
 	{
 		TdReturnOrderInf returnOrderInf = tdReturnOrderInfService.findByReturnNumber(returnNumber);
-		if (returnOrderInf == null || returnOrderInf.getSendFlag() == null || returnOrderInf.getSendFlag() == 1)
+		if (returnOrderInf == null || returnOrderInf.getSendFlag() == null || returnOrderInf.getSendFlag() == 0)
 		{
 			return ;
 		}
