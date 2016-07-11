@@ -13,6 +13,11 @@ function submit() {
 	var limitId = $("#limitId").val();
 	var limitTime = $("#limitTime").val();
 
+	if (!date) {
+	    warning("请输入预约日期");
+	    return;
+	}
+	
 	// 选择的日期不能少于最小日期
 	var time = new Date(date.replace("-", "/").replace("-", "/"));
 	var limit = new Date(limitDay.replace("-", "/").replace("-", "/"));

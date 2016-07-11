@@ -1556,6 +1556,13 @@ public class TdOrderController {
 			res.put("message", "未找到虚拟订单");
 			return res;
 		}
+		
+		// 2016-07-11修改：增加验证——判断是否输入了预约日期
+		String deliveryDate = order_temp.getDeliveryDate();
+		if (null == deliveryDate || "".equals(deliveryDate)) {
+			res.put("message", "请在\"配送方式\"中填写预约时间");
+			return res;
+		}
 
 		// 判断是否为代下单
 		// if (null != order_temp && null != order_temp.getIsSellerOrder() &&
