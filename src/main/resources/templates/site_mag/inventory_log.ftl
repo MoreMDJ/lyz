@@ -63,11 +63,12 @@ var theForm = document.forms['form1'];
     <th width="8%">选择</th>
     <th align="left" width="8%">用户名</th>
     <th align="left" width="8%">类型</th>
-    <th align="left" width="8%">所属门店</th>
+    <th align="left" width="8%">所属门店或城市</th>
     <th align="left" width="15%">产品编码</th>
     <th align="left" >产品名</th>
     <th align="left" width="5%">改变数量</th>
     <th align="left" width="15%">改变时间</th>
+    <th align="left" width="10%">关联单号</th>
   </tr>
 
     <#if log_page??>
@@ -81,11 +82,12 @@ var theForm = document.forms['form1'];
                 </td>
                 <td align="left">${item.manager!""}</td>
                 <td align="left"><#if item.changeType??>${item.changeType!""}<#else>无</#if></td>
-                <td align="left"><#if item.regionName??>${item.regionName!'无'}<#else>${item.diySiteTitle!'无'}</#if></td>
+                <td align="left"><#if item.diySiteTitle??>${item.diySiteTitle!'无'}<#else>${item.regionName!'无'}</#if></td>
                 <td align="left">${item.goodsSku!""}</td>
                 <td align="left">${item.goodsTitle!""}</td>
                 <td align="left">${item.changeValue!""}</td>
                 <td align="left"><#if item.changeDate??>${item.changeDate?string("yyyy-MM-dd HH:mm:ss")}</#if></td>
+                <td align="left">${item.orderNumber!""}</td>
             </tr>
         </#list>
     </#if>

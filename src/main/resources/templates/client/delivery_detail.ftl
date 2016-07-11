@@ -365,7 +365,7 @@ function payedChange(){
     </section>
     </#if>
     <#if td_order.statusId == 4>
-    	<#if td_order.photo??>
+    	<#--暂时隐藏拍照上传 <#if td_order.photo??> -->
     	   	<!-- <a class="btn-submit-save bgc-ff8e08" href="javascript:;" onclick="javascript:win_yes('是否已收回代收款<#if ownrecord?? && ownrecord.isEnable?? && ownrecord.isEnable == true && ownrecord.ispassed == true><#if ownrecord.owned??>${ownrecord.owned?c}<#else>0.00</#if><#else><#if td_order.allTotalPay??>${td_order.allTotalPay?c}<#else>0</#if></#if>元？','submitDelivery(${td_order.id?c});')">确认送达</a> -->
     		<!-- <a class="btn-submit-save bgc-ff8e08" <#if ownrecord??>href="javascript:;" style="background:#999"</#if> href="javascript:;" <#if !ownrecord??>onclick="pupopen()"</#if>><#if ownrecord?? && ownrecord.isEnable??><#if ownrecord.isEnable == true><#if ownrecord.ispassed == true>审核通过<#else>未通过审核</#if><#else>等待审核</#if><#else>填写代收金额</#if></a> -->
     		<#if ownrecord?? >
@@ -389,15 +389,16 @@ function payedChange(){
     		<#else>
     			<#if td_order.allTotalPay?? && td_order.allTotalPay!=0 && isOnlinePay?? && isOnlinePay==false>
     			<a class="btn-submit-save bgc-ff8e08" onclick="pupopen()">填写代收金额</a>
+    			<a class="btn-submit-save bgc-ff8e08" href="javascript:;" onclick="javascript:win_yes('是否确定拒签退货？','submitReturn(${td_order.id?c});')">拒签退货</a>
     			<#else>
     			<a class="btn-submit-save bgc-ff8e08" href="javascript:;" onclick="javascript:win_yes('是否确认送达？','submitDelivery(${td_order.id?c});')">确认送达</a>
     			</#if>
     			
     		</#if>
-    	<#else>
-    	    <a class="btn-submit-save bgc-ff8e08" href="javascript:;" onclick="javascript:win_yes('是否确定拒签退货？','submitReturn(${td_order.id?c});')">拒签退货</a>
+    	<#--暂时隐藏拍照上传 <#else>
+    	    
     		<a class="btn-submit-save bgc-ff8e08" href="javascript:photo();" >拍照上传</a>
-    	</#if>
+    	</#if> -->
 
     <!-- <a class="btn-submit-save bgc-ff8e08" href="javascript:;" onclick="submitDelivery(${td_order.id?c})">确认送达</a> -->
     </#if>
