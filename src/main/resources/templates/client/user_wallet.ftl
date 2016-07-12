@@ -58,7 +58,7 @@
                                 <div class="details-list">
                                     <div class="div1">
                                         <div class="c666">充值</div>
-                                        <div class="c999">可提现余额：<#if item.balance??>${item.balance?string("0.00")}<#else>0.00</#if></div>
+                                        <div class="c999">${item.balanceTypeName }：<#if item.balance??>${item.balance?string("0.00")}<#else>0.00</#if></div>
                                     </div>
                                     <div class="div2">
                                         <div class="c999"><#if item.finishTime??>${item.finishTime?string("yyyy-MM-dd")}</#if></div>
@@ -71,7 +71,7 @@
                                 <div class="details-list">
                                     <div class="div1">
                                         <div class="c666">提现</div>
-                                        <div class="c999">可提现余额：<#if item.balance??>${item.balance?string("0.00")}<#else>0.00</#if></div>
+                                        <div class="c999">${item.balanceTypeName }：<#if item.balance??>${item.balance?string("0.00")}<#else>0.00</#if></div>
                                     </div>
                                     <div class="div2">
                                         <div class="c999"><#if item.finishTime??>${item.finishTime?string("yyyy-MM-dd")}</#if></div>
