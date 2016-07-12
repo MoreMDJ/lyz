@@ -21,6 +21,8 @@ import com.ynyes.lyz.repository.TdCityRepo;
 import com.ynyes.lyz.repository.TdDiySiteInventoryRepo;
 import com.ynyes.lyz.repository.TdGoodsRepo;
 import com.ynyes.lyz.repository.TdOrderRepo;
+import com.ynyes.lyz.util.Criteria;
+import com.ynyes.lyz.util.Restrictions;
 
 @Service
 @Transactional
@@ -447,5 +449,28 @@ public class TdDiySiteInventoryService {
 						req, changeName);
 			}
 		}
+	}
+	/**
+	 * 根据城市,门店查找库存
+	 * @param regionId
+	 * @param keywords
+	 * @param page
+	 * @param size
+	 * @return
+	 */
+	public List<TdDiySiteInventory> searchList(Long regionId,Long diyId, String keywords) {
+		Criteria<TdDiySiteInventory> c = new Criteria<TdDiySiteInventory>();
+
+		if(regionId!=null){
+			c.add( Restrictions.eq("regionId", regionId, true));
+		}
+		if(diyId!=null){
+			c.add( Restrictions.eq("diyId", diyId, true));
+		}
+		if(StringUtils.isNotBlank(keywords)){
+			c.add(Restrictions.or(Restrictions.eq("goodsTitle", keywords, true),Restrictions.eq("goodsCode", keywords, true)));
+		}
+		c.setOrderByAsc("goodsCode");
+		return repository.findAll(c);
 	}
 }

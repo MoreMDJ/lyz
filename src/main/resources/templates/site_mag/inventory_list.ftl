@@ -88,7 +88,14 @@
     		alert("初始库存必须是大于等于0的数字");
     	}
     }
-    
+    function downloaddate(type)
+    {
+        var keywords = $("#keywords").val();
+        var diyCode = $("#siteId").val();
+        var city = $("#regionId").val();
+        
+        window.open("/Verwalter/goods/diysiteDowndata?keywords="+ keywords + "&diyCode="+diyCode+"&cityCode="+city+"&type="+type);
+    }
     </script>
 </head>
 
@@ -135,7 +142,7 @@ var theForm = document.forms['form1'];
         <div class="menu-list">
         <#if !is_diy_site_bool??>
             <div class="rule-single-select">
-                <select name="regionId" onchange="javascript:setTimeout(__doPostBack('categoryId', ''), 0)">
+                <select id="regionId" name="regionId" onchange="javascript:setTimeout(__doPostBack('categoryId', ''), 0)">
                     <option <#if !regionId??>selected="selected"</#if> value="" >所有城市</option>
                     <#if city_list??>
                         <#list city_list as c>
@@ -146,7 +153,7 @@ var theForm = document.forms['form1'];
             </div>
             </#if>
             <div class="rule-single-select">
-                <select name="siteId" onchange="javascript:setTimeout(__doPostBack('categoryId', ''), 0)">
+                <select id="siteId" name="siteId" onchange="javascript:setTimeout(__doPostBack('categoryId', ''), 0)">
                 <#if !is_diy_site_bool??>
                     <option <#if !siteId??>selected="selected"</#if> value="" >所有库存</option>
                     <option <#if siteId?? && siteId = -1>selected="selected"</#if> value="-1">仅城市库存</option>
@@ -161,9 +168,11 @@ var theForm = document.forms['form1'];
         </div>
     </div>
     <div class="r-list">
-      <input name="keywords" type="text" class="keyword" value="${keywords!''}">
+      <input id="keywords" name="keywords" type="text" class="keyword" value="${keywords!''}">
       <a id="lbtnSearch" class="btn-search" href="javascript:__doPostBack('lbtnSearch','')">查询</a>
       <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:showDialog()">添加库存</a>
+      <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:downloaddate(1)">城市报表下载</a>
+      <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:downloaddate(2)">门店报表下载</a>
     </div>
   </div>
 </div>

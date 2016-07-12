@@ -8,6 +8,27 @@
 <script type="text/javascript" src="/mag/js/layout.js"></script>
 <link href="/mag/style/pagination.css" rel="stylesheet" type="text/css">
 <link href="/mag/style/style.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/mag/js/WdatePicker.js"></script>
+<style type="text/css">
+.odiv{
+	float:left;
+	margin-bottom:10px;
+	width:310px;}
+ .odiv span.span1{
+	display:block;
+	float:left;
+	width:116px;
+	height:32px;
+	line-height:32px;
+	text-align:right;
+}
+.a1{
+	float:left;
+	margin-top:6px;
+	margin-left:20px;
+}
+
+</style>
 </head>
 
 <body class="mainbody"><div class="" style="left: 0px; top: 0px; visibility: hidden; position: absolute;"><table class="ui_border"><tbody><tr><td class="ui_lt"></td><td class="ui_t"></td><td class="ui_rt"></td></tr><tr><td class="ui_l"></td><td class="ui_c"><div class="ui_inner"><table class="ui_dialog"><tbody><tr><td colspan="2"><div class="ui_title_bar"><div class="ui_title" unselectable="on" style="cursor: move;"></div><div class="ui_title_buttons"><a class="ui_min" href="javascript:void(0);" title="最小化" style="display: inline-block;"><b class="ui_min_b"></b></a><a class="ui_max" href="javascript:void(0);" title="最大化" style="display: inline-block;"><b class="ui_max_b"></b></a><a class="ui_res" href="javascript:void(0);" title="还原"><b class="ui_res_b"></b><b class="ui_res_t"></b></a><a class="ui_close" href="javascript:void(0);" title="关闭(esc键)" style="display: inline-block;">×</a></div></div></td></tr><tr><td class="ui_icon" style="display: none;"></td><td class="ui_main" style="width: auto; height: auto;"><div class="ui_content" style="padding: 10px;"></div></td></tr><tr><td colspan="2"><div class="ui_buttons" style="display: none;"></div></td></tr></tbody></table></div></td><td class="ui_r"></td></tr><tr><td class="ui_lb"></td><td class="ui_b"></td><td class="ui_rb" style="cursor: se-resize;"></td></tr></tbody></table></div>
@@ -30,6 +51,20 @@ var theForm = document.forms['form1'];
             theForm.submit();
         }
     }
+    function downloaddate(type)
+    {
+    	var begain = $("#begain").val();
+    	var end = $("#end").val();
+        var keywords = $("#keywords").val();
+        var diyCode = $("#siteId").val();
+        var city = $("#regionId").val();
+        if(begain == "")
+        {
+            alert("请选择开始时间！");
+            return;
+        }
+        window.open("/Verwalter/goods/diysiteLogDowndata?keywords="+ keywords + "&diyCode="+diyCode+"&cityCode="+city+"&type="+type+"&begindata="+ begain + "&enddata=" + end);
+    }
 </script>
 <!--导航栏-->
 <div class="location" style="position: static; top: 0px;">
@@ -50,6 +85,50 @@ var theForm = document.forms['form1'];
         <li><a class="all" href="javascript:;" onclick="checkAll(this);"><i></i><span>全选</span></a></li>
         <li><a onclick="return ExePostBack('btnDelete');" id="btnDelete" class="del" href="javascript:__doPostBack('btnDelete','')"><i></i><span>删除日志</span></a></li>
       </ul>
+      <div class="menu-list">
+        <#if city_list??>
+            <div class="rule-single-select">
+                <select id="regionId" name="regionId" >
+                    <option <#if !regionId??>selected="selected"</#if> value="" >所有城市</option>
+                        <#list city_list as c>
+                            <option value='${c.sobIdCity?c}' <#if regionId?? && c.sobIdCity==regionId>selected="selected"</#if> >${c.cityName!""}</option>
+                        </#list>
+                    
+                </select>
+            </div>
+            </#if>
+            <#if site_list??>
+            <div class="rule-single-select">
+                <select id="siteId" name="siteId" >
+                    <option <#if !siteId??>selected="selected"</#if> value="" >所有门店</option>
+                        <#list site_list as site>
+                            <option value='${site.id?c}' <#if siteId?? && site.id==siteId>selected="selected"</#if> >${site.title!""}</option>
+                        </#list>
+                    
+                </select>
+            </div>
+            </#if>
+        </div>
+        <div class="odiv">
+						<span class="span1">开始时间：</span> <input name="orderStartTime"
+							id="begain" type="text" value="${orderStartTime!"" }" class="input date"
+							onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',lang:'zh-cn'})"
+							datatype="/^\s*$|^\d{4}\-\d{1,2}\-\d{1,2}\s{1}(\d{1,2}:){2}\d{1,2}$/"
+							errormsg="请选择正确的日期" sucmsg=" " />
+					</div>
+					<div class="odiv">
+						<span class="span1">结束时间：</span> <input name="orderEndTime"
+							id="end" type="text" value="${orderEndTime!"" }" class="input date"
+							onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',lang:'zh-cn'})"
+							datatype="/^\s*$|^\d{4}\-\d{1,2}\-\d{1,2}\s{1}(\d{1,2}:){2}\d{1,2}$/"
+							errormsg="请选择正确的日期" sucmsg=" " />
+					</div>
+    </div>
+    <div class="r-list">
+    			
+     <input id="keywords" name="keywords" type="text" class="keyword" value="${keywords!''}">
+      <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:downloaddate(1)">城市报表下载</a>
+      <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:downloaddate(2)">门店报表下载</a>
     </div>
   </div>
 </div>

@@ -7,7 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -23,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.ynyes.lyz.entity.TdCity;
 import com.ynyes.lyz.entity.TdDiySite;
 import com.ynyes.lyz.entity.TdDiySiteInventory;
+import com.ynyes.lyz.entity.TdDiySiteInventoryLog;
 import com.ynyes.lyz.entity.TdGoods;
 import com.ynyes.lyz.entity.TdManager;
 import com.ynyes.lyz.entity.TdManagerRole;
@@ -53,7 +59,7 @@ import com.ynyes.lyz.util.SiteMagConstant;
 
 @Controller
 @RequestMapping(value = "/Verwalter/goods")
-public class TdManagerGoodsController {
+public class TdManagerGoodsController extends TdManagerBaseController{
 
 	@Autowired
 	TdProductCategoryService tdProductCategoryService;
@@ -1003,7 +1009,11 @@ public class TdManagerGoodsController {
 			size = SiteMagConstant.pageSize;
 			;
 		}
-
+		
+		List<TdCity> cityList= tdCityService.findAll();
+		List<TdDiySite> diySiteList= tdDiySiteService.findAll();
+		map.addAttribute("city_list", cityList);
+		map.addAttribute("site_list", diySiteList);
 		map.addAttribute("page", page);
 		map.addAttribute("size", size);
 		map.addAttribute("action", action);
@@ -1146,6 +1156,212 @@ public class TdManagerGoodsController {
 		return "site_mag/inventory_list";
 	}
 	
+	/*
+	 * 城市可用量查询报表
+	 */
+	@RequestMapping(value = "/diysiteDowndata")
+	@ResponseBody
+	public String diysiteDowndata(HttpServletRequest req, ModelMap map,HttpServletResponse response, 
+			Long cityCode, Long diyCode,String keywords,Long type) {
+
+		String username = (String) req.getSession().getAttribute("manager");
+		if (null == username) {
+			return "redirect:/Verwalter/login";
+		}
+		
+		if(type!=null){
+			
+			if(type==1L){
+				//报表数据
+		    	List<TdDiySiteInventory> diySiteInventoryList = tdDiySiteInventoryService.searchList(cityCode,null,keywords);
+				// 第一步，创建一个webbook，对应一个Excel文件
+				HSSFWorkbook wb = new HSSFWorkbook();
+				// 第二步，在webbook中添加一个sheet,对应Excel文件中的sheet
+				HSSFSheet sheet = wb.createSheet("城市库存报表");
+				// 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制short
+				// 列宽
+				int[] widths = { 13, 18, 13, 13, 13, 15, 13, 11, 19, 11, 15, 25, 13, 13, 13, 40, 40 };
+				sheetColumnWidth(sheet, widths);
+
+				// 第四步，创建单元格，并设置值表头 设置表头居中
+				HSSFCellStyle style = wb.createCellStyle();
+				style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+				style.setWrapText(true);
+
+				// 优惠券名称、金额、领卷时间、领用用户、是否使用、使用的时间、使用订单号
+				HSSFRow row = sheet.createRow((int) 0);
+
+				String[] cellValues = { "城市","品牌","商品编码", "商品名称", "数量"};
+				cellDates(cellValues, style, row);
+				Integer i = 0;
+				List<TdGoods> goodsList=tdGoodsService.findAll();
+				for (TdDiySiteInventory diySite : diySiteInventoryList) {
+					row = sheet.createRow((int) i + 1);
+					row.createCell(0).setCellValue(objToString(diySite.getRegionName()));
+					for (TdGoods goods : goodsList) {
+						if(goods.getId()==diySite.getGoodsId()){
+							row.createCell(1).setCellValue(objToString(goods.getBrandTitle()));
+						}
+					}
+					row.createCell(2).setCellValue(objToString(diySite.getGoodsCode()));
+					row.createCell(3).setCellValue(objToString(diySite.getGoodsTitle()));
+					row.createCell(4).setCellValue(objToString(diySite.getInventory()));
+					i++;
+				}
+
+				String exportAllUrl = SiteMagConstant.backupPath;
+				download(wb, exportAllUrl, response, "城市库存报表");
+			}else if(type==2L){
+				//报表数据
+				List<TdDiySiteInventory> diySiteInventoryList = tdDiySiteInventoryService.searchList(null,diyCode,keywords);
+				// 第一步，创建一个webbook，对应一个Excel文件
+				HSSFWorkbook wb = new HSSFWorkbook();
+				// 第二步，在webbook中添加一个sheet,对应Excel文件中的sheet
+				HSSFSheet sheet = wb.createSheet("门店库存报表");
+				// 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制short
+				// 列宽
+				int[] widths = { 13, 18, 13, 13, 13, 15, 13, 11, 19, 11, 15, 25, 13, 13, 13, 40, 40 };
+				sheetColumnWidth(sheet, widths);
+
+				// 第四步，创建单元格，并设置值表头 设置表头居中
+				HSSFCellStyle style = wb.createCellStyle();
+				style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+				style.setWrapText(true);
+
+				// 优惠券名称、金额、领卷时间、领用用户、是否使用、使用的时间、使用订单号
+				HSSFRow row = sheet.createRow((int) 0);
+
+				String[] cellValues = { "门店名称","品牌","商品编码", "商品名称", "数量"};
+				cellDates(cellValues, style, row);
+				Integer i = 0;
+				List<TdGoods> goodsList=tdGoodsService.findAll();
+				for (TdDiySiteInventory diySite : diySiteInventoryList) {
+					row = sheet.createRow((int) i + 1);
+					row.createCell(0).setCellValue(objToString(diySite.getRegionName()));
+					for (TdGoods goods : goodsList) {
+						if(goods.getId()==diySite.getGoodsId()){
+							row.createCell(1).setCellValue(objToString(goods.getBrandTitle()));
+						}
+					}
+					row.createCell(2).setCellValue(objToString(diySite.getGoodsCode()));
+					row.createCell(3).setCellValue(objToString(diySite.getGoodsTitle()));
+					row.createCell(4).setCellValue(objToString(diySite.getInventory()));
+					i++;
+				}
+
+				String exportAllUrl = SiteMagConstant.backupPath;
+				download(wb, exportAllUrl, response, "门店库存报表");
+
+			}
+		}
+
+		return "";
+	}
+	
+	/*
+	 * 城市可用量明细查询报表
+	 */
+	@RequestMapping(value = "/diysiteLogDowndata")
+	@ResponseBody
+	public String diysiteLogDowndata(HttpServletRequest req, ModelMap map,HttpServletResponse response, 
+			Long cityCode, Long diyCode,String keywords,Long type,String begindata,String enddata) {
+
+		String username = (String) req.getSession().getAttribute("manager");
+		if (null == username) {
+			return "redirect:/Verwalter/login";
+		}
+		if(type!=null){
+			Date begin = stringToDate(begindata,null);
+			Date end = stringToDate(enddata,null);
+			//设置默认时间
+			if(null==begin){
+				begin=getStartTime();
+			}
+			if(null==end){
+				end=getEndTime();
+			}
+			if(type==1L){
+				//报表数据
+		    	List<TdDiySiteInventoryLog> diySiteInventoryList = tdDiySiteInventoryLogService.searchList(cityCode,null,keywords,begin,end);
+				// 第一步，创建一个webbook，对应一个Excel文件
+				HSSFWorkbook wb = new HSSFWorkbook();
+				// 第二步，在webbook中添加一个sheet,对应Excel文件中的sheet
+				HSSFSheet sheet = wb.createSheet("城市库存明细报表");
+				// 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制short
+				// 列宽
+				int[] widths = { 13, 18, 13, 13, 13, 15, 13, 11, 19, 11, 15, 25, 13, 13, 13, 40, 40 };
+				sheetColumnWidth(sheet, widths);
+
+				// 第四步，创建单元格，并设置值表头 设置表头居中
+				HSSFCellStyle style = wb.createCellStyle();
+				style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+				style.setWrapText(true);
+
+				// 优惠券名称、金额、领卷时间、领用用户、是否使用、使用的时间、使用订单号
+				HSSFRow row = sheet.createRow((int) 0);
+
+				String[] cellValues = { "产品编号","产品名称", "所属城市", "变更数量","可用量余额","变更时间","单据号"};
+				cellDates(cellValues, style, row);
+				Integer i = 0;
+				for (TdDiySiteInventoryLog diySite : diySiteInventoryList) {
+					row = sheet.createRow((int) i + 1);
+					row.createCell(0).setCellValue(objToString(diySite.getGoodsSku()));
+					row.createCell(1).setCellValue(objToString(diySite.getGoodsTitle()));
+					row.createCell(2).setCellValue(objToString(diySite.getRegionName()));
+					row.createCell(3).setCellValue(objToString(diySite.getChangeValue()));
+					row.createCell(4).setCellValue(objToString(diySite.getAfterChange()));
+					row.createCell(5).setCellValue(objToString(diySite.getChangeDate()));
+					row.createCell(6).setCellValue(objToString(diySite.getOrderNumber()));
+					i++;
+				}
+
+				String exportAllUrl = SiteMagConstant.backupPath;
+				download(wb, exportAllUrl, response, "城市库存明细报表");
+			}else if(type==2L){
+				//报表数据
+		    	List<TdDiySiteInventoryLog> diySiteInventoryList = tdDiySiteInventoryLogService.searchList(cityCode,null,keywords,begin,end);
+				// 第一步，创建一个webbook，对应一个Excel文件
+				HSSFWorkbook wb = new HSSFWorkbook();
+				// 第二步，在webbook中添加一个sheet,对应Excel文件中的sheet
+				HSSFSheet sheet = wb.createSheet("门店库存明细报表");
+				// 第三步，在sheet中添加表头第0行,注意老版本poi对Excel的行数列数有限制short
+				// 列宽
+				int[] widths = { 13, 18, 13, 13, 13, 15, 13, 11, 19, 11, 15, 25, 13, 13, 13, 40, 40 };
+				sheetColumnWidth(sheet, widths);
+
+				// 第四步，创建单元格，并设置值表头 设置表头居中
+				HSSFCellStyle style = wb.createCellStyle();
+				style.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 创建一个居中格式
+				style.setWrapText(true);
+
+				// 优惠券名称、金额、领卷时间、领用用户、是否使用、使用的时间、使用订单号
+				HSSFRow row = sheet.createRow((int) 0);
+
+				String[] cellValues = { "产品编号","产品名称", "所属城市", "变更数量","可用量余额","变更时间","单据号"};
+				cellDates(cellValues, style, row);
+				Integer i = 0;
+				for (TdDiySiteInventoryLog diySite : diySiteInventoryList) {
+					row = sheet.createRow((int) i + 1);
+					row.createCell(0).setCellValue(objToString(diySite.getGoodsSku()));
+					row.createCell(1).setCellValue(objToString(diySite.getGoodsTitle()));
+					row.createCell(2).setCellValue(objToString(diySite.getRegionName()));
+					row.createCell(3).setCellValue(objToString(diySite.getChangeValue()));
+					row.createCell(4).setCellValue(objToString(diySite.getAfterChange()));
+					row.createCell(5).setCellValue(objToString(diySite.getChangeDate()));
+					row.createCell(6).setCellValue(objToString(diySite.getOrderNumber()));
+					i++;
+				}
+
+				String exportAllUrl = SiteMagConstant.backupPath;
+				download(wb, exportAllUrl, response, "门店库存明细报表");
+
+			}
+		}
+
+		return "";
+	}
+	
+	
 	private void btnChangeInventory(Integer listCheckId[],Long[] ids,Long[] listInventory,HttpServletRequest req)
 	{
 		if (null == ids || null == listInventory || ids.length < 1 || listInventory.length < 1 || ids.length != listInventory.length || listCheckId == null || listCheckId.length < 1)
@@ -1266,5 +1482,14 @@ public class TdManagerGoodsController {
 			}
 		}
 	}
+	
+	private String objToString(Object obj){
+		if(obj==null){
+			return "";
+		}
+		return obj.toString();
+	}
+	
+	
 
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import com.ynyes.lyz.entity.TdDiySiteInventory;
 import com.ynyes.lyz.entity.TdDiySiteInventoryLog;
 import com.ynyes.lyz.repository.TdDiySiteInventoryLogRepo;
+import com.ynyes.lyz.util.Criteria;
+import com.ynyes.lyz.util.Restrictions;
 
 @Service
 @Transactional
@@ -95,5 +98,34 @@ public class TdDiySiteInventoryLogService {
 		this.save(log);
 		return true;
 		
+	}
+	/**
+	 * 根据城市,门店查找库存
+	 * @param regionId
+	 * @param keywords
+	 * @param page
+	 * @param size
+	 * @return
+	 */
+	public List<TdDiySiteInventoryLog> searchList(Long regionId,Long diyId, String keywords,Date startTime,Date endDate) {
+		Criteria<TdDiySiteInventoryLog> c = new Criteria<TdDiySiteInventoryLog>();
+
+		if(regionId!=null){
+			c.add( Restrictions.eq("regionId", regionId, true));
+		}
+		if(diyId!=null){
+			c.add( Restrictions.eq("diyId", diyId, true));
+		}
+		if(StringUtils.isNotBlank(keywords)){
+			c.add(Restrictions.or(Restrictions.eq("goodsTitle", keywords, true),Restrictions.eq("goodsSku", keywords, true)));
+		}
+		if(startTime!=null){
+			c.add(Restrictions.gte("changeDate", startTime, true));
+		}
+		if(endDate!=null){
+			c.add(Restrictions.lte("changeDate", endDate, true));
+		}
+		c.setOrderByAsc("goodsSku");
+		return repository.findAll(c);
 	}
 }

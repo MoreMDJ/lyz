@@ -140,6 +140,10 @@ public class TdGoodsService {
 
 		return repository.findAll(pageRequest);
 	}
+	// 查找所有商品
+	public List<TdGoods> findAll() {
+		return (List<TdGoods>) repository.findAll();
+	}
 
 	// 查找所有商品
 	public Page<TdGoods> findAllOrderById(int page, int size) {
