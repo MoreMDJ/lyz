@@ -790,7 +790,7 @@ public class TdManagerStatementController extends TdManagerBaseController {
 	    		}
 	        	if (null != gathering.getTotalPrice())
 	        	{//代收款金额
-	            	row.createCell(12).setCellValue(gathering.getTotalPrice()-(gathering.getUnCashBalanceUsed()==null?0:gathering.getUnCashBalanceUsed())-(gathering.getCashBalanceUsed()==null?0:gathering.getCashBalanceUsed()));
+	            	row.createCell(12).setCellValue(gathering.getTotalPrice());
 	    		}
 	        	if(null!= gathering.getPayed()){//实际代收款金额 
 	        			row.createCell(13).setCellValue(gathering.getPayed());
