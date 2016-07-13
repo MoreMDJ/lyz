@@ -1468,22 +1468,22 @@ public class TdUserController {
 			}
 		}
 
-//		// 获取第三方支付的金额（主单的金额）
-//		Double otherPay = order.getOtherPay();
-//		// 生成打款通知
-//		// 根据退款方式和退货金额生成一个资金退还申请单据
-//		TdCashReturnNote note = new TdCashReturnNote();
-//		note.setCreateTime(new Date());
-//		note.setMoney(otherPay);
-//		note.setTypeId(order.getPayTypeId());
-//		note.setTypeTitle(order.getPayTypeTitle());
-//		note.setOrderNumber(order.getOrderNumber());
-//		note.setMainOrderNumber(order.getMainOrderNumber());
-//		note.setReturnNoteNumber(null);
-//		note.setUserId(user.getId());
-//		note.setUsername(user.getUsername());
-//		note.setIsOperated(false);
-//		tdCashReturnNoteService.save(note);
+		// // 获取第三方支付的金额（主单的金额）
+		// Double otherPay = order.getOtherPay();
+		// // 生成打款通知
+		// // 根据退款方式和退货金额生成一个资金退还申请单据
+		// TdCashReturnNote note = new TdCashReturnNote();
+		// note.setCreateTime(new Date());
+		// note.setMoney(otherPay);
+		// note.setTypeId(order.getPayTypeId());
+		// note.setTypeTitle(order.getPayTypeTitle());
+		// note.setOrderNumber(order.getOrderNumber());
+		// note.setMainOrderNumber(order.getMainOrderNumber());
+		// note.setReturnNoteNumber(null);
+		// note.setUserId(user.getId());
+		// note.setUsername(user.getUsername());
+		// note.setIsOperated(false);
+		// tdCashReturnNoteService.save(note);
 
 		order.setStatusId(7L);
 		order.setCancelTime(new Date());
@@ -2831,7 +2831,7 @@ public class TdUserController {
 									if (uncashBalance > 0) {
 										BigDecimal bd = new BigDecimal(uncashBalance);
 										uncashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-										infos.add(Math.round(uncashBalance*100)/100 + "元【不可提现预存款】");
+										infos.add(uncashBalance + "元【不可提现预存款】");
 									}
 									// // 开始退还不可提现余额
 									// 判断是否剩余部分金额需要退还
@@ -2855,7 +2855,7 @@ public class TdUserController {
 									if (cashBalance > 0) {
 										BigDecimal bd = new BigDecimal(cashBalance);
 										cashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-										infos.add(Math.round(cashBalance*100)/100 + "元【可提现预存款】");
+										infos.add(cashBalance + "元【可提现预存款】");
 									}
 									total -= cashBalance;
 									cashBalanceUsed -= cashBalance;
@@ -2866,7 +2866,8 @@ public class TdUserController {
 									// 判断用户是否使用了第三方支付
 									if (null != otherPay && otherPay > 0.00) {
 										// 获取用户的支付方式
-//										String payTypeTitle = order.getPayTypeTitle();
+										// String payTypeTitle =
+										// order.getPayTypeTitle();
 										// 定义一个变量表示退款金额数
 										Double otherReturn = 0.00;
 										if (total < otherPay) {
