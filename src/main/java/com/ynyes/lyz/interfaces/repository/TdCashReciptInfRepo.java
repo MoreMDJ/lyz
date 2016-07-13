@@ -10,5 +10,6 @@ import com.ynyes.lyz.interfaces.entity.TdCashReciptInf;
 public interface TdCashReciptInfRepo extends PagingAndSortingRepository<TdCashReciptInf, Long>, JpaSpecificationExecutor<TdCashReciptInf> 
 {
 	List<TdCashReciptInf> findByOrderHeaderId(Long headerId);
+	List<TdCashReciptInf> findByOrderNumber(String orderNumber);
 }
 

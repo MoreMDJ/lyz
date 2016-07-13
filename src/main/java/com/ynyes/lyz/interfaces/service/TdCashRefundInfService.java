@@ -98,6 +98,14 @@ public class TdCashRefundInfService {
 		}
     	return repository.findByOrderHeaderId(orderHeaderId);
     }
+    public List<TdCashRefundInf> findByReturnNumber(String returnNumber)
+    {
+    	if (returnNumber == null)
+    	{
+			return null;
+		}
+    	return repository.findByReturnNumber(returnNumber);
+    }
     
     /**
      * 保存

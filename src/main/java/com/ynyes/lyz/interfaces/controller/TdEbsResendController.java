@@ -76,12 +76,11 @@ public class TdEbsResendController
 	@RequestMapping(value = "/cashReceipt")
 	public void resendCashReceipt(String orderNumber)
 	{
-		TdOrderInf tdOrderInf = tdOrderInfService.findByOrderNumber(orderNumber);
-		if (tdOrderInf == null)
+		if (orderNumber == null)
 		{
 			return;
 		}
-		List<TdCashReciptInf> cashReciptInfs = tdCashReciptInfService.findByOrderHeaderId(tdOrderInf.getHeaderId());
+		List<TdCashReciptInf> cashReciptInfs = tdCashReciptInfService.findByOrderNumber(orderNumber);
 		if (cashReciptInfs != null && cashReciptInfs.size() > 0)
 		{
 			for (int i = 0; i < cashReciptInfs.size(); i++)
@@ -109,17 +108,16 @@ public class TdEbsResendController
 	
 	/**
 	 * 退款重传
-	 * @param orderNumber 分单号
+	 * @param returnNumber 退货单号
 	 */
 	@RequestMapping(value = "/cashRefund")
-	public void resendCashRefund(String orderNumber)
+	public void resendCashRefund(String returnNumber)
 	{
-		TdOrderInf orderInf = tdOrderInfService.findByOrderNumber(orderNumber);
-		if (orderInf == null)
+		if (returnNumber == null)
 		{
 			return ;
 		}
-		List<TdCashRefundInf> cashRefundInfs = tdCashRefundInfService.findByOrderHeaderId(orderInf.getHeaderId());
+		List<TdCashRefundInf> cashRefundInfs = tdCashRefundInfService.findByReturnNumber(returnNumber);
 		if (cashRefundInfs != null && cashRefundInfs.size() > 0)
 		{
 			for (int i = 0; i < cashRefundInfs.size(); i++)

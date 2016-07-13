@@ -11,5 +11,7 @@ public interface TdCashRefundInfRepo extends PagingAndSortingRepository<TdCashRe
 {
 //	List<TdReturnOrderInf> findByorderHeaderId(Long headerId);
 	List<TdCashRefundInf> findByOrderHeaderId(Long orderHeaderId);
+	
+	List<TdCashRefundInf> findByReturnNumber(String returnNumber);
 }
 

@@ -95,6 +95,14 @@ public class TdCashReciptInfService {
     {
     	return repository.findByOrderHeaderId(headerId);
     }
+    public List<TdCashReciptInf> findByOrderNumber(String orderNumber)
+    {
+    	if (orderNumber == null)
+    	{
+			return null;
+		}
+    	return repository.findByOrderNumber(orderNumber);
+    }
     
     /**
      * 保存
