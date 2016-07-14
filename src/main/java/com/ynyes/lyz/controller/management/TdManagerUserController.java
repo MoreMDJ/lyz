@@ -442,7 +442,7 @@ public class TdManagerUserController {
 			//不能修改预存款
 			if((!oldBalance.equals(newBalance)) || (tdUser.getBalance()!=tdUser.getCashBalance()+tdUser.getUnCashBalance())){
 				tdUser.setIsEnable(false);
-				this.setAndSaveBalanceLog(obalance,0L, tdUser, manager);
+				this.setAndSaveBalanceLog(oldBalance,0L, tdUser, manager);
 			}
 			
 //			// add MDJ
