@@ -2914,7 +2914,7 @@ public class TdUserController {
 											}
 
 											if (posReturn > 0.00) {
-												all_cash_return += posPay;
+												all_cash_return += posReturn;
 												// infos.add(posReturn +
 												// "元【POS退还】");
 												posPay -= posReturn;
