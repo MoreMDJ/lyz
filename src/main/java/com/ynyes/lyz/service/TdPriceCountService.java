@@ -656,7 +656,12 @@ public class TdPriceCountService {
 				}
 			}
 		}
-
+		
+		Double activitySubPrice = order.getActivitySubPrice();
+		if(null == activitySubPrice){
+			activitySubPrice = 0.0;
+		}
+		total -= activitySubPrice;
 		return total;
 	}
 
