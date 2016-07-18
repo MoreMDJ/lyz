@@ -1211,15 +1211,15 @@ public class TdPriceCountService {
 										uncashBalance = unCashBalanceUsed;
 									}
 									// 开始退还不可提现余额
-									user.setUnCashBalance(user.getUnCashBalance() + uncashBalance);
-									user.setBalance(user.getBalance() + uncashBalance);
-									// 添加用于余额变更明细
 									if (uncashBalance > 0) {
+										BigDecimal bd = new BigDecimal(uncashBalance);
+										uncashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+										user.setUnCashBalance(user.getUnCashBalance() + uncashBalance);
+										user.setBalance(user.getBalance() + uncashBalance);
+										// 添加用于余额变更明细
 										TdBalanceLog balanceLog = new TdBalanceLog();
 										balanceLog.setUserId(user.getId());
 										balanceLog.setUsername(user.getUsername());
-										BigDecimal bd = new BigDecimal(uncashBalance);
-										uncashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 										balanceLog.setMoney(uncashBalance);
 										balanceLog.setType(4L);
 										balanceLog.setCreateTime(new Date());
@@ -1258,17 +1258,16 @@ public class TdPriceCountService {
 									} else {
 										cashBalance = cashBalanceUsed;
 									}
-
 									// 开始退还余额
-									user.setCashBalance(user.getCashBalance() + cashBalance);
-									user.setBalance(user.getBalance() + cashBalance);
-									// 记录余额变更明细
 									if (cashBalance > 0) {
+										BigDecimal bd = new BigDecimal(cashBalance);
+										cashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+										user.setCashBalance(user.getCashBalance() + cashBalance);
+										user.setBalance(user.getBalance() + cashBalance);
+										// 记录余额变更明细
 										TdBalanceLog balanceLog = new TdBalanceLog();
 										balanceLog.setUserId(user.getId());
 										balanceLog.setUsername(user.getUsername());
-										BigDecimal bd = new BigDecimal(cashBalance);
-										cashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 										balanceLog.setMoney(cashBalance);
 										balanceLog.setType(4L);
 										balanceLog.setCreateTime(new Date());

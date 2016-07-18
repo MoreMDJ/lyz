@@ -2786,6 +2786,8 @@ public class TdUserController {
 															((Integer) result.get("pro" + goodsId) - 1));
 													number--;
 													total -= unit;
+													result.put("pro" + goodsId,
+															((Integer) result.get("pro" + goodsId) - 1));
 												}
 											}
 										}
