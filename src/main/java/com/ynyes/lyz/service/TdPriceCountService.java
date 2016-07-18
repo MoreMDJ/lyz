@@ -1493,7 +1493,7 @@ public class TdPriceCountService {
 				for (TdOrderGoods goods : returnGoodsList) {
 					if (null != goods && null != goods.getGoodsId() && null != goods.getQuantity()
 							&& null != goods.getPrice()) {
-						params += goods.getGoodsId() + "-" + goods.getQuantity() + "-" + goods.getPrice() + ",";
+						params += goods.getGoodsId() + "-" + goods.getQuantity() + "-" + goods.getReturnUnitPrice() + ",";
 					}
 				}
 				return this.returnCashOrCoupon(orderId, params, returnNote.getReturnNumber());
