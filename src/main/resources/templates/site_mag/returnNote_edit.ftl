@@ -327,6 +327,16 @@
                             </div>
                         </td>
                     </tr>
+                    <tr>
+                        <th valign="top">
+                            退款明细
+                        </th>
+                        <td>
+                            <div class="position">
+                                <div>${returnNote.returnDetail!""}</div>
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
                 </table>
             </dd>

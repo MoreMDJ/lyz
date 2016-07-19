@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -148,6 +149,26 @@ public class TdReturnNote {
 	@Column
 	private String diyCode;
 	
+	// 退款明细
+	@Lob
+	private String returnDetail;
+	
+	public String getReturnDetail() {
+		return returnDetail;
+	}
+
+	public void setReturnDetail(String returnDetail) {
+		this.returnDetail = returnDetail;
+	}
+
+	public void setStatusName(String statusName) {
+		this.statusName = statusName;
+	}
+
+	public void setTurnTypeName(String turnTypeName) {
+		this.turnTypeName = turnTypeName;
+	}
+
 	public String getDiyCode() {
 		return diyCode;
 	}

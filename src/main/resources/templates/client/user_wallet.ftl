@@ -84,7 +84,7 @@
                                 <div class="details-list">
                                     <div class="div1">
                                         <div class="c666">管理员手动修改</div>
-                                        <div class="c999">${item.balanceTypeName }余额：<#if item.balance??>${item.balance?string("0.00")}<#else>0.00</#if></div>
+                                        <div class="c999">${item.balanceTypeName }：<#if item.balance??>${item.balance?string("0.00")}<#else>0.00</#if></div>
                                     </div>
                                     <div class="div2">
                                         <div class="c999"><#if item.finishTime??>${item.finishTime?string("yyyy-MM-dd")}</#if></div>
@@ -98,7 +98,7 @@
                                     <div class="div1">
                                         <div class="c666">订单支付使用</div>
                                         <div style="font-size: 0.9em;"><#if item.orderNumber??>${item.orderNumber }</#if></div>
-                                        <div class="c999">${item.balanceTypeName }余额：<#if item.balance??>${item.balance?string("0.00")}<#else>0.00</#if></div>
+                                        <div class="c999">${item.balanceTypeName }：<#if item.balance??>${item.balance?string("0.00")}<#else>0.00</#if></div>
                                     </div>
                                     <div class="div2">
                                         <div class="c999"><#if item.finishTime??>${item.finishTime?string("yyyy-MM-dd")}</#if></div>
@@ -112,7 +112,7 @@
                                     <div class="div1">
                                         <div class="c666">${item.reason }</div>
                                         <div style="font-size: 0.9em;"><#if item.orderNumber??>${item.orderNumber }</#if></div>
-                                        <div class="c999">${item.balanceTypeName }余额：<#if item.balance??>${item.balance?string("0.00")}<#else>0.00</#if></div>
+                                        <div class="c999">${item.balanceTypeName }：<#if item.balance??>${item.balance?string("0.00")}<#else>0.00</#if></div>
                                     </div>
                                     <div class="div2">
                                         <div class="c999"><#if item.finishTime??>${item.finishTime?string("yyyy-MM-dd")}</#if></div>

@@ -60,6 +60,9 @@ public class TdPriceCountService {
 
 	@Autowired
 	private TdCashReturnNoteService tdCashReturnNoteService;
+	
+	@Autowired
+	private TdReturnNoteService tdReturnNoteService;
 
 	/**
 	 * 计算订单价格和能使用的最大的预存款的方法
@@ -470,7 +473,7 @@ public class TdPriceCountService {
 			balanceLog.setCreateTime(new Date());
 			balanceLog.setFinishTime(new Date());
 			balanceLog.setIsSuccess(true);
-			balanceLog.setBalanceType(2L);
+			balanceLog.setBalanceType(4L);
 			balanceLog.setBalance(user.getUnCashBalance());
 			balanceLog.setOperator(user.getUsername());
 			try {
@@ -497,7 +500,7 @@ public class TdPriceCountService {
 			balanceLog.setCreateTime(new Date());
 			balanceLog.setFinishTime(new Date());
 			balanceLog.setIsSuccess(true);
-			balanceLog.setBalanceType(2L);
+			balanceLog.setBalanceType(3L);
 			balanceLog.setBalance(user.getCashBalance());
 			balanceLog.setOperator(user.getUsername());
 			try {
@@ -928,6 +931,11 @@ public class TdPriceCountService {
 				posPay = 0d;
 			}
 
+			TdReturnNote returnNote = tdReturnNoteService.findByReturnNumber(returnNoteNumber);
+			if (null != returnNote.getReturnDetail()) {
+				returnNote.setReturnDetail("");
+			}
+			
 			// 获取一年后的时间（新的券的有效时间）
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(new Date());
@@ -1141,6 +1149,7 @@ public class TdPriceCountService {
 													number--;
 													result.put("pro" + goodsId,
 															((Integer) result.get("pro" + goodsId) - 1));
+													returnNote.setReturnDetail(returnNote.getReturnDetail() + goods.getTitle() + "【产品券】*1，");
 												}
 											}
 										}
@@ -1191,6 +1200,7 @@ public class TdPriceCountService {
 
 											total -= cashPrice;
 											result.put("cashTotal", cashTotal - cashPrice);
+											returnNote.setReturnDetail(returnNote.getReturnDetail() + cashPrice + "元【通用现金券】*1，");
 										}
 									}
 								}
@@ -1239,6 +1249,7 @@ public class TdPriceCountService {
 										balanceLog.setDiySiteId(user.getUpperDiySiteId());
 										balanceLog.setCityId(user.getCityId());
 										tdBalanceLogService.save(balanceLog);
+										returnNote.setReturnDetail(returnNote.getReturnDetail() + uncashBalance + "元【不可提现预存款】，");
 									}
 									// 判断是否剩余部分金额需要退还
 									total -= uncashBalance;
@@ -1287,6 +1298,7 @@ public class TdPriceCountService {
 										balanceLog.setDiySiteId(user.getUpperDiySiteId());
 										balanceLog.setCityId(user.getCityId());
 										tdBalanceLogService.save(balanceLog);
+										returnNote.setReturnDetail(returnNote.getReturnDetail() + cashBalance + "元【可提现预存款】，");
 									}
 									total -= cashBalance;
 									cashBalanceUsed -= cashBalance;
@@ -1460,7 +1472,11 @@ public class TdPriceCountService {
 
 			if (new_return_note.getMoney() > (posPay + cashPay)) {
 				new_return_note.setMoney(posPay + cashPay);
+				returnNote.setReturnDetail(returnNote.getReturnDetail() + new_return_note.getMoney() + "元【现金】");
 			}
+			
+			tdReturnNoteService.save(returnNote);
+			
 			// 2016-07-05修改：持久化总的打款记录，当收款现金为零不持久化
 			if (new_return_note.getMoney() != 0)
 			{
