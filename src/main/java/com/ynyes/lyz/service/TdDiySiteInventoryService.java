@@ -24,8 +24,6 @@ import com.ynyes.lyz.repository.TdOrderRepo;
 import com.ynyes.lyz.util.Criteria;
 import com.ynyes.lyz.util.Restrictions;
 
-import aj.org.objectweb.asm.Type;
-
 @Service
 @Transactional
 public class TdDiySiteInventoryService {

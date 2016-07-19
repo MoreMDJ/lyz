@@ -12,7 +12,6 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.ynyes.lyz.entity.TdCashReturnNote;
-import com.ynyes.lyz.interfaces.entity.TdDiySiteInventoryEbs;
 import com.ynyes.lyz.repository.TdCashReturnNoteRepository;
 
 /**

@@ -126,6 +126,7 @@ public class TdPayController {
 		return "/client/waiting_pay";
 	}
 
+	@SuppressWarnings("rawtypes")
 	@RequestMapping(value = "/alipay/return")
 	public String alipayReturn(HttpServletRequest req) {
 		String username = (String) req.getSession().getAttribute("username");
@@ -150,6 +151,7 @@ public class TdPayController {
 		// 获取支付宝的通知返回参数，可参考技术文档中页面跳转同步通知参数列表(以下仅供参考)
 
 		String out_trade_no = null;
+		@SuppressWarnings("unused")
 		String trade_no = null;
 		String trade_status = null;
 		String total_fee = null;
@@ -326,6 +328,7 @@ public class TdPayController {
 		return "/client/pay_success";
 	}
 
+	@SuppressWarnings("rawtypes")
 	@RequestMapping(value = "/pay/alipay/return/async")
 	@ResponseBody
 	public String payAlipayReturnAsync(HttpServletRequest req) {
@@ -346,6 +349,7 @@ public class TdPayController {
 		}
 
 		String out_trade_no = null;
+		@SuppressWarnings("unused")
 		String trade_no = null;
 		String trade_status = null;
 		String total_fee = null;
