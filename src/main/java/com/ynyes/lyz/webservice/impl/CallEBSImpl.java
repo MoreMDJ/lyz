@@ -1345,7 +1345,6 @@ public class CallEBSImpl implements ICallEBS {
 				{
 					return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>事物编码重复："+ transId + "</MESSAGE></STATUS></RESULTS>";
 				}
-				tdDiySiteInventoryEbsService.save(diySiteInventoryEbs);
 				
 				TdGoods tdGoods = tdGoodsService.findByCodeAndStatus(itemCode,1l);
 				
@@ -1359,6 +1358,8 @@ public class CallEBSImpl implements ICallEBS {
 				{
 					return "<RESULTS><STATUS><CODE>1</CODE><MESSAGE>门店编码为："+ diySiteCode +"的门店不存在或者不可用</MESSAGE></STATUS></RESULTS>";
 				}
+				
+				tdDiySiteInventoryEbsService.save(diySiteInventoryEbs);
 				
 				TdDiySiteInventory inventory = tdDiySiteInventoryService.findByGoodsCodeAndDiySiteId(itemCode, site.getId());
 				if (inventory == null)
