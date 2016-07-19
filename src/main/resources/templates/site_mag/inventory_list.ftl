@@ -171,8 +171,8 @@ var theForm = document.forms['form1'];
       <input id="keywords" name="keywords" type="text" class="keyword" value="${keywords!''}">
       <a id="lbtnSearch" class="btn-search" href="javascript:__doPostBack('lbtnSearch','')">查询</a>
       <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:showDialog()">添加库存</a>
-      <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:downloaddate(1)">城市报表下载</a>
-      <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:downloaddate(2)">门店报表下载</a>
+      <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:downloaddate(1)">城市可用报表下载</a>
+      <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:downloaddate(2)">门店可用报表下载</a>
     </div>
   </div>
 </div>

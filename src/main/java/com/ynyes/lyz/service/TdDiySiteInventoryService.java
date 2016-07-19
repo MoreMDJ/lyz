@@ -24,6 +24,8 @@ import com.ynyes.lyz.repository.TdOrderRepo;
 import com.ynyes.lyz.util.Criteria;
 import com.ynyes.lyz.util.Restrictions;
 
+import aj.org.objectweb.asm.Type;
+
 @Service
 @Transactional
 public class TdDiySiteInventoryService {
@@ -450,24 +452,41 @@ public class TdDiySiteInventoryService {
 			}
 		}
 	}
+
 	/**
 	 * 根据城市,门店查找库存
-	 * @param regionId
-	 * @param keywords
-	 * @param page
-	 * @param size
+	 * @param regionId 城市id（ebs）
+	 * @param diyId   门店id
+	 * @param keywords 关键字
+	 * @param type  1：城市 2：门店
 	 * @return
 	 */
-	public List<TdDiySiteInventory> searchList(Long regionId,Long diyId, String keywords) {
+	public List<TdDiySiteInventory> searchList(Long regionId,Long diyId, String keywords,Integer type) {
 		Criteria<TdDiySiteInventory> c = new Criteria<TdDiySiteInventory>();
 
-		if(regionId!=null){
-			c.add( Restrictions.eq("regionId", regionId, true));
+		if (type == 1)
+		{
+			if(regionId!=null)
+			{
+				c.add( Restrictions.eq("regionId", regionId, true));
+			}
+			c.add(Restrictions.isNull("diySiteId"));
 		}
-		if(diyId!=null){
-			c.add( Restrictions.eq("diyId", diyId, true));
+		else if (type == 2)
+		{
+			if(diyId != null)
+			{
+				c.add( Restrictions.eq("diySiteId", diyId, true));
+			}
+			else
+			{
+				c.add(Restrictions.isNotNull("diySiteId"));
+			}
 		}
-		if(StringUtils.isNotBlank(keywords)){
+		
+		
+		if(StringUtils.isNotBlank(keywords))
+		{
 			c.add(Restrictions.or(Restrictions.eq("goodsTitle", keywords, true),Restrictions.eq("goodsCode", keywords, true)));
 		}
 		c.setOrderByAsc("goodsCode");

@@ -25,7 +25,7 @@ public class TdDiySiteInventoryLog {
 	public static final String CHANGETYPE_USER_ADD				= "自提单退货";
 	public static final String CHANGETYPE_DELIVERY_SUB			= "配送出货";
 	public static final String CHANGETYPE_DELIVERY_ADD			= "配送退货";
-	public static final String CHANGETYPE_INVENTORY_OVERAGE	= "库存盘盈";
+	public static final String CHANGETYPE_INVENTORY_OVERAGE		= "库存盘盈";
 	public static final String CHANGETYPE_INVENTORY_LOSE		= "库存盘亏";
 	public static final String CHANGETYPE_CITY_ADD				= "城市入货";
 	public static final String CHANGETYPE_CITY_SUB				= "城市退货";

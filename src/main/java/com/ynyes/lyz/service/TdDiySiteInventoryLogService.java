@@ -107,15 +107,33 @@ public class TdDiySiteInventoryLogService {
 	 * @param size
 	 * @return
 	 */
-	public List<TdDiySiteInventoryLog> searchList(Long regionId,Long diyId, String keywords,Date startTime,Date endDate) {
+	public List<TdDiySiteInventoryLog> searchList(Long regionId,Long diyId, String keywords,Date startTime,Date endDate,Integer type)
+	{
 		Criteria<TdDiySiteInventoryLog> c = new Criteria<TdDiySiteInventoryLog>();
-
-		if(regionId!=null){
-			c.add( Restrictions.eq("regionId", regionId, true));
+		if (type == 1)
+		{
+			if(regionId!=null)
+			{
+				c.add( Restrictions.eq("regionId", regionId, true));
+			}
+			else
+			{
+				c.add(Restrictions.isNull("diySiteId"));
+			}
 		}
-		if(diyId!=null){
-			c.add( Restrictions.eq("diyId", diyId, true));
+		else if (type == 2)
+		{
+			if(diyId!=null)
+			{
+				c.add( Restrictions.eq("diySiteId", diyId, true));
+			}
+			else
+			{
+				c.add(Restrictions.isNotNull("diySiteId"));
+			}
 		}
+		
+		
 		if(StringUtils.isNotBlank(keywords)){
 			c.add(Restrictions.or(Restrictions.eq("goodsTitle", keywords, true),Restrictions.eq("goodsSku", keywords, true)));
 		}

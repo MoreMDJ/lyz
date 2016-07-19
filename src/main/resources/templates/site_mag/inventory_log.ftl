@@ -127,8 +127,8 @@ var theForm = document.forms['form1'];
     <div class="r-list">
     			
      <input id="keywords" name="keywords" type="text" class="keyword" value="${keywords!''}">
-      <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:downloaddate(1)">城市报表下载</a>
-      <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:downloaddate(2)">门店报表下载</a>
+      <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:downloaddate(1)">城市进销报表下载</a>
+      <a style="color:black;line-height: 30px;margin-left: 20px;" href="javascript:downloaddate(2)">门店进销报表下载</a>
     </div>
   </div>
 </div>
