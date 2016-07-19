@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.ynyes.lyz.entity.TdCashReturnNote;
+import com.ynyes.lyz.interfaces.entity.TdDiySiteInventoryEbs;
 import com.ynyes.lyz.repository.TdCashReturnNoteRepository;
 
 /**
@@ -42,6 +43,19 @@ public class TdCashReturnNoteService {
 		}
 		return repository.save(e);
 	}
+	
+	/**
+     * 删除
+     * 
+     * @param e 菜单项
+     */
+    public void delete(TdCashReturnNote e)
+    {
+        if (null != e)
+        {
+            repository.delete(e);
+        }
+    }
 
 	public void delete(Long id) {
 		if (null != id) {

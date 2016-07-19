@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.neo4j.cypher.internal.compiler.v2_1.commands.indexQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -34,6 +35,7 @@ import com.ynyes.lyz.interfaces.entity.TdCashRefundInf;
 import com.ynyes.lyz.interfaces.entity.TdReturnTimeInf;
 import com.ynyes.lyz.interfaces.service.TdInterfaceService;
 import com.ynyes.lyz.interfaces.utils.EnumUtils.INFTYPE;
+import com.ynyes.lyz.service.TdCashReturnNoteService;
 import com.ynyes.lyz.service.TdCityService;
 import com.ynyes.lyz.service.TdCommonService;
 import com.ynyes.lyz.service.TdDiySiteInventoryService;
@@ -90,6 +92,9 @@ public class TdManagerReturnNoteController extends TdManagerBaseController{
 	
 	@Autowired
 	private TdDiySiteInventoryService tdDiySiteInventoryService;
+	
+	@Autowired
+	private TdCashReturnNoteService tdCashReturnNoteService;
 	
 	// 列表
 	@RequestMapping(value = "/{type}/list")
@@ -403,6 +408,14 @@ public class TdManagerReturnNoteController extends TdManagerBaseController{
 							{
 								TdCashRefundInf cashRefundInf = tdInterfaceService.initCashRefundInf(tdCashReturnNote);
 								tdInterfaceService.ebsWithObject(cashRefundInf, INFTYPE.CASHREFUNDINF);
+							}
+							for(int index = 0 ;index < cashReturnNotes.size();index ++ )
+							{
+								TdCashReturnNote cashReturnNote = cashReturnNotes.get(index);
+								if (cashReturnNote != null && cashReturnNote.getMoney() == null || (cashReturnNote.getMoney() != null && cashReturnNote.getMoney() == 0d) )
+								{
+									tdCashReturnNoteService.delete(cashReturnNote);
+								}
 							}
 						}
 						returnNote.setReturnTime(new Date());
