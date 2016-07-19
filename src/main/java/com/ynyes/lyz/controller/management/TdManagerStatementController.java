@@ -963,7 +963,7 @@ public class TdManagerStatementController extends TdManagerBaseController {
 				//商品子分类
 	        	row.createCell(16).setCellValue(objToString(salesDetail.getGoodsTypeTitle()));
 				//配送方式
-	        	row.createCell(17).setCellValue(objToString(salesDetail.getDeliverRealName()));
+	        	row.createCell(17).setCellValue(objToString(salesDetail.getDeliverTypeTitle()));
 				//中转仓
 	            row.createCell(18).setCellValue(objToString(salesDetail.getWhName()));
 	    		//配送人员
