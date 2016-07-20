@@ -931,6 +931,8 @@ public class TdPriceCountService {
 				posPay = 0d;
 			}
 
+			Double all_off_line = posPay + cashPay;
+			
 			TdReturnNote returnNote = tdReturnNoteService.findByReturnNumber(returnNoteNumber);
 			if (null != returnNote.getReturnDetail()) {
 				returnNote.setReturnDetail("");
@@ -1149,7 +1151,6 @@ public class TdPriceCountService {
 													number--;
 													result.put("pro" + goodsId,
 															((Integer) result.get("pro" + goodsId) - 1));
-													returnNote.setReturnDetail(returnNote.getReturnDetail() + goods.getTitle() + "【产品券】*1，");
 												}
 											}
 										}
@@ -1200,7 +1201,6 @@ public class TdPriceCountService {
 
 											total -= cashPrice;
 											result.put("cashTotal", cashTotal - cashPrice);
-											returnNote.setReturnDetail(returnNote.getReturnDetail() + cashPrice + "元【通用现金券】*1，");
 										}
 									}
 								}
@@ -1249,7 +1249,6 @@ public class TdPriceCountService {
 										balanceLog.setDiySiteId(user.getUpperDiySiteId());
 										balanceLog.setCityId(user.getCityId());
 										tdBalanceLogService.save(balanceLog);
-										returnNote.setReturnDetail(returnNote.getReturnDetail() + uncashBalance + "元【不可提现预存款】，");
 									}
 									// 判断是否剩余部分金额需要退还
 									total -= uncashBalance;
@@ -1298,7 +1297,6 @@ public class TdPriceCountService {
 										balanceLog.setDiySiteId(user.getUpperDiySiteId());
 										balanceLog.setCityId(user.getCityId());
 										tdBalanceLogService.save(balanceLog);
-										returnNote.setReturnDetail(returnNote.getReturnDetail() + cashBalance + "元【可提现预存款】，");
 									}
 									total -= cashBalance;
 									cashBalanceUsed -= cashBalance;
@@ -1470,9 +1468,8 @@ public class TdPriceCountService {
 				}
 			}
 
-			if (new_return_note.getMoney() > (posPay + cashPay)) {
-				new_return_note.setMoney(posPay + cashPay);
-				returnNote.setReturnDetail(returnNote.getReturnDetail() + new_return_note.getMoney() + "元【现金】");
+			if (new_return_note.getMoney() > all_off_line) {
+				new_return_note.setMoney(all_off_line);
 			}
 			
 			tdReturnNoteService.save(returnNote);

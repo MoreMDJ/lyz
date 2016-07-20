@@ -2087,6 +2087,10 @@ public class TdUserController {
 			returnNote.setReturnGoodsList(orderGoodsList);
 			order.setStatusId(9L);
 			order.setIsRefund(true);
+			
+			// 2016-07-20存储退钱退券明细信息
+			returnNote = this.getReturnDetail(orderId, infos, returnNote);
+			
 			tdOrderService.save(order);
 			tdReturnNoteService.save(returnNote);
 			tdInterfaceService.initReturnOrder(returnNote, INFConstants.INF_RETURN_ORDER_SUB_INT);
@@ -2645,6 +2649,8 @@ public class TdUserController {
 				posPay = 0.00;
 			}
 
+			Double all_off_line = posPay + cashPay;
+
 			// 2016-07-05修改：以现金的方式归还第三方支付的钱，POS和现金
 			Double all_cash_return = 0.00;
 
@@ -2930,8 +2936,8 @@ public class TdUserController {
 				}
 			}
 			if (all_cash_return > 0) {
-				if (all_cash_return > (posPay + cashPay)) {
-					all_cash_return = (posPay + cashPay);
+				if (all_cash_return > all_off_line) {
+					all_cash_return = all_off_line;
 				}
 				BigDecimal bd = new BigDecimal(all_cash_return);
 				all_cash_return = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
@@ -2940,5 +2946,332 @@ public class TdUserController {
 		}
 		res.put("infos", infos);
 		return res;
+	}
+
+	private TdReturnNote getReturnDetail(Long orderId, String params, TdReturnNote returnNote) {
+		StringBuffer sb = new StringBuffer("");
+
+		TdOrder order = tdOrderService.findOne(orderId);
+		if (null != order && null != params && !"".equals(params)) {
+			Map<String, Object> result = tdPriceCountService.countCouponCondition(orderId);
+
+			Boolean useProCoupon = (Boolean) result.get("useProCoupon");
+			Boolean useCashCoupon = (Boolean) result.get("useCashCoupon");
+
+			Double cashTotal = (Double) result.get("cashTotal");
+			// 获取订单使用的总不可提现余额
+			Double unCashBalanceUsed = order.getUnCashBalanceUsed();
+			// 获取用户使用的可提现余额
+			Double cashBalanceUsed = order.getCashBalanceUsed();
+			// 获取用户第三方支付的金额
+			Double otherPay = order.getOtherPay();
+			// 获取用户支付的现金
+			Double cashPay = order.getCashPay();
+			if (null == cashPay) {
+				cashPay = 0.00;
+			}
+			// 获取用户支付的POS
+			Double posPay = order.getPosPay();
+			if (null == posPay) {
+				posPay = 0.00;
+			}
+
+			Double all_off_line = posPay + cashPay;
+
+			// 2016-07-05修改：以现金的方式归还第三方支付的钱，POS和现金
+			Double all_cash_return = 0.00;
+
+			Map<Long, Double> price_difference = new HashMap<>();
+
+			// 2016-06-26修改：需要获取用户使用赠送的产品券和购买的产品券的集合
+			Map<Long, ArrayList<TdCoupon>> buy_pro_coupon_condition = new HashMap<>();
+			Map<Long, ArrayList<TdCoupon>> send_pro_coupon_condition = new HashMap<>();
+
+			String productCouponId = order.getProductCouponId();
+
+			if (null != productCouponId && !"".equalsIgnoreCase(productCouponId)) {
+				String[] sIds = productCouponId.split(",");
+				if (null != sIds && sIds.length > 0) {
+					for (String sId : sIds) {
+						if (null != sId && !"".equalsIgnoreCase(sId)) {
+							Long couponId = Long.parseLong(sId);
+							TdCoupon coupon = tdCouponService.findOne(couponId);
+							if (null != coupon) {
+								Long goodsId = coupon.getGoodsId();
+								if (null != coupon.getIsBuy() && coupon.getIsBuy()) {
+									ArrayList<TdCoupon> list = buy_pro_coupon_condition.get(goodsId);
+									if (null == list) {
+										list = new ArrayList<>();
+									}
+									list.add(coupon);
+									buy_pro_coupon_condition.put(goodsId, list);
+								} else {
+									ArrayList<TdCoupon> list = send_pro_coupon_condition.get(goodsId);
+									if (null == list) {
+										list = new ArrayList<>();
+									}
+									list.add(coupon);
+									send_pro_coupon_condition.put(goodsId, list);
+								}
+							}
+						}
+					}
+				}
+			}
+			// -----------------------------修改结束--------------------------------
+
+			// 修改：2016-06-26 计算这些商品使用的指定产品现金券的金额，这部分金额是不会退还的
+			Map<Long, ArrayList<TdCoupon>> cash__pro_coupon_condition = new HashMap<>();
+			String cashCouponId = order.getCashCouponId();
+			if (null != cashCouponId && !"".equalsIgnoreCase(cashCouponId)) {
+				String[] sCashIds = cashCouponId.split(",");
+				if (null != sCashIds && sCashIds.length > 0) {
+					for (String sId : sCashIds) {
+						if (null != sId && !"".equalsIgnoreCase(sId)) {
+							Long id = Long.parseLong(sId);
+							TdCoupon coupon = tdCouponService.findOne(id);
+							if (null != coupon && null != coupon.getTypeCategoryId()
+									&& 2L == coupon.getTypeCategoryId().longValue()) {
+								Long goodsId = coupon.getGoodsId();
+								ArrayList<TdCoupon> cash_coupon = cash__pro_coupon_condition.get(goodsId);
+								if (null == cash_coupon) {
+									cash_coupon = new ArrayList<>();
+								}
+								cash_coupon.add(coupon);
+								cash__pro_coupon_condition.put(goodsId, cash_coupon);
+							}
+						}
+					}
+				}
+			}
+			// -----------------------------修改结束-----------------------------------
+
+			// 开始拆分退货参数
+			String[] param = params.split(",");
+			if (null != param && param.length > 0) {
+				for (String group : param) {
+					if (null != group && !"".equals(group)) {
+						String[] singles = group.split("-");
+						// 判断singles是否为一个正确的参数
+						if (null != singles && singles.length == 4) {
+							String sGoodsId = singles[0];
+							Long goodsId = null;
+							String sNumber = singles[1];
+							Long number = 0L;
+							String sUnit = singles[2];
+							Double unit = 0.00;
+							if (null != sGoodsId && !"".equals(sGoodsId)) {
+								goodsId = Long.parseLong(sGoodsId);
+							}
+							if (null != sNumber && !"".equals(sNumber)) {
+								number = Long.parseLong(sNumber);
+							}
+							if (null != sUnit && !"".equals(sUnit)) {
+								unit = Double.parseDouble(sUnit);
+							}
+
+							// 计算该商品的退货总额
+							Double total = number * unit;
+							if (null != goodsId) {
+								TdGoods goods = tdGoodsService.findOne(goodsId);
+
+								// 2016-06-24修改：需要排除是退货部分使用的指定产品现金券的价格
+								Double sub_coupon_price = 0.00;
+								ArrayList<TdCoupon> coupon_list = cash__pro_coupon_condition.get(goodsId);
+								List<TdCoupon> delete_coupon = new ArrayList<>();
+								if (null != coupon_list) {
+									for (int i = 0; i < number; i++) {
+										if (coupon_list.size() > i) {
+											TdCoupon tdCoupon = coupon_list.get(i);
+											Double realPrice = tdCoupon.getRealPrice();
+											sub_coupon_price += realPrice;
+											delete_coupon.add(tdCoupon);
+										}
+									}
+
+									for (TdCoupon tdCoupon : delete_coupon) {
+										coupon_list.remove(tdCoupon);
+									}
+									delete_coupon = null;
+									cash__pro_coupon_condition.put(goodsId, coupon_list);
+								}
+
+								total -= sub_coupon_price;
+								Double record = price_difference.get(goodsId);
+								if (null == record) {
+									record = 0.00;
+								}
+								record += sub_coupon_price;
+								price_difference.put(goodsId, record);
+								// --------------------修改结束-----------------------
+
+								// 开始退还产品券
+								if (total > 0) {
+									if (useProCoupon) {
+										// 查找本产品是否使用了产品券
+										Integer useNumber = (Integer) result.get("pro" + goodsId);
+										if (null != useNumber && useNumber > 0) {
+											// 开始计算退还几张券
+											for (int i = 0; i < useNumber; i++) {
+												if (number > 0) {
+													sb.append(goods.getTitle() + "【产品券】*1");
+													result.put("pro" + goodsId,
+															((Integer) result.get("pro" + goodsId) - 1));
+													number--;
+													total -= unit;
+													result.put("pro" + goodsId,
+															((Integer) result.get("pro" + goodsId) - 1));
+												}
+											}
+										}
+									}
+								}
+								// 开始退还通用现金券
+								if (total > 0) {
+									if (useCashCoupon) {
+										// 声明一个变量用来表示退还的通用现金券的面额
+										Double cashPrice = 0.00;
+										if (cashTotal > total) {
+											cashPrice = total;
+										} else {
+											cashPrice = cashTotal;
+										}
+
+										if (cashPrice > 0) {
+											BigDecimal bd = new BigDecimal(cashPrice);
+											cashPrice = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+											sb.append(cashPrice + "元【通用现金券】*1");
+										}
+										total -= cashPrice;
+										result.put("cashTotal", cashTotal - cashPrice);
+
+									}
+								}
+								// 如果还有金额没有退还，再退还不可提现余额
+								if (total > 0) {
+									// 定义实际退还的不可提现余额
+									Double uncashBalance = 0.00;
+
+									if (null == unCashBalanceUsed) {
+										unCashBalanceUsed = 0.00;
+									}
+
+									if (total < unCashBalanceUsed) {
+										// 需要退还的金额小于用户使用的总的不可提现余额，则直接退还退还的总额
+										uncashBalance = total;
+									} else {
+										// 如果需要退还的金额大于等于用户使用的不可提现余额，则只能够退还用户使用的不可提现余额
+										uncashBalance = unCashBalanceUsed;
+									}
+									if (uncashBalance > 0) {
+										BigDecimal bd = new BigDecimal(uncashBalance);
+										uncashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+										sb.append(uncashBalance + "元【不可提现预存款】");
+									}
+									// // 开始退还不可提现余额
+									// 判断是否剩余部分金额需要退还
+									total -= uncashBalance;
+									unCashBalanceUsed -= uncashBalance;
+								}
+
+								// 如果还有剩余的金额没有退还，则开始退还可提现余额
+								if (total > 0) {
+									if (null == cashBalanceUsed) {
+										cashBalanceUsed = 0.00;
+									}
+									// 定义一个变量用于获取用户使用的可提现余额
+									Double cashBalance = 0.00;
+									// 如果需要退还的金额小于用户使用的可提现余额，则将所有的金额以可提现余额的形式退还
+									if (total < cashBalanceUsed) {
+										cashBalance = total;
+									} else {
+										cashBalance = cashBalanceUsed;
+									}
+									if (cashBalance > 0) {
+										BigDecimal bd = new BigDecimal(cashBalance);
+										cashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+										sb.append(cashBalance + "元【可提现预存款】");
+									}
+									total -= cashBalance;
+									cashBalanceUsed -= cashBalance;
+								}
+								// 如果还剩余部分金额没有退还，则需要根据支付方式进行第三方退还
+								if (total > 0) {
+
+									// 判断用户是否使用了第三方支付
+									if (null != otherPay && otherPay > 0.00) {
+										// 获取用户的支付方式
+										// String payTypeTitle =
+										// order.getPayTypeTitle();
+										// 定义一个变量表示退款金额数
+										Double otherReturn = 0.00;
+										if (total < otherPay) {
+											otherReturn = total;
+										} else {
+											otherReturn = otherPay;
+										}
+
+										if (otherReturn > 0.00) {
+											all_cash_return += otherReturn;
+											// infos.add(otherReturn + "元【" +
+											// payTypeTitle + "】");
+											otherPay -= otherReturn;
+										}
+										// ----------在此处理退款申请单的一系列操作动作-------------------
+
+									} else {
+										if (null == cashPay) {
+											cashPay = 0.00;
+										}
+
+										Double cashReturn = 0.00;
+
+										if (total < cashPay) {
+											cashReturn = total;
+										} else {
+											cashReturn = cashPay;
+										}
+
+										if (cashReturn > 0.00) {
+											all_cash_return += cashReturn;
+											// infos.add(cashReturn + "元【现金】");
+											total -= cashReturn;
+											cashPay -= cashReturn;
+										}
+										// 退还现金后还剩余未退还的金额，就退还POS
+										if (total > 0) {
+											Double posReturn = 0.00;
+
+											if (total < posPay) {
+												posReturn = total;
+											} else {
+												posReturn = posPay;
+											}
+
+											if (posReturn > 0.00) {
+												all_cash_return += posReturn;
+												// infos.add(posReturn +
+												// "元【POS退还】");
+												posPay -= posReturn;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			if (all_cash_return > 0) {
+				if (all_cash_return > all_off_line) {
+					all_cash_return = all_off_line;
+				}
+				BigDecimal bd = new BigDecimal(all_cash_return);
+				all_cash_return = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+				sb.append(all_cash_return + "元【现金】");
+			}
+		}
+		returnNote.setReturnDetail(sb.toString());
+		return returnNote;
 	}
 }
