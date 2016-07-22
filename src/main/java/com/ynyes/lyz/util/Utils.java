@@ -52,9 +52,7 @@ public class Utils {
 		try {
 			if(str!=null && !"td".equals(str)){
 				String type=str.substring(2, 3);
-				int strLength = str.length();
-				String doubleStr = str.substring(3, str.length());
-				res=Double.valueOf(doubleStr);
+				res=Double.valueOf(str.substring(3, str.length()));
 				if("1".equals(type)){
 					res=99999-res;
 				}else if("2".equals(type)){

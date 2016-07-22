@@ -60,9 +60,6 @@ public class TdPriceCountService {
 
 	@Autowired
 	private TdCashReturnNoteService tdCashReturnNoteService;
-	
-	@Autowired
-	private TdReturnNoteService tdReturnNoteService;
 
 	/**
 	 * 计算订单价格和能使用的最大的预存款的方法
