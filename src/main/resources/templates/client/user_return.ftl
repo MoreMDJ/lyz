@@ -314,7 +314,7 @@
 			<p>申请退货</p>	
 			<a></a>
 		</div>
-		<div class="fen_goodbox">					
+		<div class="fen_goodbox" style="margin-bottom: 50px;">				
 			<dl ng-repeat="item in goods">
 				<dt>
 					<a>
@@ -341,7 +341,7 @@
 				display:block;
 			">总金额：￥{{total | number:2}}</span>
 			-->
-			<div class="sub">
+			<div class="sub" style="position:fixed;">
 			<input style="width:50%;height:100%;border:none;background:#ffaa00;color:white;font-size:1em;float:left;display:block;" type="button" ng-click="get_return_detail();" value="退款明细" />
 			<input style="width:50%;height:100%;border:none;background:#cc1421;color:white;font-size:1em;float:left;display:block;" type="button" onclick="order_return();" value="去退货" />
 			</div>
