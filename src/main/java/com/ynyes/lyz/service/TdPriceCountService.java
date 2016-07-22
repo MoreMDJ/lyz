@@ -656,6 +656,22 @@ public class TdPriceCountService {
 				}
 			}
 		}
+		String cashProCouponId = order.getCashCouponId();
+		if (null != cashProCouponId && !"".equalsIgnoreCase(cashProCouponId)) {
+			String[] sIds = cashProCouponId.split(",");
+			if (null != sIds && sIds.length > 0) {
+				for (String sId : sIds) {
+					if (null != sId && !"".equalsIgnoreCase(sId)) {
+						Long id = Long.parseLong(sId);
+						TdCoupon coupon = tdCouponService.findOne(id);
+						if (isProductCashCoupon(coupon))
+						{
+							total -= coupon.getPrice();
+						}
+					}
+				}
+			}
+		}
 		
 		Double activitySubPrice = order.getActivitySubPrice();
 		if(null == activitySubPrice){
@@ -663,6 +679,38 @@ public class TdPriceCountService {
 		}
 		total -= activitySubPrice;
 		return total;
+	}
+	
+	public Boolean isProductCashCoupon(TdCoupon tdCoupon)
+	{
+		if (tdCoupon == null)
+		{
+			return false;
+		}
+		else if (tdCoupon.getTypeCategoryId() == null)
+		{
+			return false;
+		}
+		else if (tdCoupon.getTypeCategoryId() != 2)
+		{
+			return false;
+		}
+		else if(tdCoupon.getPrice() == null)
+		{
+			return false;
+		}
+		else if (tdCoupon.getPrice() <=0 )
+		{
+			return false;
+		}
+		else if(tdCoupon.getIsBuy() != null && tdCoupon.getIsBuy() == true)
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	/**
