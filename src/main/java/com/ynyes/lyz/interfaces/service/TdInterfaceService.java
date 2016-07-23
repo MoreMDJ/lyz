@@ -33,6 +33,8 @@ import com.ynyes.lyz.entity.TdOrder;
 import com.ynyes.lyz.entity.TdOrderGoods;
 import com.ynyes.lyz.entity.TdOwnMoneyRecord;
 import com.ynyes.lyz.entity.TdPayType;
+import com.ynyes.lyz.entity.TdPriceList;
+import com.ynyes.lyz.entity.TdPriceListItem;
 import com.ynyes.lyz.entity.TdRecharge;
 import com.ynyes.lyz.entity.TdReturnNote;
 import com.ynyes.lyz.entity.TdSetting;
@@ -56,6 +58,8 @@ import com.ynyes.lyz.service.TdDiySiteService;
 import com.ynyes.lyz.service.TdOrderService;
 import com.ynyes.lyz.service.TdPayTypeService;
 import com.ynyes.lyz.service.TdPriceCountService;
+import com.ynyes.lyz.service.TdPriceListItemService;
+import com.ynyes.lyz.service.TdPriceListService;
 import com.ynyes.lyz.service.TdReturnNoteService;
 import com.ynyes.lyz.service.TdSettingService;
 
@@ -114,6 +118,12 @@ public class TdInterfaceService {
 	
 	@Autowired
 	private TdSettingService tdSettingService;
+	
+	@Autowired
+	private TdPriceListService tdPriceListService;
+	
+	@Autowired
+	private TdPriceListItemService tdPriceListItemService;
 	
 	private Call call;
 	
@@ -196,76 +206,8 @@ public class TdInterfaceService {
 	/**
 	 * 根据退货单给ebs发送销退单
 	 * @param returnNote
-	 
-	private void sendEbsReturnOrder(TdReturnNote returnNote)
-	{
-		if (returnNote == null)
-		{
-			return ;
-		}
-		TdReturnOrderInf returnOrderInf = tdReturnOrderInfService.findByReturnNumber(returnNote.getReturnNumber());
-		if (returnOrderInf == null)
-		{
-			return ;
-		}
-		Boolean isSendSuccess = true;
-		//退单头
-		String returnOrderInfXml = this.XmlWithReturnNote(returnNote, INFTYPE.RETURNORDERINF);
-		if (returnOrderInfXml != null)
-		{
-			Object[] orderInf = { INFConstants.INF_RT_ORDER_STR, "1", returnOrderInfXml};
-			try
-			{
-				String object = (String)this.getCall().invoke(orderInf);
-				String resultStr = StringTools.interfaceMessage(object);
-				System.out.println(resultStr);
-				if (resultStr != null)
-				{
-					isSendSuccess = false;
-				}
-			}
-			catch (RemoteException e)
-			{
-				e.printStackTrace();
-				isSendSuccess = false;
-			}
-		}
-		//行
-		String returnGoodsInfXml = this.XmlWithReturnNote(returnNote, INFTYPE.RETURNGOODSINF);
-		if (returnGoodsInfXml != null && isSendSuccess)
-		{
-			Object[] orderGoodsInf = { INFConstants.INF_RT_ORDER_GOODS_STR, "1", returnGoodsInfXml};
-			try
-			{
-				String object = (String)this.getCall().invoke(orderGoodsInf);
-				String resultStr = StringTools.interfaceMessage(object);
-				System.out.println(resultStr);
-			} 
-			catch (RemoteException e)
-			{
-				e.printStackTrace();
-			}
-		}
-		//券
-		String returnCouponInfXml = this.XmlWithReturnNote(returnNote, INFTYPE.RETURNCOUPONINF);
-		if (returnCouponInfXml != null && isSendSuccess)
-		{
-			Object[] orderInf = { INFConstants.INF_RT_ORDER_COUPONS_STR, "1", returnCouponInfXml};
-			try
-			{
-				String object = (String)this.getCall().invoke(orderInf);
-				String resultStr = StringTools.interfaceMessage(object);
-				System.out.println(resultStr);
-			} 
-			catch (RemoteException e)
-			{
-				e.printStackTrace();
-			}
-		}
-		
-		
-	}
-	*/
+	 * 
+	 */
 	private void sendEbsReturnOrder(TdReturnNote returnNote)
 	{
 		if (returnNote == null)
@@ -440,13 +382,13 @@ public class TdInterfaceService {
 				goodsInf.setSku(tdOrderGoods.getSku());
 				goodsInf.setQuantity(tdOrderGoods.getQuantity());
 //				goodsInf.setJxPrice(tdOrderGoods.getRealPrice());
-				goodsInf.setLsPrice(tdOrderGoods.getPrice());
+				goodsInf.setLsPrice(this.getGoodsPrice(SobId, tdOrderGoods));
 				goodsInf.setGiftFlag("Y");
 				goodsInf.setPromotion(tdOrderGoods.getActivityId());
 				tdOrderGoodsInfService.save(goodsInf);
 			}
 		}
-		//小辅料TdOrderGoodsInf
+		//赠品TdOrderGoodsInf
 		List<TdOrderGoods> presentedList = tdOrder.getPresentedList();
 		if (presentedList != null && presentedList.size() > 0) 
 		{
@@ -525,6 +467,64 @@ public class TdInterfaceService {
 			tdCashReciptInfService.save(cashReciptInf);
 		}*/
 		return orderInf;
+	}
+	
+	/**
+	 * 获取商品零售价
+	 * @param sobId
+	 * @param goods
+	 * @return
+	 */
+	public Double getGoodsPrice(Long sobId, TdOrderGoods goods) {
+
+		if (null == goods) {
+			return 0d;
+		}
+
+		String productFlag = goods.getBrandTitle();
+
+		if (null == productFlag) {
+			return 0d;
+		}
+
+		String priceType = null;
+
+		// 零售价
+		if (productFlag.equalsIgnoreCase("华润")) {
+			priceType = "LS";
+		}
+		// 乐意装价
+		else if (productFlag.equalsIgnoreCase("乐易装")) {
+			priceType = "LYZ";
+		}
+		// 莹润价
+		else if (productFlag.equalsIgnoreCase("莹润")) {
+			priceType = "YR";
+		}
+		// 不支持的价格
+		else {
+			return 0d;
+		}
+
+		List<TdPriceList> priceList_list = tdPriceListService
+				.findBySobIdAndPriceTypeAndStartDateActiveAndEndDateActive(sobId, priceType, new Date(), new Date());
+
+		if (null == priceList_list || priceList_list.size() == 0 || priceList_list.size() > 1) {
+			return 0d;
+		}
+
+		// 价目表ID
+		Long list_header_id = 0L;
+		list_header_id = priceList_list.get(0).getListHeaderId();
+
+		List<TdPriceListItem> priceItemList = tdPriceListItemService
+				.findValidItemByPriceListHeaderIdAndGoodsCode(list_header_id,goods.getSku());
+
+		if (null == priceItemList || priceItemList.size() == 0 || priceItemList.size() > 1) {
+			return 0d;
+		}
+
+		return priceItemList.get(0).getPrice();
 	}
 	
 	/**

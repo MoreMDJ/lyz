@@ -85,7 +85,6 @@ function pay() {
 			warning("亲，您的网速不给力啊");
 		},
 		success : function(res) {
-			close(1);
 			if (-1 == res.status) {
 				warning(res.message);
 				return;

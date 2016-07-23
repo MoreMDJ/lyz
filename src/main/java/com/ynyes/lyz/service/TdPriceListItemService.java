@@ -168,7 +168,7 @@ public class TdPriceListItemService {
 		}
 	}
 	
-	List<TdPriceListItem> findByListHeaderIdAndInventoryItemIdAndStartDateActiveAndEndDateActive(Long lIstHearderId,Long inventoryItemId,Date start,Date end)
+	public List<TdPriceListItem> findByListHeaderIdAndInventoryItemIdAndStartDateActiveAndEndDateActive(Long lIstHearderId,Long inventoryItemId,Date start,Date end)
 	{
 		if(null == lIstHearderId || null == inventoryItemId || null == start)
 		{
@@ -179,6 +179,19 @@ public class TdPriceListItemService {
 										lIstHearderId, inventoryItemId, start,
 										lIstHearderId, inventoryItemId, start, end,
 										lIstHearderId,inventoryItemId);
+	}
+	
+	public List<TdPriceListItem> findValidItemByPriceListHeaderIdAndGoodsCode(Long priceListHeaderId,String goodsCode)
+	{
+		if (priceListHeaderId == null || goodsCode == null)
+		{
+			return null;
+		}
+		Date currentDate = new Date();
+		return repository.findByPriceListIdAndItemNumAndStartDateActiveBeforeAndEndDateActiveIsNullOrPriceListIdAndItemNumAndStartDateActiveBeforeAndEndDateActiveAfterOrPriceListIdAndItemNumAndStartDateActiveIsNull(
+				 priceListHeaderId, goodsCode, currentDate,
+				 priceListHeaderId, goodsCode, currentDate, currentDate,
+				 priceListHeaderId, goodsCode);
 	}
 	
 	/**

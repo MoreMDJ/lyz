@@ -1665,7 +1665,7 @@ public class TdPriceCountService {
 				for (TdOrderGoods goods : returnGoodsList) {
 					if (null != goods && null != goods.getGoodsId() && null != goods.getQuantity()
 							&& null != goods.getPrice()) {
-						params += goods.getGoodsId() + "-" + goods.getQuantity() + "-" + goods.getPrice() + ",";
+						params += goods.getGoodsId() + "-" + goods.getQuantity() + "-" + goods.getReturnUnitPrice() + ",";
 					}
 				}
 			}
@@ -1913,40 +1913,41 @@ public class TdPriceCountService {
 										} else {
 											cashPrice = cashTotal;
 										}
-
-										TdCoupon cashCoupon = new TdCoupon();
-										cashCoupon.setTypeId(3L);
-										cashCoupon.setTypeCategoryId(1L);
-										if (null != goods) {
-											cashCoupon.setBrandId(goods.getBrandId());
-											cashCoupon.setBrandTitle(goods.getBrandTitle());
+										if(cashPrice > 0)
+										{
+											TdCoupon cashCoupon = new TdCoupon();
+											cashCoupon.setTypeId(3L);
+											cashCoupon.setTypeCategoryId(1L);
+											if (null != goods) {
+												cashCoupon.setBrandId(goods.getBrandId());
+												cashCoupon.setBrandTitle(goods.getBrandTitle());
+											}
+											cashCoupon.setPicUri(goods.getCoverImageUri());
+											cashCoupon.setGoodsName(goods.getTitle());
+											cashCoupon.setPrice(cashPrice);
+											cashCoupon.setTypeTitle("退货返还的优惠券");
+											cashCoupon.setGetNumber(1L);
+											if (null != city) {
+												cashCoupon.setCityName(city.getCityName());
+												cashCoupon.setCityId(city.getId());
+											}
+											cashCoupon.setAddTime(new Date());
+											cashCoupon.setIsDistributted(true);
+											cashCoupon.setGetTime(new Date());
+											cashCoupon.setExpireTime(endTime);
+											cashCoupon.setUsername(order.getUsername());
+											cashCoupon.setIsUsed(false);
+											cashCoupon.setIsOutDate(false);
+											cashCoupon.setMobile(order.getUsername());
+											// add MDJ
+											cashCoupon.setOrderId(order.getId());
+											cashCoupon.setOrderNumber(order.getOrderNumber());
+											// add end
+											// tdCouponService.save(cashCoupon);
+											returnCouponList.add(cashCoupon);
+											total -= cashPrice;
+											result.put("cashTotal", cashTotal - cashPrice);
 										}
-										cashCoupon.setPicUri(goods.getCoverImageUri());
-										cashCoupon.setGoodsName(goods.getTitle());
-										cashCoupon.setPrice(cashPrice);
-										cashCoupon.setTypeTitle("退货返还的优惠券");
-										cashCoupon.setGetNumber(1L);
-										if (null != city) {
-											cashCoupon.setCityName(city.getCityName());
-											cashCoupon.setCityId(city.getId());
-										}
-										cashCoupon.setAddTime(new Date());
-										cashCoupon.setIsDistributted(true);
-										cashCoupon.setGetTime(new Date());
-										cashCoupon.setExpireTime(endTime);
-										cashCoupon.setUsername(order.getUsername());
-										cashCoupon.setIsUsed(false);
-										cashCoupon.setIsOutDate(false);
-										cashCoupon.setMobile(order.getUsername());
-										// add MDJ
-										cashCoupon.setOrderId(order.getId());
-										cashCoupon.setOrderNumber(order.getOrderNumber());
-										// add end
-										// tdCouponService.save(cashCoupon);
-										returnCouponList.add(cashCoupon);
-										total -= cashPrice;
-										result.put("cashTotal", cashTotal - cashPrice);
-
 									}
 								}
 								// 如果还有金额没有退还，再退还不可提现余额
@@ -1967,10 +1968,10 @@ public class TdPriceCountService {
 									}
 
 									// 判断是否剩余部分金额需要退还
-									BigDecimal bd = new BigDecimal(uncashBalance);
-									uncashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+//									BigDecimal bd = new BigDecimal(uncashBalance);
+//									uncashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 									returnBalance += uncashBalance;
-									total -= uncashBalance;
+									total -= uncashBalance; 
 									unCashBalanceUsed -= uncashBalance;
 								}
 
@@ -1989,8 +1990,8 @@ public class TdPriceCountService {
 									}
 
 									// 开始退还余额
-									BigDecimal bd = new BigDecimal(cashBalance);
-									cashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+//									BigDecimal bd = new BigDecimal(cashBalance);
+//									cashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 									returnBalance += cashBalance;
 									total -= cashBalance;
 									cashBalanceUsed -= cashBalance;
@@ -2122,5 +2123,4 @@ public class TdPriceCountService {
 
 		return resultMap;
 	}
-
 }
