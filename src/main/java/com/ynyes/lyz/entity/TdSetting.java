@@ -1,10 +1,16 @@
 package com.ynyes.lyz.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 
 /**
@@ -145,6 +151,18 @@ public class TdSetting {
     //WebService 接口错误是发送的手机号
     @Column(length = 20)
     private String infPhone;
+    
+    // 开始时间
+ 	@Column
+ 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+ 	@Temporal(TemporalType.TIMESTAMP)
+ 	private Date startDate;
+
+ 	// 结束时间
+ 	@Column
+ 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+ 	@Temporal(TemporalType.TIMESTAMP)
+ 	private Date endDate;
 
     public Long getId() {
         return id;
@@ -408,6 +426,26 @@ public class TdSetting {
 
 	public void setInfPhone(String infPhone) {
 		this.infPhone = infPhone;
+	}
+
+	public Date getStartDate()
+	{
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate)
+	{
+		this.startDate = startDate;
+	}
+
+	public Date getEndDate()
+	{
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate)
+	{
+		this.endDate = endDate;
 	}
 
 	@Override

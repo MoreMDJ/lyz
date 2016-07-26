@@ -320,6 +320,7 @@ public class TdEbsResendController
 	 * 重传退货单
 	 * @param orderNumber 退货单号
 	 */
+	@RequestMapping(value = "/returnOrder")
 	public void resendReturnOrder(String returnNumber)
 	{
 		TdReturnOrderInf returnOrderInf = tdReturnOrderInfService.findByReturnNumber(returnNumber);
@@ -327,7 +328,7 @@ public class TdEbsResendController
 		{
 			return ;
 		}
-		Boolean isSendSuccess = true;
+		Boolean isSendSuccess = false;
 		//退单头
 		String returnOrderInfXml = tdInterfaceService.XmlWithObject(returnOrderInf, INFTYPE.RETURNORDERINF);
 		if (returnOrderInfXml != null)
@@ -336,7 +337,7 @@ public class TdEbsResendController
 			String result = tdInterfaceService.ebsWsInvoke(orderInf);
 			if (StringUtils.isBlank(result))
 			{
-				isSendSuccess = false;
+				isSendSuccess = true;
 				returnOrderInf.setSendFlag(0);
 			}
 			else
@@ -459,6 +460,11 @@ public class TdEbsResendController
 		}
 	}
 	
+	/**
+	 * 重传退货单时间
+	 * @param returnNumber 退货单号
+	 */
+	@RequestMapping(value = "/returnTime")
 	public void resendReturnTime(String returnNumber)
 	{
 		List<TdReturnTimeInf> returnTimeInfs = tdReturnTimeInfService.findByReturnNumber(returnNumber);

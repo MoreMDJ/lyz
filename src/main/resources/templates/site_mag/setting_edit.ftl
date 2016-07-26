@@ -179,10 +179,30 @@ $(function () {
     <dl>
         <dt>接口通知电话</dt>
         <dd>
-            <input name="infPhone" type="text" value="<#if setting??>${setting.infPhone!""}</#if>" class="input normal" datatype="m" sucmsg=" "</input>
-            <span class="Validform_chektip"></span>
+            <input name="infPhone" type="text" value="<#if setting??>${setting.infPhone!""}</#if>" class="input normal" datatype="/^\s*$|^\1\d{10}$/" sucmsg=" "</input>
+            <span class="Validform_chektip">为空代表不发送</span>
         </dd>
     </dl>
+    <dl>
+        <dt>ebs接口传输开始时间</dt>
+            <dd>
+                <div class="input-date">
+                    <input name="startDate" id="beginDate" type="text" value="<#if setting?? && setting.startDate??>${setting.startDate?string("yyyy-MM-dd HH:mm:ss")}</#if>" class="input date" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',lang:'zh-cn'})" datatype="/^\s*$|^\d{4}\-\d{1,2}\-\d{1,2}\s{1}(\d{1,2}:){2}\d{1,2}$/" errormsg="请选择正确的日期" sucmsg=" ">
+                    <i></i>
+                </div>
+                <span class="Validform_checktip">为空代表可传输</span>
+            </dd>
+        </dl>
+        <dl>
+            <dt>ebs接口传输结束时间</dt>
+            <dd>
+                <div class="input-date">
+                    <input name="endDate" id="finishDate" type="text" value="<#if setting?? && setting.endDate??>${setting.endDate?string("yyyy-MM-dd HH:mm:ss")}</#if>" class="input date" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',lang:'zh-cn'})" datatype="/^\s*$|^\d{4}\-\d{1,2}\-\d{1,2}\s{1}(\d{1,2}:){2}\d{1,2}$/" errormsg="请选择正确的日期" sucmsg=" ">
+                    <i>为空代表可传输</i>
+                </div>
+                <span class="Validform_checktip">为空代表可传输</span>
+            </dd>
+        </dl>
     <dl>
         <dt>客服电话</dt>
         <dd>

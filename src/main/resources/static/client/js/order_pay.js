@@ -86,6 +86,7 @@ function pay() {
 		},
 		success : function(res) {
 			if (-1 == res.status) {
+				close(1);
 				warning(res.message);
 				return;
 			}
@@ -94,6 +95,7 @@ function pay() {
 				return;
 			}
 			if (3 == res.status) {
+				close(1);
 				if ("支付宝" == res.title) {
 					window.location.href = "/pay/alipay?number=" + res.order_number
 							+ "&type=0";

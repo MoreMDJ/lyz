@@ -1648,6 +1648,10 @@ public class TdInterfaceService {
 	 */
 	public String ebsWsInvoke(Object[] params)
 	{
+		if(!this.canSend())
+		{
+			return "后台设置了时间限制传送";
+		}
 		String result = new String();
 		try
 		{
@@ -1711,7 +1715,7 @@ public class TdInterfaceService {
 			e.printStackTrace();
 		}
 		TdSetting tdSetting = tdSettingService.findTopBy();
-		if (tdSetting == null || tdSetting.getInfPhone() == null || "".equalsIgnoreCase(tdSetting.getInfPhone()))
+		if (tdSetting == null || StringUtils.isBlank(tdSetting.getInfPhone()))
 		{
 			return ;
 		}
@@ -1769,6 +1773,34 @@ public class TdInterfaceService {
 			e.printStackTrace();
 		}
 	}
-	
+	/**        ----------------- EBS接口是否传送 --------------------      **/
+	private Boolean canSend()
+	{
+		Date nowDate = new Date();
+		TdSetting tdSetting = tdSettingService.findTopBy();
+		if (tdSetting == null )
+		{
+			return true;
+		}
+		if (tdSetting.getStartDate() == null)
+		{
+			return true;
+		}
+		else if (tdSetting.getStartDate().getTime() > nowDate.getTime())
+		{
+			return false;
+		}
+		
+		if (tdSetting.getEndDate() == null)
+		{
+			return true;
+		}
+		else if (tdSetting.getEndDate().getTime() < nowDate.getTime())
+		{
+			return false;
+		}
+		
+		return true;
+	}
 
 }
