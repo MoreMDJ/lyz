@@ -1215,7 +1215,6 @@ public class TdPriceCountService {
 												cashCoupon.setBrandTitle(goods.getBrandTitle());
 											}
 											cashCoupon.setPicUri(goods.getCoverImageUri());
-											cashCoupon.setGoodsName(goods.getTitle());
 											BigDecimal bd = new BigDecimal(cashPrice);
 											cashPrice = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
 											cashCoupon.setPrice(cashPrice);
