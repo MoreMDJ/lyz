@@ -871,12 +871,21 @@ public class TdUserController {
 	 */
 	@RequestMapping(value = "/address/{type}")
 	public String userAddressAdd(HttpServletRequest req, ModelMap map, @PathVariable Long type, Long id,
-			String receiver, String receiverMobile, String detailAddress, String returnPage) {
+			String receiver, String receiverMobile, String detailAddress, String returnPage,Long realUserId) {
 		// 判断用户是否登陆
 		String username = (String) req.getSession().getAttribute("username");
 		TdUser user = tdUserService.findByUsernameAndIsEnableTrue(username);
 		if (null == user) {
 			return "redirect:/login";
+		}
+		if (null != returnPage && "1".equals(returnPage)) {
+			req.getSession().setAttribute("returnPage", "1");
+		} else {
+			req.getSession().setAttribute("returnPage", "0");
+		}
+		if(realUserId != null)
+		{
+			map.addAttribute("realUserId", realUserId);
 		}
 
 		// type的值代表了当前进行的操作：1. type==0代表进行的是增加收货地址的操作；2. type==1代表进行的是修改收货地址的操作
@@ -899,11 +908,6 @@ public class TdUserController {
 			// 设置行政街道
 			req.getSession().setAttribute("new_subdistrict", address.getSubdistrict());
 			req.getSession().setAttribute("new_subdistrict_id", address.getSubdistrictId());
-		}
-		if (null != returnPage && "1".equals(returnPage)) {
-			req.getSession().setAttribute("returnPage", "1");
-		} else {
-			req.getSession().setAttribute("returnPage", "0");
 		}
 		map.addAttribute("city", user.getCityName());
 		map.addAttribute("operation", type);
@@ -973,13 +977,22 @@ public class TdUserController {
 	@RequestMapping(value = "/address/add/save")
 	@ResponseBody
 	public Map<String, Object> userAddressAddSave(HttpServletRequest req, String receiver, String receiverMobile,
-			String detailAddress, Long operation, Long addressId) {
+			String detailAddress, Long operation, Long addressId ,Long realUserId) {
 		Map<String, Object> res = new HashMap<>();
 		res.put("status", -1);
 
 		// 判断用户是否登陆
 		String username = (String) req.getSession().getAttribute("username");
 		TdUser user = tdUserService.findByUsernameAndIsEnableTrue(username);
+		if (null == user) {
+			res.put("status", -2);
+			return res;
+		}
+		if (realUserId != null)
+		{
+			user = tdUserService.findOne(realUserId);
+		}
+		
 		if (null == user) {
 			res.put("status", -2);
 			return res;

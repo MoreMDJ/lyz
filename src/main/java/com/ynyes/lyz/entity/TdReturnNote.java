@@ -84,7 +84,7 @@ public class TdReturnNote {
 	private Date orderTime;
 
 
-	// 从门店取到货的时间
+	// 配送员从门店取到货的时间
 	@Column
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date recvTime;
@@ -109,7 +109,7 @@ public class TdReturnNote {
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date sendWmsTime;
 
-	// 配送员确认收货时间
+	// 配送员或者门店确认收货时间
 	@Column
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date receiveTime;
