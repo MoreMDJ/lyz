@@ -395,14 +395,14 @@ public class TdManagerGoodsController extends TdManagerBaseController{
 		for (TdCity tdCity : cityList)
 		{
 			List<TdGoods> goods = tdGoodsService.findBySobId(tdCity.getSobIdCity());
-			this.setInventoryByCity(tdCity, 0,goods,defualtInventory,sum);
+			sum = this.setInventoryByCity(tdCity, 0,goods,defualtInventory,sum);
 			List<TdDiySite> diySites = tdDiySiteService.findByCityId(tdCity.getId());
 			for (TdDiySite tdDiySite : diySites)
 			{
-				setInventoryByDiySite(tdDiySite,page,goods,defualtInventory,sum);
+				sum = setInventoryByDiySite(tdDiySite,page,goods,defualtInventory,sum);
 			}
 		}
-		res="本次运行一共添加库存商品"+sum+"件";
+		res="本次运行一共添加库存记录"+sum+"条";
 		map.put("res", res);
 		return map;
 	}

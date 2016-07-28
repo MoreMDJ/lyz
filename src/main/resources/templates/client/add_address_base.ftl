@@ -75,5 +75,6 @@
         <input type="hidden" id="user_city" value="${city!''}">
         <input type="hidden" id="operation_type" value="${operation!''}">
         <input type="hidden" id="address_id" value="<#if addressId??>${addressId?c}</#if>">
+        <input type="hidden" id="realUserId" value="<#if realUserId??>${realUserId?c}</#if>">
     </body>
 </html>

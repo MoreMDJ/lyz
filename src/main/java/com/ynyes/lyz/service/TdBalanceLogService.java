@@ -93,7 +93,8 @@ public class TdBalanceLogService {
 	 */
 	public Page<TdBalanceLog> searchList(String keywords,List<Long> roleDiyIds,Long type, int page, int size,Long cityCode,Long diyCode,String startTime,
 			String endTime){
-		PageRequest pageRequest = new PageRequest(page, size);
+		Sort sort = new Sort(Sort.Direction.DESC, "createTime").and(new Sort(Sort.Direction.DESC, "id"));
+		PageRequest pageRequest = new PageRequest(page, size,sort);
 		Criteria<TdBalanceLog> c = new Criteria<TdBalanceLog>();
 		//用户名
 		if (StringUtils.isNotBlank(keywords)) {

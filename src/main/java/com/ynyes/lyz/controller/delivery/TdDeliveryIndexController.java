@@ -519,9 +519,11 @@ public class TdDeliveryIndexController {
 			res.put("message", "退货单状态错误");
 			return res;
 		}
-
+		
+		Date current = new Date();
 		returnNote.setStatusId(4L);
-		returnNote.setRecvTime(new Date());
+		returnNote.setRecvTime(current);
+		returnNote.setReceiveTime(current);
 		
 		returnNote = tdReturnNoteService.save(returnNote);
 		

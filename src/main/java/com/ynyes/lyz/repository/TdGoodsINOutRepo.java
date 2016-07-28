@@ -36,7 +36,7 @@ public interface TdGoodsINOutRepo extends PagingAndSortingRepository<TdGoodsInOu
 	 * @return
 	 */
 	@Query(value = "select og.id id,o.diy_site_name diy_site_name,o.main_order_number main_order_number,o.order_number order_number,o.order_time order_time, "
-			+ "di.begin_dt sales_time,o.status_id status_id,su.real_name seller_real_name,u.real_name real_name,IFNULL(o.real_user_username,o.username) "
+			+ "o.send_time sales_time,o.status_id status_id,su.real_name seller_real_name,u.real_name real_name,IFNULL(o.real_user_username,o.username) "
 			+ " username,og.sku sku,og.goods_title goods_title,og.quantity quantity,og.price price,og.quantity*og.price total_price,o.cash_coupon cash_coupon, "
 			+ "og.brand_title brand_title,ppc.title goods_parent_type_title,pc.title goods_type_title,o.deliver_type_title deliver_type_title,wh.wh_name wh_name, "
 			+ "u1.real_name deliver_real_name,u1.username deliver_username,o.shipping_name shipping_name,o.shipping_phone shipping_phone,o.shipping_address "
@@ -52,8 +52,8 @@ public interface TdGoodsINOutRepo extends PagingAndSortingRepository<TdGoodsInOu
 			+ " left join td_user su on su.id=o.seller_id "
 			+ "  where di.begin_dt>=?1 and di.begin_dt<=?2 and o.status_id not in(1,2,7,8) and o.city like ?3 and o.diy_site_code like ?4 and o.diy_site_id in ?5 "
 			+ "union ALL "
-			+ "select og.id id,o.diy_site_name diy_site_name,rn.return_number main_order_number,rn.order_number order_number,rn.order_time order_time,"
-			+ "rn.receive_time sales_time,o.status_id status_id,o.seller_real_name seller_real_name,u.real_name real_name,rn.username username,og.sku sku,"
+			+ "select og.id id,o.diy_site_name diy_site_name,rn.return_number main_order_number,rn.order_number order_number,rn.order_time order_time, "
+			+ "IFNULL(rn.receive_time,rn.recv_time) sales_time,o.status_id status_id,o.seller_real_name seller_real_name,u.real_name real_name,rn.username username,og.sku sku,"
 			+ "og.goods_title goods_title,-og.quantity quantity,og.price,-og.quantity*og.price total_price,o.cash_coupon cash_coupon,"
 			+ "og.brand_title brand_title,ppc.title  goods_parent_type_title,pc.title  goods_type_title,o.deliver_type_title deliver_type_title,"
 			+ "'' wh_name,u1.real_name deliver_real_name,u1.username deliver_username,o.shipping_name shipping_name,o.shipping_phone shipping_phone,"
@@ -67,7 +67,7 @@ public interface TdGoodsINOutRepo extends PagingAndSortingRepository<TdGoodsInOu
 			+ "left join td_goods g on g.id=og.goods_id "
 			+ "left JOIN td_product_category pc on pc.id=g.category_id "
 			+ "left join td_product_category ppc on ppc.id=pc.parent_id "
-			+ " where rn.receive_time>=?1 and rn.receive_time<=?2 and o.status_id not in(1,2,7,8) and o.city like ?3 and o.diy_site_code like ?4 and o.diy_site_id in ?5 "
+			+ " where ((rn.receive_time >= ?1 AND rn.receive_time <= ?2 ) OR (rn.recv_time >= ?1 AND  rn.recv_time <= ?2 )) and o.status_id not in(1,2,7,8) and o.city like ?3 and o.diy_site_code like ?4 and o.diy_site_id in ?5 "
 			+ "order by sales_time desc;",nativeQuery = true)
 	List<TdGoodsInOut> queryDownList(Date begin,Date end,String cityName,String diySiteCode,List<String> roleDiyIds);
 }

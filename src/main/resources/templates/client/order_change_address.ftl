@@ -37,7 +37,7 @@
                             <div class="div2 c999">${item.detailAddress!''}</div>
                         </div>
                         <div class="editable">
-                        <a class="a2" href="/user/address/1?returnPage=1&id=${item.id?c}">修改</a>
+                        <a class="a2" href="/user/address/1?returnPage=1&id=${item.id?c}&realUserId=${realUserId?c}">修改</a>
                     </div>
                     </dt>
                 </#list>

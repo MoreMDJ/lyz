@@ -133,6 +133,7 @@ function saveAddress() {
 
 	var operation_type = $("#operation_type").val();
 	var addressId = $("#address_id").val();
+	var realUserId = $("#realUserId").val();
 	
 	if(!/^1\d{10}$/.test(receiverMobile)){
 		warning("请输入正确的手机号码");
@@ -162,7 +163,8 @@ function saveAddress() {
 			receiverMobile : receiverMobile,
 			detailAddress : detailAddress,
 			operation : operation_type,
-			addressId : addressId
+			addressId : addressId,
+			realUserId : realUserId
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
 			// 关闭等待图标

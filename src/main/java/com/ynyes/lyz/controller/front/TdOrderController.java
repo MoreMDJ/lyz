@@ -1488,6 +1488,7 @@ public class TdOrderController {
 				address_list.add(0,shipDefault);
 			}
 			map.addAttribute("address_list", address_list);
+			map.addAttribute("realUserId",realUserId);
 		}
 		return "/client/order_change_address";
 	}
@@ -2010,8 +2011,6 @@ public class TdOrderController {
 		TdUser user = tdUserService.findByUsernameAndIsEnableTrue(username);
 
 		if (null != user) {
-			user.getCityId();
-			user.getCustomerId();
 			List<TdUser> user_list = tdUserService
 					.findByCityIdAndCustomerIdAndUserTypeOrderBySortIdAsc(user.getCityId(), user.getCustomerId());
 			map.addAttribute("user_list", user_list);
