@@ -1239,6 +1239,7 @@ public class TdPriceCountService {
 											tdCouponService.save(cashCoupon);
 
 											total -= cashPrice;
+											cashTotal -= cashPrice;
 											result.put("cashTotal", cashTotal - cashPrice);
 										}
 									}
