@@ -2829,6 +2829,7 @@ public class TdUserController {
 											infos.add(cashPrice + "元【通用现金券】*1");
 										}
 										total -= cashPrice;
+										cashTotal -= cashPrice;
 										result.put("cashTotal", cashTotal - cashPrice);
 
 									}
