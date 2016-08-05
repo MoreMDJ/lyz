@@ -5,10 +5,6 @@ public class InterfaceConfigure
 	/*
 	 * 根据不同的服务器注释不同的部分
 	 */
-//	static String wmsUrl = "http://101.200.75.73:8999/WmsInterServer.asmx?wsdl"; // 正式
-	static String wmsUrl = "http://182.92.160.220:8199/WmsInterServer.asmx?wsdl"; // 测试
-	String ebsUrlReal = "http://erpap.zghuarun.com:8008/webservices/SOAProvider/plsql/cux_app_webservice_pkg?wsdl";
-	String ebsUrlTest = "http://erptest.zghuarun.com:8030/webservices/SOAProvider/plsql/cux_app_webservice_pkg/?wsdl";
 	
 	/*-----测试环境 start----*/
 	
@@ -16,39 +12,26 @@ public class InterfaceConfigure
 	/**
 	 * 在测试服务器抛给WMS的WEBSERVICE接口地址
 	 */
-	static String WMS_WS_URL = "http://182.92.160.220:8199/WmsInterServer.asmx?wsdl";
+	public static String WMS_WS_URL = "http://182.92.160.220:8199/WmsInterServer.asmx?wsdl";
 	
 	/**
 	 * 在测试服务器抛给EBS的WEBSERVICE接口地址
 	 */
-	static String EBS_WS_URL = "http://erptest.zghuarun.com:8030/webservices/SOAProvider/plsql/cux_app_webservice_pkg/?wsdl";
+	public static String EBS_WS_URL = "http://erptest.zghuarun.com:8030/webservices/SOAProvider/plsql/cux_app_webservice_pkg/?wsdl";
+	
+	/**
+	 * 在测试环境的微信回调地址
+	 */
+	public static String WX_NOTIFY_RETURN_URL = "http://123.57.32.143:8080/pay/wx_notify";
 	
 	
 	/*-----正式环境 start----*/
 	
-	// 在正式服务器抛给WMS的WEBSERVICE接口地址
-//	static String WMS_WS_URL = "http://101.200.75.73:8999/WmsInterServer.asmx?wsdl";
+//	public static String WMS_WS_URL = "http://101.200.75.73:8999/WmsInterServer.asmx?wsdl";
+//	
+//	public static String EBS_WS_URL = "http://erpap.zghuarun.com:8008/webservices/SOAProvider/plsql/cux_app_webservice_pkg/?wsdl";
+//	
+//	public static String WX_NOTIFY_RETURN_URL = "http://101.200.128.65:8080/pay/wx_notify";
 	
-	// 在正式服务器抛给EBS的WEBSERVICE接口地址
-//	static String EBS_WS_URL = "http://erpap.zghuarun.com:8008/webservices/SOAProvider/plsql/cux_app_webservice_pkg/?wsdl";
-
-
-	/**
-	 * 抛给WMS的WEBSERVICE接口地址
-	 * @return WMS_WS_URL
-	 */
-	public static String getWMS_WS_URL() {
-		return WMS_WS_URL;
-	}
-
-	/**
-	 * 抛给EBS的WEBSERVICE接口地址
-	 * @return EBS_WS_URL
-	 */
-	public static String getEBS_WS_URL() {
-		return EBS_WS_URL;
-	}
-	
-	
-	/*-----测试环境   end----*/
+	/*-----正式环境    end----*/
 }

@@ -8,16 +8,50 @@ public class MainTest {
 	
 //	@Autowired
 //	TdOrderService tdOrderService;
-	
+//	 private static final int MAX_GENERATE_COUNT = 99999;
+     private static int generateCount = 0;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		try {
-			String newStr = getNumberStr("TTR");
+			String str = "afsdfafewaa";
+			str.replace("_fd_", "123");
+			System.err.println(str);
+			String newStr = getUniqueString();
 			System.err.println("test -----:"+newStr);
+	        
+	       
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println(e.getMessage());
 		}
+	}
+	
+	
+	private static synchronized String getUniqueString()
+	{
+		if(generateCount > 99999)
+			generateCount = 0;
+		String uniqueNumber = Long.toString(System.currentTimeMillis()) + Integer.toString(generateCount);
+		generateCount++;
+		return uniqueNumber;
+	}
+
+
+	public static String getUniqueNoWithHeader(String headStr)
+	{
+		if (headStr == null)
+		{
+			headStr = "";
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+		Date now = new Date();
+		String sDate = sdf.format(now);
+		Random random = new Random();
+		Integer suiji = random.nextInt(900) + 100;
+		sDate = sDate.substring(1);
+		String orderNum = sDate + suiji;
+		Long long1 = Long.parseLong(orderNum);
+		return orderNum;
 	}
 	
 	public static String XMLEncNA(String s) {

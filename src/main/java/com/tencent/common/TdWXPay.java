@@ -25,10 +25,11 @@ import org.dom4j.io.XMLWriter;
 import org.springframework.ui.ModelMap;
 
 import com.ynyes.lyz.entity.TdOrder;
+import com.ynyes.lyz.interfaces.utils.InterfaceConfigure;
 
 public class TdWXPay {
 	
-	private static String notify_url_str = "http://www.leyizhuang.com.cn/pay/wx_notify";
+	private static String notify_url_str = InterfaceConfigure.WX_NOTIFY_RETURN_URL;
 	
 	private static String trade_type_str = "APP";
 	
@@ -240,10 +241,10 @@ public class TdWXPay {
 	 * @throws IOException
 	 * @throws DocumentException
 	 */
-	public static Map<String, String> parseXml(HttpServletRequest request) throws IOException, DocumentException
+	public static Map<String, Object> parseXml(HttpServletRequest request) throws IOException, DocumentException
 	{
 		// 将解析结果存储在HashMap中
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, Object> map = new HashMap<String, Object>();
   
         // 从request中取得输入流
         InputStream inputStream = request.getInputStream();

@@ -164,7 +164,7 @@ public class TdInterfaceService {
 			QName EBSQName = new QName("http://xmlns.oracle.com/apps/cux/soaprovider/plsql/cux_app_webservice_pkg/get_xml/", "GET_XML");
 			call.setOperationName(EBSQName);
 			call.setEncodingStyle("UTF-8");
-			call.setTargetEndpointAddress(InterfaceConfigure.getEBS_WS_URL());
+			call.setTargetEndpointAddress(InterfaceConfigure.EBS_WS_URL);
 			call.setReturnType(XMLType.XSD_STRING);
 			call.addHeader(soapHeaderElement);
 			QName TableQName = new QName("STRTABLE");
@@ -312,6 +312,7 @@ public class TdInterfaceService {
 		}
 		
 //		orderInf.setHeaderId(tdOrder.getId());
+		String payTypeTitle = tdOrder.getPayTypeTitle();
 		orderInf.setSobId(SobId);
 		orderInf.setOrderNumber(tdOrder.getOrderNumber());
 		orderInf.setOrderDate(tdOrder.getOrderTime());
@@ -332,11 +333,10 @@ public class TdInterfaceService {
 		orderInf.setShippingPhone(tdOrder.getShippingPhone());
 		orderInf.setDeliverTypeTitle(tdOrder.getDeliverTypeTitle());
 		orderInf.setIsonlinepay(booleanStrByPayTypeId(tdOrder.getPayTypeId()));
-		orderInf.setPayType(tdOrder.getPayTypeTitle());
+		orderInf.setPayType(("微信支付".equalsIgnoreCase(payTypeTitle)? "微信":payTypeTitle));
 		orderInf.setPayDate(tdOrder.getPayTime());
 		orderInf.setPayAmt(booleanByStr(orderInf.getIsonlinepay())?tdOrder.getTotalPrice():0);
 		orderInf.setPrepayAmt(tdOrder.getCashBalanceUsed() + tdOrder.getUnCashBalanceUsed());
-		String payTypeTitle = tdOrder.getPayTypeTitle();
 		if ("支付宝".equalsIgnoreCase(payTypeTitle) || "银行卡".equalsIgnoreCase(payTypeTitle) || "微信支付".equalsIgnoreCase(payTypeTitle) )
 		{
 			orderInf.setRecAmt(0.0);
@@ -345,6 +345,7 @@ public class TdInterfaceService {
 		{
 			orderInf.setRecAmt(tdOrder.getTotalPrice());
 		}
+		
 		tdOrderInfService.save(orderInf);
 		
 		

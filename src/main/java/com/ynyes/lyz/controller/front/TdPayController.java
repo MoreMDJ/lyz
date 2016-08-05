@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alipay.config.AlipayConfig;
 import com.alipay.util.AlipayNotify;
 import com.alipay.util.AlipaySubmit;
+import com.tencent.common.Signature;
 import com.tencent.common.TdWXPay;
 import com.ynyes.lyz.entity.TdBalanceLog;
 import com.ynyes.lyz.entity.TdCoupon;
@@ -793,13 +794,206 @@ public class TdPayController {
 	}
 
 	@RequestMapping(value = "/wx_notify")
-	public void wxPayNotify(HttpServletResponse response, HttpServletRequest request) throws IOException, Exception {
-		Map<String, String> map = TdWXPay.parseXml(request);
-		String return_code = map.get("return_code");
-		if (return_code != null && return_code.contains("SUCCESS")) {
-			String out_trade_no = map.get("out_trade_no");
-			System.out.println(out_trade_no);
+	public void wxPayNotify(HttpServletResponse response, HttpServletRequest request,HttpServletRequest req) throws IOException, Exception {
+		String username = (String) req.getSession().getAttribute("username");
+		Map<String, Object> map = TdWXPay.parseXml(request);
+		//		Map<String, Object> map = new HashMap<>();
+		//		map.put("is_subscribe", "N");
+		//		map.put("appid", "wxe9bbe828a4573b95");
+		//		map.put("fee_type", "CNY");
+		//		map.put("nonce_str", "gz2c4wfxwsr4xbvi29hhizqzz24w4vxa");
+		//		map.put("out_trade_no", "XN20160803235532616232");
+		//		map.put("device_info", "APP");
+		//		map.put("transaction_id", "4009372001201608030506210998");
+		//		map.put("trade_type", "APP");
+		//		map.put("sign", "352CA1B86C62823D825EC3F0C4C291F6");
+		//		map.put("result_code", "SUCCESS");
+		//		map.put("mch_id", "1323382001");
+		//		map.put("total_fee", "1");
+		//		map.put("time_end", "20160803235554");
+		//		map.put("openid", "ovuB1s-fS8yuY5KQyGOi8LUF329w");
+		//		map.put("bank_type", "CFT");
+		//		map.put("return_code", "SUCCESS");
+		//		map.put("cash_fee", "1");
+
+		System.err.println("wx_notify -------------->" + map);
+
+		if (!wxNotifyCheak(map))
+			return ;
+
+		Double PAYMENT = Double.parseDouble((String)map.get("total_fee")) / 100;
+		String out_trade_no = (String)map.get("out_trade_no");
+		System.out.println(out_trade_no);
+		TdOrder order = tdOrderService.findByOrderNumber(out_trade_no);
+		if (null == username) {
+			username = order.getUsername();
+			req.getSession().setAttribute("username", username);
 		}
+		if (out_trade_no.contains("CZ")) {
+			// 如果是充值的情况下
+			TdRecharge recharge = tdRechargeService.findByNumber(out_trade_no);
+			if (null != recharge && null != recharge.getStatusId()
+					&& 1L == recharge.getStatusId().longValue()) {
+				recharge.setStatusId(2L);
+				TdUser user = tdUserService.findOne(recharge.getUserId());
+				Double cashBalance = user.getCashBalance();
+				if (null == cashBalance) {
+					cashBalance = 0.00;
+				}
+				Double balance = user.getBalance();
+				if (null == balance) {
+					balance = 0.00;
+				}
+
+				recharge.setFinishTime(new Date());
+				user.setCashBalance(cashBalance + recharge.getTotalPrice());
+				user.setBalance(balance + recharge.getTotalPrice());
+				tdUserService.save(user);
+				tdRechargeService.save(recharge);
+				this.saveCashReceiptAndSendToEBS(recharge,user);
+
+				TdBalanceLog log = new TdBalanceLog();
+				log.setUserId(user.getId());
+				log.setUsername(user.getUsername());
+				log.setMoney(recharge.getTotalPrice());
+				log.setType(0L);
+				log.setBalanceType(1L);
+				log.setCreateTime(new Date());
+				log.setFinishTime(new Date());
+				log.setIsSuccess(true);
+				log.setReason("微信充值");
+				log.setBalance(user.getCashBalance());
+				log.setOrderNumber(out_trade_no);
+				log.setDiySiteId(user.getUpperDiySiteId());
+				log.setCityId(user.getCityId());
+				tdBalanceLogService.save(log);
+			}
+		} 
+		else
+		{
+			if(null != order && order.getStatusId() == 2L) {
+				Double totalPrice = order.getTotalPrice();
+				// 在支付金额和实际金额相匹配的情况下再进行业务逻辑的处理
+				if (null != totalPrice && totalPrice.equals(PAYMENT)) {
+					if (order.getStatusId().longValue() == 2L) {
+						req.getSession().setAttribute("order_temp", order);
+						order.setOtherPay(PAYMENT);
+						Long id = order.getRealUserId();
+						TdUser realUser = tdUserService.findOne(id);
+						String cashCouponId = order.getCashCouponId();
+						String productCouponId = order.getProductCouponId();
+						// 将所使用的优惠券设置为已使用状态
+						if (null != cashCouponId) {
+							String[] cashs = cashCouponId.split(",");
+							if (null != cashs) {
+								for (String sId : cashs) {
+									if (null != sId && !"".equals(sId)) {
+										Long coupon_id = Long.valueOf(sId);
+										TdCoupon coupon = tdCouponService.findOne(coupon_id);
+										if (null != coupon) {
+											coupon.setIsUsed(true);
+											coupon.setUseTime(new Date());
+											coupon.setOrderNumber(order.getOrderNumber());
+
+											coupon.setUseDiySiteCode(order.getDiySiteCode());
+											coupon.setUseDiySiteId(order.getDiySiteId());
+											coupon.setUseDiySiteTitle(order.getDiySiteName());
+
+											tdCouponService.save(coupon);
+										}
+									}
+								}
+							}
+						}
+
+						if (null != productCouponId) {
+							String[] products = productCouponId.split(",");
+							if (null != products) {
+								for (String sId : products) {
+									if (null != sId && !"".equals(sId)) {
+										Long coupon_id = Long.valueOf(sId);
+										TdCoupon coupon = tdCouponService.findOne(coupon_id);
+										if (null != coupon) {
+											coupon.setIsUsed(true);
+											coupon.setUseTime(new Date());
+											coupon.setOrderNumber(order.getOrderNumber());
+
+											coupon.setUseDiySiteCode(order.getDiySiteCode());
+											coupon.setUseDiySiteId(order.getDiySiteId());
+											coupon.setUseDiySiteTitle(order.getDiySiteName());
+
+											tdCouponService.save(coupon);
+										}
+									}
+								}
+							}
+						}
+						// 获取用户的不可体现余额
+						Double unCashBalance = realUser.getUnCashBalance();
+						if (null == unCashBalance) {
+							unCashBalance = 0.00;
+						}
+
+						// 获取用户的可提现余额
+						Double cashBalance = realUser.getCashBalance();
+						if (null == cashBalance) {
+							cashBalance = 0.00;
+						}
+
+						Double balance = realUser.getBalance();
+						if (null == balance) {
+							balance = 0.00;
+						}
+						Double actualPay = order.getActualPay();
+						if (actualPay ==null)
+						{
+							actualPay = 0d;
+						}
+
+						// 如果用户的不可提现余额大于或等于订单的预存款使用额，则表示改单用的全部都是不可提现余额
+						if (unCashBalance >= actualPay) {
+							realUser.setUnCashBalance(realUser.getUnCashBalance() - order.getActualPay());
+							order.setUnCashBalanceUsed(order.getActualPay());
+						} else {
+							realUser.setCashBalance(
+									realUser.getCashBalance() + realUser.getUnCashBalance() - order.getActualPay());
+							realUser.setUnCashBalance(0.0);
+							order.setUnCashBalanceUsed(realUser.getUnCashBalance());
+							order.setCashBalanceUsed(order.getActualPay() - realUser.getUnCashBalance());
+						}
+						realUser.setBalance(realUser.getBalance() - order.getActualPay());
+						tdUserService.save(realUser);
+						if (out_trade_no.contains("XN")) {
+							tdCommonService.dismantleOrder(req, username);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public Boolean wxNotifyCheak(Map<String, Object> map)
+	{
+		String sign = (String)map.get("sign");
+		String result_code = (String)map.get("result_code");
+		String return_code = (String)map.get("return_code");
+		String out_trade_no = (String)map.get("out_trade_no");
+		String total_fee = (String)map.get("total_fee");
+		if (result_code == null || !result_code.equalsIgnoreCase("SUCCESS"))
+		{
+			return false;
+		}
+		if (return_code == null || !return_code.equalsIgnoreCase("SUCCESS"))
+		{
+			return false;
+		}
+		if (sign == null ||out_trade_no == null || total_fee == null)
+		{
+			return false;
+		}
+		map.remove("sign");
+		String comfrimSign = Signature.getSign(map);
+		return sign.equalsIgnoreCase(comfrimSign) ? true : false;
 	}
 	
 	private void saveCashReceiptAndSendToEBS(TdRecharge tdRecharge,TdUser tdUser)

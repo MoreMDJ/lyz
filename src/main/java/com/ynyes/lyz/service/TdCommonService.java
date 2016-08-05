@@ -69,6 +69,7 @@ import com.ynyes.lyz.interfaces.service.TdOrderGoodsInfService;
 import com.ynyes.lyz.interfaces.service.TdOrderInfService;
 import com.ynyes.lyz.interfaces.utils.EnumUtils.INFTYPE;
 import com.ynyes.lyz.interfaces.utils.INFConstants;
+import com.ynyes.lyz.interfaces.utils.InterfaceConfigure;
 import com.ynyes.lyz.interfaces.utils.StringTools;
 import com.ynyes.lyz.util.ClientConstant;
 import com.ynyes.lyz.util.StringUtils;
@@ -76,8 +77,7 @@ import com.ynyes.lyz.util.StringUtils;
 @Service
 public class TdCommonService {
 
-//	 static String wmsUrl = "http://101.200.75.73:8999/WmsInterServer.asmx?wsdl"; // 正式
-	static private String wmsUrl = "http://182.92.160.220:8199/WmsInterServer.asmx?wsdl"; // 测试
+	static private String wmsUrl = InterfaceConfigure.WMS_WS_URL;
 	private JaxWsDynamicClientFactory WMSDcf = JaxWsDynamicClientFactory.newInstance();
 	private org.apache.cxf.endpoint.Client WMSClient = WMSDcf.createClient(wmsUrl);
 	private QName WMSName = new QName("http://tempuri.org/", "GetErpInfo");
