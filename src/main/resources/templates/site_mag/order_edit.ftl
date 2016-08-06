@@ -700,7 +700,7 @@
         <dl>
             <dt>订单号</dt>
             <dd>
-                <span id="spanOrderNumber">${order.orderNumber!""}</span>
+                <span id="spanOrderNumber">${order.orderNumber!""}<#if order.isCoupon??&&order.isCoupon>（券订单）</#if></span>
             </dd>
         </dl>
         <#if order.photo??>

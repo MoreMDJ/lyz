@@ -276,7 +276,7 @@ function downloaddate(type)
                     <input type="hidden" name="listId" id="listId" value="${order.id?c}">
                 </td>
                 <td>
-                    <a href="/Verwalter/order/edit?id=${order.id?c}&statusId=${statusId!'0'}">${order.orderNumber!""}</a></td>
+                    <a href="/Verwalter/order/edit?id=${order.id?c}&statusId=${statusId!'0'}">${order.orderNumber!""}<#if order.isCoupon??&&order.isCoupon>（券订单）</#if></a></td>
                 <#-- 显示订单真正的用户   历史数据没有真实用户 -->
                 <#if order.realUserUsername??>
                 <td>${order.realUserUsername!""}</td>
