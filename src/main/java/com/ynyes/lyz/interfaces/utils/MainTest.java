@@ -50,7 +50,6 @@ public class MainTest {
 		Integer suiji = random.nextInt(900) + 100;
 		sDate = sDate.substring(1);
 		String orderNum = sDate + suiji;
-		Long long1 = Long.parseLong(orderNum);
 		return orderNum;
 	}
 	
