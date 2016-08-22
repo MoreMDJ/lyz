@@ -3342,8 +3342,8 @@ public class TdCommonService {
 		List<TdOrderGoods> presentedList = order.getPresentedList();
 
 		order.setActivitySubPrice(0.00);
-
-		presentedList = new ArrayList<>();
+		if(presentedList == null)
+			presentedList = new ArrayList<>();
 
 		Long giftType = 0L;
 
@@ -3418,7 +3418,7 @@ public class TdCommonService {
 
 			String buyCouponId = order.getBuyCouponId();
 			if (null != buyCouponId && !"".equals(buyCouponId)) {
-				presentedList = new ArrayList<>();
+//				presentedList = new ArrayList<>();
 
 				List<TdOrderGoods> orderGoodsList = order.getOrderGoodsList();
 				if (null != orderGoodsList && orderGoodsList.size() > 0) {
