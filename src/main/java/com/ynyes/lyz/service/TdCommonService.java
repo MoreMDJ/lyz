@@ -2839,8 +2839,8 @@ public class TdCommonService {
 						coupon.setGoodsId(orderGoods.getGoodsId());
 						coupon.setPicUri(orderGoods.getGoodsCoverImageUri());
 						coupon.setGoodsName(orderGoods.getGoodsTitle());
-						coupon.setTypeTitle(orderGoods.getSku() + "产品现金券");
-						coupon.setTypeDescription(orderGoods.getSku() + "产品现金券");
+						coupon.setTypeTitle(orderGoods.getSku() + "产品券");
+						coupon.setTypeDescription(orderGoods.getSku() + "产品券");
 						coupon.setTypePicUri(orderGoods.getGoodsCoverImageUri());
 						coupon.setPrice(orderGoods.getPrice());
 						coupon.setIsDistributted(true);

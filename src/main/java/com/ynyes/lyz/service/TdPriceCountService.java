@@ -664,51 +664,36 @@ public class TdPriceCountService {
 					if (null != sId && !"".equalsIgnoreCase(sId)) {
 						Long id = Long.parseLong(sId);
 						TdCoupon coupon = tdCouponService.findOne(id);
-						if (isProductCashCoupon(coupon))
-						{
+						if (isProductCashCoupon(coupon)) {
 							total -= coupon.getPrice();
 						}
 					}
 				}
 			}
 		}
-		
+
 		Double activitySubPrice = order.getActivitySubPrice();
-		if(null == activitySubPrice){
+		if (null == activitySubPrice) {
 			activitySubPrice = 0.0;
 		}
 		total -= activitySubPrice;
 		return total;
 	}
-	
-	public Boolean isProductCashCoupon(TdCoupon tdCoupon)
-	{
-		if (tdCoupon == null)
-		{
+
+	public Boolean isProductCashCoupon(TdCoupon tdCoupon) {
+		if (tdCoupon == null) {
 			return false;
-		}
-		else if (tdCoupon.getTypeCategoryId() == null)
-		{
+		} else if (tdCoupon.getTypeCategoryId() == null) {
 			return false;
-		}
-		else if (tdCoupon.getTypeCategoryId() != 2)
-		{
+		} else if (tdCoupon.getTypeCategoryId() != 2) {
 			return false;
-		}
-		else if(tdCoupon.getPrice() == null)
-		{
+		} else if (tdCoupon.getPrice() == null) {
 			return false;
-		}
-		else if (tdCoupon.getPrice() <=0 )
-		{
+		} else if (tdCoupon.getPrice() <= 0) {
 			return false;
-		}
-		else if(tdCoupon.getIsBuy() != null && tdCoupon.getIsBuy() == true)
-		{
+		} else if (tdCoupon.getIsBuy() != null && tdCoupon.getIsBuy() == true) {
 			return false;
-		}
-		else
-		{
+		} else {
 			return true;
 		}
 	}
@@ -977,7 +962,7 @@ public class TdPriceCountService {
 			}
 
 			Double all_off_line = posPay + cashPay;
-			
+
 			// 获取一年后的时间（新的券的有效时间）
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(new Date());
@@ -1511,21 +1496,18 @@ public class TdPriceCountService {
 			if (new_return_note.getMoney() > all_off_line) {
 				new_return_note.setMoney(all_off_line);
 			}
-			
+
 			// 2016-07-05修改：持久化总的打款记录，当收款现金为零不持久化
-			if (new_return_note.getMoney() != 0)
-			{
+			if (new_return_note.getMoney() != 0) {
 				tdCashReturnNoteService.save(new_return_note);
 			}
-			if (new_return_note != null)
-			{
+			if (new_return_note != null) {
 				tdCashReturnNotes.add(new_return_note);
 			}
 			// 修改结束
 		}
 		tdUserService.save(user);
-		if (tdCashReturnNotes != null && tdCashReturnNotes.size() > 0)
-		{
+		if (tdCashReturnNotes != null && tdCashReturnNotes.size() > 0) {
 			return tdCashReturnNotes;
 		}
 		return null;
@@ -1544,7 +1526,8 @@ public class TdPriceCountService {
 				for (TdOrderGoods goods : returnGoodsList) {
 					if (null != goods && null != goods.getGoodsId() && null != goods.getQuantity()
 							&& null != goods.getPrice()) {
-						params += goods.getGoodsId() + "-" + goods.getQuantity() + "-" + goods.getReturnUnitPrice() + ",";
+						params += goods.getGoodsId() + "-" + goods.getQuantity() + "-" + goods.getReturnUnitPrice()
+								+ ",";
 					}
 				}
 				return this.returnCashOrCoupon(orderId, params, returnNote.getReturnNumber());
@@ -1665,7 +1648,8 @@ public class TdPriceCountService {
 				for (TdOrderGoods goods : returnGoodsList) {
 					if (null != goods && null != goods.getGoodsId() && null != goods.getQuantity()
 							&& null != goods.getPrice()) {
-						params += goods.getGoodsId() + "-" + goods.getQuantity() + "-" + goods.getReturnUnitPrice() + ",";
+						params += goods.getGoodsId() + "-" + goods.getQuantity() + "-" + goods.getReturnUnitPrice()
+								+ ",";
 					}
 				}
 			}
@@ -1833,7 +1817,8 @@ public class TdPriceCountService {
 								// --------------------修改结束-----------------------
 
 								// 开始退还产品券
-								if (total > 0) {
+								if (total > 0 || (null != result.get("pro" + goodsId)
+										&& (Integer) result.get("pro" + goodsId) > 0)) {
 									if (useProCoupon) {
 										// 查找本产品是否使用了产品券
 										Integer useNumber = (Integer) result.get("pro" + goodsId);
@@ -1913,8 +1898,7 @@ public class TdPriceCountService {
 										} else {
 											cashPrice = cashTotal;
 										}
-										if(cashPrice > 0)
-										{
+										if (cashPrice > 0) {
 											TdCoupon cashCoupon = new TdCoupon();
 											cashCoupon.setTypeId(3L);
 											cashCoupon.setTypeCategoryId(1L);
@@ -1968,10 +1952,12 @@ public class TdPriceCountService {
 									}
 
 									// 判断是否剩余部分金额需要退还
-//									BigDecimal bd = new BigDecimal(uncashBalance);
-//									uncashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+									// BigDecimal bd = new
+									// BigDecimal(uncashBalance);
+									// uncashBalance = bd.setScale(2,
+									// BigDecimal.ROUND_HALF_UP).doubleValue();
 									returnBalance += uncashBalance;
-									total -= uncashBalance; 
+									total -= uncashBalance;
 									unCashBalanceUsed -= uncashBalance;
 								}
 
@@ -1990,8 +1976,10 @@ public class TdPriceCountService {
 									}
 
 									// 开始退还余额
-//									BigDecimal bd = new BigDecimal(cashBalance);
-//									cashBalance = bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+									// BigDecimal bd = new
+									// BigDecimal(cashBalance);
+									// cashBalance = bd.setScale(2,
+									// BigDecimal.ROUND_HALF_UP).doubleValue();
 									returnBalance += cashBalance;
 									total -= cashBalance;
 									cashBalanceUsed -= cashBalance;

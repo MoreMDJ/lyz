@@ -2792,7 +2792,8 @@ public class TdUserController {
 								// --------------------修改结束-----------------------
 
 								// 开始退还产品券
-								if (total > 0) {
+								if (total > 0 || (null != result.get("pro" + goodsId)
+										&& (Integer) result.get("pro" + goodsId) > 0)) {
 									if (useProCoupon) {
 										// 查找本产品是否使用了产品券
 										Integer useNumber = (Integer) result.get("pro" + goodsId);
@@ -3120,7 +3121,8 @@ public class TdUserController {
 								// --------------------修改结束-----------------------
 
 								// 开始退还产品券
-								if (total > 0) {
+								if (total > 0 || (null != result.get("pro" + goodsId)
+										&& (Integer) result.get("pro" + goodsId) > 0)) {
 									if (useProCoupon) {
 										// 查找本产品是否使用了产品券
 										Integer useNumber = (Integer) result.get("pro" + goodsId);
